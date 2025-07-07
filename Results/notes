@@ -1,0 +1,2 @@
+24.06.2025: Attempted FGSM/PGD attack on MNIST which disregards the gradient as a whole and simply sets every border pixel in the image to a high value.
+--> All of a sudden, most if not all images are classified as sevens.

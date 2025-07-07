@@ -1,0 +1,11 @@
+- Get SSH set-up done to connect into the compute cluster for larger tests
+
+- Get Example ImageNet Model and Dataset
+
+- PDG: Make stepsize variable as the algorithm goes along to "zero in" on a solution
+- PDG: do we use the gradient sign or the gradient itself?
+- PGD: decide if the dfeasibility projection step should occur before the rest.
+
+- Get TopoDNN model
+- Get the CMS Dataset used for it
+- Implement numpy memory mapping to not eat as much RAM
