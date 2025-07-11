@@ -1,7 +1,16 @@
-- PDG: Make stepsize variable as the algorithm goes along to "zero in" on a solution
-- PDG: do we use the gradient sign or the gradient itself?
-- PGD: decide if the dfeasibility projection step should occur before the rest.
+Roadmap. Be fast.
 
-- Get TopoDNN model
-- Get the CMS Dataset used for it
-- Implement numpy memory mapping to not eat as much RAM
+Write paper while all steps are ongoing.
+
+Write an extensiev README to maybe make the code in this project retain its uselfulness.
+
+1. Implement model teching script, especially to include TopoDNN.
+    --> Have ALL of them ready and preprocessed before any more steps are taken.
+2. With datasets and helpers having been renamed and shifted around, fix the existing attack scripts.
+3. Attack ImageNet with PGD and RDSA. Also attack CIFAR-10 with all.
+4. Attack TopoDNN with existing methods, ensure reproducibility.
+5. Introduce restrictions.
+    --> For topodnn, find some shit that makes sense that isn't just Energy Conservation.
+    --> Introduce comparable restrictions for attacks on CIFAR-10 and ImageNet to see if their reactions are similar.
+    --> Conclusion: does the same restriction applied to the same task produce comparable results?
+6. Retrain Models. Evaluate Performance.
