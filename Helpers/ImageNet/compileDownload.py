@@ -17,8 +17,7 @@ from Helpers.ImageNet.Preprocessing import preprocess
 
 # The downloaded test set contains - in this case - 1000 sets of 10 images each, in subfolders. The below function does not rely on these numbers, though.
 # We want to compile this into a usable numpy format containing each (preprocessed) image as data and the folder title as the label.
-# The folder titles are just integers, thought each folder has an associated class. This will be important later.
-# --> TODO find/create a list of these class index <-> class description associations?
+# The folder titles are just integers, thought each folder has an associated class. This can be fetched through keras.
 def compileDownload(sourceFolder, resolution, resultDataPath, resultLabelPath):
     subfolders = os.listdir(sourceFolder)
 
@@ -58,9 +57,9 @@ def compileDownload(sourceFolder, resolution, resultDataPath, resultLabelPath):
 
 
 # Specifications for compiling
-sourceFolder = "Datasets/ImageNET/imagenetv2-threshold"
-resolution = (224,224)
-resultDataPath = "Datasets/ImageNET/ImageNETv2_data.npy"
-resultLabelPath = "Datasets/ImageNET/ImageNETv2_target.npy"
+# sourceFolder = "Datasets/ImageNET/imagenetv2-threshold"
+# resolution = (224,224)
+# resultDataPath = "Datasets/ImageNET/ImageNet_v2_data.npy"
+# resultLabelPath = "Datasets/ImageNET/ImageNet_v2_target.npy"
 
-compileDownload(sourceFolder, resolution, resultDataPath, resultLabelPath)
+# compileDownload(sourceFolder, resolution, resultDataPath, resultLabelPath)

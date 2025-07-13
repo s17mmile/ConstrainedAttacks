@@ -12,6 +12,8 @@ import tarfile
 from sklearn.datasets import fetch_openml
 import keras
 
+from ImageNet.compileDownload import compileDownload
+
 print(os.getcwd())
 
 # Choose which datasets to have set up here
@@ -98,6 +100,7 @@ if (get_cifar):
 if (get_imagenet):
     destination = "Datasets/ImageNet/"
     expected_subdir_count = 1000
+    resolution = (224,224)
 
     urls =          [
                     "https://huggingface.co/datasets/vaishaal/ImageNetV2/resolve/main/imagenetv2-threshold0.7.tar.gz?download=true",
@@ -105,60 +108,64 @@ if (get_imagenet):
                     "https://huggingface.co/datasets/vaishaal/ImageNetV2/resolve/main/imagenetv2-top-images.tar.gz?download=true"
                     ]
     
-    archive_paths = [
-                    "Datasets/ImageNet/imagenetv2-threshold.tar.gz",
-                    "Datasets/ImageNet/imagenetv2-matched_frequency.tar.gz",
-                    "Datasets/ImageNet/imagenetv2-top_images.tar.gz"
+    archive_names = [
+                    "imagenetv2-threshold.tar.gz",
+                    "imagenetv2-matched_frequency.tar.gz",
+                    "imagenetv2-top_images.tar.gz"
                     ]
 
-    old_names =     [
+    dir_names =     [
                     "imagenetv2-threshold0.7-format-val",
                     "imagenetv2-matched-frequency-format-val",
                     "imagenetv2-top-images-format-val"
                     ]
     
     
-    new_names =     [
-                    "imagenetv2-threshold",
-                    "imagenetv2-matched_frequency",
-                    "imagenetv2-top_images"
+    array_names =   [
+                    "threshold",
+                    "matched-frequency",
+                    "top-images"
                     ]
 
-    for i in range(len(archive_paths)):
+    for i in range(len(archive_names)):
         print()
 
         url = urls[i]
-        archive_path = archive_paths[i]
-        old_name = old_names[i]
-        new_name = new_names[i]
+        archive_name = archive_names[i]
+        dir_name = dir_names[i]
+        array_name = array_names[i]
 
-        if not os.path.isfile(archive_path):
-            print("ImageNet v2: Fetching archive.")
-            urlretrieve(url, archive_path)
+        if not os.path.isfile(destination+archive_name):
+            print("ImageNet v2: Fetching archive...")
+            urlretrieve(url, destination+archive_name)
             print("ImageNet v2: Complete.")
         else:
             print("ImageNet v2: Archive found locally.")
         
-        if not os.path.isdir(destination+new_name):
-            print("ImageNet v2: Image directory does not exist. Creating.")
-            os.mkdir(destination+new_name)
+        if not os.path.isdir(destination+dir_name):
+            print("ImageNet v2: Image directory does not exist. Creating...")
+            os.mkdir(destination+dir_name)
         else:
             print("ImageNet v2: Image directory exists.")
 
-        if (len(os.listdir(destination+new_name)) != expected_subdir_count):
-            print("ImageNet v2: Image folder has incorrect subdirectory structure. Clearing.")
-            shutil.rmtree(destination+new_name)
+        if (len(os.listdir(destination+dir_name)) != expected_subdir_count):
+            print("ImageNet v2: Image folder has incorrect subdirectory structure. Clearing...")
+            shutil.rmtree(destination+dir_name)
             print("ImageNet v2: Complete.")
         
-            print("ImageNet v2: Extracting Archive.")
-            archive = tarfile.open(archive_path)
+            print("ImageNet v2: Extracting Archive...")
+            archive = tarfile.open(destination+archive_name)
             archive.extractall(destination)
             archive.close()
-            os.chmod(destination+old_name, stat.S_IRWXO)
-            os.rename(destination+old_name, destination+new_name)
             print("ImageNet v2: Complete.")
         else:
             print("ImageNet v2: Image directory subdirectory structure is correct.")
+
+        if not (os.path.isfile(destination+array_name+"_data.npy") and os.path.isfile(destination+array_name+"_target.npy")):
+            print("ImageNet v2: Compiling Dataset into numpy format...")
+            compileDownload(destination+dir_name, resolution, destination+array_name+"_data.npy", destination+array_name+"_target.npy")
+            print("ImageNet v2: Completed.")
+
 
 # Fetch and save the TopoDNN dataset (training, validation and testing)
 print()
