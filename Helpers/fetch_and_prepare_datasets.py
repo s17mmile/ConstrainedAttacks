@@ -10,9 +10,14 @@ import shutil
 from urllib.request import urlretrieve
 import tarfile
 from sklearn.datasets import fetch_openml
+
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ["KERAS_BACKEND"] = "tensorflow"
+
 import keras
 
 from ImageNet.compileDownload import compileDownload
+from TopoDNN.topodnnpreprocessing import topodnn_preprocess
 
 print(os.getcwd())
 
@@ -42,40 +47,31 @@ if (get_mnist):
     else:
         print("MNIST: Fetching Dataset...")
         (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+
+        # Scale data to range [0,1] instead of [0,255]
+        x_train = x_train.astype("float64")/255.0
+        x_test = x_test.astype("float64")/255.0
+
+        # Data format: add extra dimension to make each smaple (28,28,1) instead of (28,28)
+        x_train = np.expand_dims(x_train, -1)
+        x_test = np.expand_dims(x_test, -1)
+
+        # Create one-hot labels
+        target_train = np.zeros((x_train.shape[0], 10)).astype(np.int64)
+        target_train[np.arange(x_train.shape[0]), y_train.flatten()] = 1
+
+        target_test = np.zeros((x_test.shape[0], 10)).astype(np.int64)
+        target_test[np.arange(x_test.shape[0]), y_test.flatten()] = 1
+
         if not trainDataExists:     np.save("Datasets/MNIST/train_data.npy", x_train)
-        if not trainTargetExists:   np.save("Datasets/MNIST/train_target.npy", y_train)
+        if not trainTargetExists:   np.save("Datasets/MNIST/train_target.npy", target_train)
         if not testDataExists:      np.save("Datasets/MNIST/test_data.npy", x_test)
-        if not testTargetExists:    np.save("Datasets/MNIST/test_target.npy", y_test)
+        if not testTargetExists:    np.save("Datasets/MNIST/test_target.npy", target_test)
         print("MNIST: Completed.")
 
 # Fetch, save and extract the CIFAR-10 Dataset.
 # Originally fetched the CIFAR Dataset in batches - this is now commented out as it unnecessarily complex.
 # Keras handily provides the CIFAR-10 Dataset in preprocessed numpy array form. 
-'''
-if (get_cifar):
-    url = "https://www.cs.toronto.edu/%7Ekriz/cifar-10-python.tar.gz"
-    archive_path = "Datasets/CIFAR-10/cifar-10-python.tar.gz"
-
-    destination = "Datasets/CIFAR-10/"
-    folder = "batches"
-
-    if not os.path.isfile(archive_path):
-        print("CIFAR-10: Fetching archive.")
-        urlretrieve(url, archive_path)
-        print("Complete.")
-    
-    if (os.path.isdir(destination+folder)):
-        print("CIFAR-10: Clearing image folder.")
-        shutil.rmtree(destination+folder)
-        print("CIFAR-10: Complete.")
-
-    print("CIFAR-10: Extracting Archive.")
-    archive = tarfile.open(archive_path)
-    archive.extractall(destination)
-    os.rename(destination+"cifar-10-batches-py", destination+folder)
-    archive.close()
-    print("CIFAR-10: Complete.")
-'''
 print()
 if (get_cifar):
     trainDataExists = os.path.isfile("Datasets/CIFAR-10/train_data.npy")
@@ -88,10 +84,26 @@ if (get_cifar):
     else:
         print("CIFAR-10: Fetching Dataset...")
         (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+
+        # Scale data to range [0,1] instead of [0,255]
+        x_train = x_train.astype("float64")/255.0
+        x_test = x_test.astype("float64")/255.0
+
+        # Data format: add extra dimension to make each smaple (28,28,1) instead of (28,28)
+        x_train = np.expand_dims(x_train, -1)
+        x_test = np.expand_dims(x_test, -1)
+
+        # Create one-hot targets
+        target_train = np.zeros((x_train.shape[0], 10)).astype(np.int64)
+        target_train[np.arange(x_train.shape[0]), y_train.flatten()] = 1
+
+        target_test = np.zeros((x_test.shape[0], 10)).astype(np.int64)
+        target_test[np.arange(x_test.shape[0]), y_test.flatten()] = 1
+
         if not trainDataExists:     np.save("Datasets/CIFAR-10/train_data.npy", x_train)
-        if not trainTargetExists:   np.save("Datasets/CIFAR-10/train_target.npy", y_train)
+        if not trainTargetExists:   np.save("Datasets/CIFAR-10/train_target.npy", target_train)
         if not testDataExists:      np.save("Datasets/CIFAR-10/test_data.npy", x_test)
-        if not testTargetExists:    np.save("Datasets/CIFAR-10/test_target.npy", y_test)
+        if not testTargetExists:    np.save("Datasets/CIFAR-10/test_target.npy", target_test)
         print("CIFAR-10: Completed.")
 
 # Fetch, save and extract all three ImageNet v2 testing Datasets.
@@ -172,27 +184,33 @@ print()
 if (get_topodnn):
     destination = "Datasets/TopoDNN/"
     
-    url_test = "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=test.h5"
-    url_train = "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=train.h5"
-    url_validate = "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=val.h5"
+    # Data Fetching
 
-    if (os.path.isfile(destination+"test.h5")):
-        print("TopoDNN: Testing dataset found.")
-    else:
-        print("TopoDNN: Feching testing dataset.")
-        urlretrieve(url_test, destination+"test.h5")
-        print("TopoDNN: Complete.")
+    urls =      [
+                "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=test.h5",
+                "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=train.h5",
+                "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=val.h5"
+                ]
 
-    if (os.path.isfile(destination+"train.h5")):
-        print("TopoDNN: Training dataset found.")
-    else:
-        print("TopoDNN: Feching training dataset.")
-        urlretrieve(url_train, destination+"train.h5")
-        print("TopoDNN: Complete.")
+    names =     ["test", "train", "val"]
 
-    if (os.path.isfile(destination+"val.h5")):
-        print("TopoDNN: Validation dataset found.")
-    else:
-        print("TopoDNN: Feching validation dataset.")
-        urlretrieve(url_validate, destination+"val.h5")
-        print("TopoDNN: Complete.")
+    for i in range(len(urls)):
+        url = urls[i]
+        name = names[i]
+
+        # Fetching, if necessary
+        if (os.path.isfile(destination + name + ".h5")):
+            print("TopoDNN: \"" + name + "\" dataset found.")
+        else:
+            print("TopoDNN: Fetching \"" + name + "\" dataset...")
+            urlretrieve(url, destination + name + ".h5")
+            print("TopoDNN: Complete.")
+
+        # Preprocessing, if necessary
+        if (os.path.isfile(destination + name + "_data.npy") and os.path.isfile(destination + name + "_target.npy")):
+            print("TopoDNN: Preprocessed \"" + name + "\" dataset found.")
+        else:
+            print("TopoDNN: Preprocessing \"" + name + "\" dataset...")
+            topodnn_preprocess(destination + name + ".h5")
+        
+        print()

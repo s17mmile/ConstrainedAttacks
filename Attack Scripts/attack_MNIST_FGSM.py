@@ -21,21 +21,13 @@ from sklearn.model_selection import train_test_split
 # import Helpers.RDSA_Helpers as RDSA_Help
 import Attacks.constrained_FGSM as cFGSM
 
+# Input file paths
+datasetPath = "Datasets/MNIST/train_data.npy"
+labelsPath = "Datasets/MNIST/train_target.npy"
+modelPath = "Models/MNIST/base_model.keras"
 
-
-
-trainTestSplitSeed = 42
-
-evaluateBase = False
-
-dataset_name = "mnist_784"
-dataset_path = "Datasets/MNIST/MNIST784_data.npy"
-labels_path = "Datasets/MNIST/MNIST784_target.npy"
-force_download = False
-save_locally = True
-
-model_path = "Models/MNIST/best_model.keras"
-results_path = "Results/TestBaseModel/"
+# Output file path for fooling success indicators 
+successPath = "Results/MNIST/FGSM_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
@@ -43,44 +35,28 @@ epsilon = 0.1
 n = 100
 workercount = 8
 chunksize = 16
-adversaryFolder = "Datasets/MNIST/"
 
 if __name__ == "__main__":
 
     # Load dataset
-    # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normaized and categorized,
-    if os.path.isfile(dataset_path) and os.path.isfile(labels_path) and not force_download:
+    # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
+    if os.path.isfile(datasetPath) and os.path.isfile(labelsPath):
         print("Found local dataset and labels.")
-        X = np.load(dataset_path, allow_pickle=True)
-        Y = np.load(labels_path, allow_pickle=True)
+        data = np.load(datasetPath, allow_pickle=True)
+        labels = np.load(labelsPath, allow_pickle=True)
     else:
-        print("Did not find dataset. Make sure it is downloaded and properly preprocessed.")
-        # baseDataset = fetch_openml(dataset_name, as_frame = False, parser="liac-arff")
-
-        # # Extract and normalize the examples
-        # X = StandardScaler().fit_transform(baseDataset.data.astype(np.float32))
-        # # Encode the labels as one-hot vectors
-        # Y = to_categorical(baseDataset.target.astype(int))
-
-        # if save_locally:
-        #     print("Saving dataset.")
-        #     np.save(dataset_path, X)
-        #     np.save(labels_path, Y)
-
-    # Perform train-test-split.
-    # We're using a pre-trained model here, which should be trained on the same split to avoid evaluating on training examples 
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=trainTestSplitSeed)
+        print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
+        quit()
 
     # Load pre-trained Model
-    model = keras.models.load_model(model_path)
-
-
+    model = keras.models.load_model(modelPath)
+    model.summary()
 
     # Perform parallel FGSM (on first n testing samples)
     adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
         model = model,
-        dataset = X_test[:n],
-        labels = Y_test[:n],
+        dataset = data[:n],
+        labels = labels[:n],
         lossObject = lossObject,
         epsilon = epsilon,
         constrainer = None,
@@ -90,6 +66,6 @@ if __name__ == "__main__":
 
     print("saving")
 
-    np.save(adversaryFolder + "MNIST784_adv_FGSM_data.npy", adversaries)
-    np.save(adversaryFolder + "MNIST784_adv_FGSM_labels.npy", newLabels)
-    np.save(adversaryFolder + "MNIST784_adv_FGSM_indicators.npy", success)
+    np.save(datasetPath.replace(".npy", "_adv.npy"), adversaries)
+    np.save(labelsPath.replace(".npy", "_adv.npy"), newLabels)
+    np.save(successPath, success)

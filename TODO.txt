@@ -1,13 +1,23 @@
-Roadmap. Be fast.
-
 Write paper while all steps are ongoing.
 
-Write an extensiev README to maybe make the code in this project retain its uselfulness.
+Write an extensive README to maybe make the code in this project retain its uselfulness.
+
+
+Keras previous version: 3.9.2 (newest?)
+Tensorflow previous version: 2.16.1
+
+
+
 
 1. ImageNet and MNIST: Save training and testing data separately.
     --> Decide exactly which data should be augmented. 
     --> I would assume we augment the training data while leaving training data unchanged.
     --> Exception for ImageNet, as I cannot find the training data: use one of the three test sets for augmentation, one for evaluation.
+
+--> YOU ARE HERE
+EXTRA: dataset preprocessing: ensure normalization for MNIST, CIFAR and ImageNet. Should all be float32!
+MEMMAP!
+
 2. With datasets and helpers having been renamed and shifted around, fix the existing attack scripts.
     --> Include Memory Mapping or use numpy archives instead of saving it all ass one big array.
 3. Attack ImageNet with PGD and RDSA. Also attack CIFAR-10 with all.

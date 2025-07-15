@@ -16,10 +16,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import keras
 
-from sklearn.datasets import fetch_openml
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-
 # Local imports
 # import Helpers.RDSA_Helpers as RDSA_Help
 import Attacks.constrained_FGSM as cFGSM
@@ -33,8 +29,6 @@ adversaryFolder = "Datasets/ImageNet/"
 
 # Load pre-trained Model
 model = keras.applications.MobileNetV2(include_top=True, weights='imagenet')
-# model_name = "Models/MNIST/best_model.keras"
-# results_path = "Results/TestBaseModel/"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1

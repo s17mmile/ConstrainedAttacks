@@ -58,22 +58,7 @@ if __name__ == "__main__":
         X = np.load(dataset_path, allow_pickle=True)
         Y = np.load(labels_path, allow_pickle=True)
     else:
-        print("Downloading dataset.")
-        baseDataset = fetch_openml(dataset_name, as_frame = False, parser="liac-arff")
-
-        # Extract and normalize the examples
-        X = StandardScaler().fit_transform(baseDataset.data.astype(np.float32))
-        # Encode the labels as one-hot vectors
-        Y = to_categorical(baseDataset.target.astype(int))
-
-        if save_locally:
-            print("Saving dataset.")
-            np.save(dataset_path, X)
-            np.save(labels_path, Y)
-
-    # Perform train-test-split.
-    # We're using a pre-trained model here, which should be trained on the same split to avoid evaluating on training examples 
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=trainTestSplitSeed)
+        print("Did not find dataset. Make sure it is downloaded and properly preprocessed.")
 
     # Load pre-trained Model
     model = keras.models.load_model(model_path)
