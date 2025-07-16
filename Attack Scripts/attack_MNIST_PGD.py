@@ -14,10 +14,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
 import keras
 
-from sklearn.datasets import fetch_openml
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-
 # Local imports
 # import Helpers.RDSA_Helpers as RDSA_Help
 import Attacks.constrained_PGD as cPGD
