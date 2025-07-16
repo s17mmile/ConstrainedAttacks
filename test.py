@@ -1,16 +1,18 @@
 import numpy as np
 
-test = np.array([[0,0,0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1],[1,0,1,1,1,0,0,1,0,1]])
+def transformIndex(index, shape):
+    assert index >= 0
+    assert index < np.prod(shape)
 
-data, labels = np.hsplit(test, [2])
+    transformedIndex = []
 
-print(data)
-print(labels)
+    remainder = index
 
-labels = labels[0]
+    for dimension in shape:
+        coordinate = remainder % dimension
+        remainder = int(remainder/dimension)
+        transformedIndex.append(coordinate)
 
-event_count = labels.shape[0]
-target = np.zeros((event_count, 2))
-target[np.arange(event_count), labels] = 1
+    return transformedIndex
 
-print(target)
+print(transformIndex(1,(3,28,28)))

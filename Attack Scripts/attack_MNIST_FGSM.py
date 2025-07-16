@@ -10,6 +10,7 @@ sys.path.append(os.getcwd())
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ["KERAS_BACKEND"] = "tensorflow"
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 
 import keras
 
@@ -23,11 +24,13 @@ import Attacks.constrained_FGSM as cFGSM
 
 # Input file paths
 datasetPath = "Datasets/MNIST/train_data.npy"
-labelsPath = "Datasets/MNIST/train_target.npy"
+targetPath = "Datasets/MNIST/train_target.npy"
 modelPath = "Models/MNIST/base_model.keras"
 
 # Output file path for fooling success indicators 
-successPath = "Results/MNIST/FGSM_fooling_success.npy"
+adversaryPath = "Datasets/MNIST/FGSM_train_data.npy"
+newLabelPath = "Datasets/MNIST/FGSM_train_label.npy"
+successPath = "Datasets/MNIST/FGSM_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
@@ -40,10 +43,10 @@ if __name__ == "__main__":
 
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
-    if os.path.isfile(datasetPath) and os.path.isfile(labelsPath):
+    if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
         print("Found local dataset and labels.")
         data = np.load(datasetPath, allow_pickle=True)
-        labels = np.load(labelsPath, allow_pickle=True)
+        labels = np.load(targetPath, allow_pickle=True)
     else:
         print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()
@@ -64,8 +67,10 @@ if __name__ == "__main__":
         chunksize = chunksize
     )
 
-    print("saving")
+    print("Saving adversaries...")
 
-    np.save(datasetPath.replace(".npy", "_adv.npy"), adversaries)
-    np.save(labelsPath.replace(".npy", "_adv.npy"), newLabels)
+    np.save(adversaryPath, adversaries)
+    np.save(newLabelPath, newLabels)
     np.save(successPath, success)
+
+    print("Done.")

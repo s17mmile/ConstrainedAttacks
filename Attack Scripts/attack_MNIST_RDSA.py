@@ -55,8 +55,8 @@ if __name__ == "__main__":
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normaized and categorized,
     if os.path.isfile(dataset_path) and os.path.isfile(labels_path) and not force_download:
         print("Found local dataset and labels.")
-        X = np.load(dataset_path, allow_pickle=True)
-        Y = np.load(labels_path, allow_pickle=True)
+        data= np.load(dataset_path, allow_pickle=True)
+        target = np.load(labels_path, allow_pickle=True)
     else:
         print("Did not find dataset. Make sure it is downloaded and properly preprocessed.")
 
@@ -78,8 +78,8 @@ if __name__ == "__main__":
     # Perform parallel RDSA (on first n testing samples)
     adversaries, newLabels, success = cRDSA.parallel_constrained_RDSA(
         model = model,
-        dataset = X_test[:n],
-        labels = Y_test[:n],
+        dataset = data[:n],
+        labels = target[:n],
         steps = RDSA_attempts,
         perturbationIndexLists = perturbationIndexLists,
         binEdges = binEdges,

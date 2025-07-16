@@ -10,9 +10,7 @@ sys.path.append(os.getcwd())
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ["KERAS_BACKEND"] = "tensorflow"
-
-# Hiding tensorflow performance warning for CPU-specific instruction set extensions
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 
 import keras
 
@@ -39,75 +37,59 @@ def constrainer(example):
     return example
 
 
-trainTestSplitSeed = 42
 
-evaluateBase = False
+# Input file paths
+datasetPath = "Datasets/MNIST/train_data.npy"
+targetPath = "Datasets/MNIST/train_target.npy"
+modelPath = "Models/MNIST/base_model.keras"
 
-dataset_name = "mnist_784"
-dataset_path = "Datasets/MNIST/MNIST784_data.npy"
-labels_path = "Datasets/MNIST/MNIST784_target.npy"
-force_download = False
-save_locally = True
-
-model_path = "Models/MNIST/best_model.keras"
-results_path = "Results/TestBaseModel/"
+# Output file paths
+adversaryPath = "Datasets/MNIST/PGD_train_data.npy"
+newLabelPath = "Datasets/MNIST/PGD_train_label.npy"
+successPath = "Datasets/MNIST/PGD_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
-stepcount = 1
-stepsize = 0
+stepcount = 50
+stepsize = 0.005
 
 n = 100
 workercount = 8
 chunksize = 16
-adversaryFolder = "Datasets/MNIST/"
 
 if __name__ == "__main__":
 
     # Load dataset
-    # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normaized and categorized,
-    if os.path.isfile(dataset_path) and os.path.isfile(labels_path) and not force_download:
+    # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
+    if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
         print("Found local dataset and labels.")
-        X = np.load(dataset_path, allow_pickle=True)
-        Y = np.load(labels_path, allow_pickle=True)
+        data = np.load(datasetPath, allow_pickle=True)
+        target = np.load(targetPath, allow_pickle=True)
     else:
-        print("Downloading dataset.")
-        baseDataset = fetch_openml(dataset_name, as_frame = False, parser="liac-arff")
-
-        # Extract and normalize the examples
-        X = StandardScaler().fit_transform(baseDataset.data.astype(np.float32))
-        # Encode the labels as one-hot vectors
-        Y = to_categorical(baseDataset.target.astype(int))
-
-        if save_locally:
-            print("Saving dataset.")
-            np.save(dataset_path, X)
-            np.save(labels_path, Y)
-
-    # Perform train-test-split.
-    # We're using a pre-trained model here, which should be trained on the same split to avoid evaluating on training examples 
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=trainTestSplitSeed)
+        print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
+        quit()
 
     # Load pre-trained Model
-    model = keras.models.load_model(model_path)
+    model = keras.models.load_model(modelPath)
+    model.summary()
 
-
-
-    # Perform parallel FGSM (on first n testing samples)
+    # Perform parallel PGD (on first n testing samples)
     adversaries, newLabels, success = cPGD.parallel_constrained_PGD(
         model = model,
-        dataset = X_test[:n],
-        labels = Y_test[:n],
+        dataset = data[:n],
+        labels = target[:n],
         lossObject = lossObject,
         stepcount = stepcount,
         stepsize = stepsize,
         feasibilityProjector = feasibilityProjector,
-        constrainer = constrainer,
+        constrainer = None,
         workercount = workercount,
         chunksize = chunksize
     )
 
-    print("saving")
+    print("Saving adversaries...")
 
-    np.save(adversaryFolder + "MNIST784_adv_PGD_data.npy", adversaries)
-    np.save(adversaryFolder + "MNIST784_adv_PGD_labels.npy", newLabels)
-    np.save(adversaryFolder + "MNIST784_adv_PGD_indicators.npy", success)
+    np.save(adversaryPath, adversaries)
+    np.save(newLabelPath, newLabels)
+    np.save(successPath, success)
+
+    print("Done.")
