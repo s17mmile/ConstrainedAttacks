@@ -36,14 +36,14 @@ def constrainer(example):
 
 
 # Input file paths
-datasetPath = "Datasets/MNIST/train_data.npy"
-targetPath = "Datasets/MNIST/train_target.npy"
-modelPath = "Models/MNIST/maxpool_model.keras"
+datasetPath = "Datasets/ImageNet/threshold_data.npy"
+targetPath = "Datasets/ImageNet/threshold_target.npy"
+modelPath = "Models/ImageNet/base_model.keras"
 
 # Output file paths
-adversaryPath = "Datasets/MNIST/FGSM_train_data.npy"
-newLabelPath = "Datasets/MNIST/FGSM_train_labels.npy"
-successPath = "Datasets/MNIST/FGSM_fooling_success.npy"
+adversaryPath = "Datasets/ImageNet/FGSM_threshold_data.npy"
+newLabelPath = "Datasets/ImageNet/FGSM_threshold_labels.npy"
+successPath = "Datasets/ImageNet/FGSM_threshold_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
         print("Found local dataset and labels.")
         data = np.load(datasetPath, allow_pickle=True)
-        target = np.load(targetPath, allow_pickle=True)
+        labels = np.load(targetPath, allow_pickle=True)
     else:
         print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
         model = model,
         dataset = data[:n],
-        labels = target[:n],
+        labels = labels[:n],
         lossObject = lossObject,
         epsilon = epsilon,
         constrainer = constrainer,

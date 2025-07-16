@@ -19,12 +19,11 @@ import keras
 # Local imports
 # import Helpers.RDSA_Helpers as RDSA_Help
 import Attacks.constrained_FGSM as cFGSM
-from Helpers.ImageNet.Visualization import displayImage
 
-trainTestSplitSeed = 42
 
-dataset_path = "Datasets/ImageNet/ImageNetv2_data.npy"
-target_path = "Datasets/ImageNet/ImageNetv2_target.npy"
+
+dataset_path = "Datasets/ImageNet/threshold_data.npy"
+target_path = "Datasets/ImageNet/threshold_target.npy"
 adversaryFolder = "Datasets/ImageNet/"
 
 # Load pre-trained Model
@@ -47,18 +46,12 @@ if __name__ == "__main__":
     # If this has not occured, use the compileDownload() helper function to create it.
     if os.path.isfile(dataset_path) and os.path.isfile(target_path):
         print("Found local dataset and labels.")
-        X = np.load(dataset_path, allow_pickle=True)
-        Y = np.load(target_path, allow_pickle=True)
+        data = np.load(dataset_path, allow_pickle=True)
+        target = np.load(target_path, allow_pickle=True)
     else:
         print("No dataset found. Ensure you have a compiled dataset (use compileDownload() helper) and the path to it is correct.")
         quit()
 
-#     # Perform train-test-split.
-#     # We're using a pre-trained model here, which should be trained on the same split to avoid evaluating on training examples 
-#     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=trainTestSplitSeed)
-
-    print("Y_Shape:", Y.shape)
-    print("X_Shape:", X.shape)
 
     # Perform parallel FGSM (on first n testing samples)
     adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
