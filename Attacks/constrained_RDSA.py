@@ -20,8 +20,8 @@ def constrained_RDSA(model, example, label, steps, perturbationIndices, binEdges
 
         Params:
             model: a pre-trained keras model
-            example: singular model input. Should be a simple 1D numpy array. Pass by value!
-            label: the correct classification label for the given instance --> probability vector (presumably, but not necessarily one-hot!). "Correct" Label is interpreted as the argmax.
+            example: singular model input as a numpy array. Can be multidimensional.
+            label: the correct classification label for the given instance --> probability vector. "Correct" Label is interpreted as the argmax.
             steps: maximum number of shuffling attempts
             perturbationIndices: indices of the variables that should be shuffled.
             binEdges: Array of bin edge vectors (in ascending order) for the variables to be shuffled.
@@ -42,15 +42,16 @@ def constrained_RDSA(model, example, label, steps, perturbationIndices, binEdges
         # Loop over variables to perturb
         for featureIndex in perturbationIndices:
 
-            featureBinEdges = binEdges[featureIndex]
+            featureBinEdges = binEdges[*featureIndex]
+            featureBinProbabilities = binProbabilites[*featureIndex]
 
             # Sample probability distribution to get a bin with given prbabilities
             # Choose a lower bin edge at random from all of the bin edges except the highest one.
-            low_bin_index = np.random.choice(featureBinEdges.shape[0]-1, p = binProbabilites[featureIndex])
+            low_bin_index = np.random.choice(featureBinEdges.shape[0]-1, p = featureBinProbabilities.flatten())
 
             new_value = np.random.uniform(low = featureBinEdges[low_bin_index], high = featureBinEdges[low_bin_index+1])
             
-            adversary[featureIndex] = new_value
+            adversary[*featureIndex] = new_value
 
         # Apply constraint
         if constrainer is not None:

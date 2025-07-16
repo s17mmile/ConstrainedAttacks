@@ -34,9 +34,9 @@ adversaryPath = "Datasets/MNIST/RDSA_train_data.npy"
 newLabelPath = "Datasets/MNIST/RDSA_train_label.npy"
 successPath = "Datasets/MNIST/RDSA_fooling_success.npy"
 
-categoricalFeatureMaximum = 100
+categoricalFeatureMaximum = 200
 binCount = 100
-perturbedFeatureCount = 200
+perturbedFeatureCount = 30
 RDSA_attempts = 100
 
 n = 100
@@ -48,16 +48,17 @@ if __name__ == "__main__":
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
     if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
-        print("Found local dataset and labels.")
+        print("Found local dataset and target.")
         data = np.load(datasetPath, allow_pickle=True)
-        labels = np.load(targetPath, allow_pickle=True)
+        target = np.load(targetPath, allow_pickle=True)
+        print("Data shape: ", data.shape)
+        print("Target Shape: ", target.shape)
     else:
-        print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
+        print("Did not find dataset or target. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()
 
     # Load pre-trained Model
     model = keras.models.load_model(modelPath)
-    model.summary()
 
 
 
@@ -72,16 +73,13 @@ if __name__ == "__main__":
     # Randomly choose a given number of continuous features to be perturbed for the first n examples
     perturbationIndexLists = [random.sample(continuous, perturbedFeatureCount) for i in range(n)]
 
-    # DEBUG
-    quit()
-
-
+    print(perturbationIndexLists[0])
 
     # Perform parallel RDSA (on first n testing samples)
     adversaries, newLabels, success = cRDSA.parallel_constrained_RDSA(
         model = model,
         dataset = data[:n],
-        labels = labels[:n],
+        labels = target[:n],
         steps = RDSA_attempts,
         perturbationIndexLists = perturbationIndexLists,
         binEdges = binEdges,

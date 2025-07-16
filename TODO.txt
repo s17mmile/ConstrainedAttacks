@@ -15,10 +15,10 @@ Tensorflow previous version: 2.16.1
     --> Exception for ImageNet, as I cannot find the training data: use one of the three test sets for augmentation, one for evaluation.
 
 --> YOU ARE HERE
-EXTRA: dataset preprocessing: ensure normalization for MNIST, CIFAR and ImageNet. Should all be float32!
 Memory Mapping
 Move RDSA Prep into parallel_constrained_RDSA function
-Decide: do I flatten all data?
+Test with flattened data
+Fix the damn indexing in the RDSA helpers
 
 2. With datasets and helpers having been renamed and shifted around, fix the existing attack scripts.
     --> Include Memory Mapping or use numpy archives instead of saving it all ass one big array.

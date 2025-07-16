@@ -1,18 +1,9 @@
 import numpy as np
 
-def transformIndex(index, shape):
-    assert index >= 0
-    assert index < np.prod(shape)
+datasetPath = "Datasets/MNIST/train_data.npy"
 
-    transformedIndex = []
+data = data = np.load(datasetPath, allow_pickle=True)
 
-    remainder = index
+tuple = (4,7,0)
 
-    for dimension in shape:
-        coordinate = remainder % dimension
-        remainder = int(remainder/dimension)
-        transformedIndex.append(coordinate)
-
-    return transformedIndex
-
-print(transformIndex(1,(3,28,28)))
+print(len(np.unique(data[:,5,3,0])))

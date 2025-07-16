@@ -11,9 +11,11 @@ from scipy import stats
 
 import tensorflow as tf
 
-
+# DEBUG
+import timeit
 
 # Transform a single index (in the range [0, prod(shape)]) into the corresponding multidimensional index.
+# Ok yeah this works but I just realized it's stupidly slow. I just need to generate a list of all the combinations anyway.
 def transformIndex(index, shape):
     assert index >= 0
     assert index < np.prod(shape)
@@ -27,7 +29,7 @@ def transformIndex(index, shape):
         remainder = int(remainder/dimension)
         transformedIndex.append(coordinate)
 
-    return transformedIndex
+    return tuple(transformedIndex)
 
 
 
@@ -43,19 +45,20 @@ def featureContinuity(data, categoricalLimit):
     # To get proper feature counts - since every single number in the array is a feature (for images: each channel for each pixel) - we cannot just use shape[1] for the featureCount and index like that.
     # Instead, we use a small helper (transformIndex) to transform a single index into a multidimensional one for easy looping.
     exampleShape = data.shape[1:]
-    print("Detected example shape:", exampleShape)
     featureCount = np.prod(exampleShape)
 
+    # Might want to change this since it's inefficient. However, this is a TINY performance improvement relative to other stuff since it only gets called a few times.
     allFeatureIndices = [transformIndex(i,exampleShape) for i in range(featureCount)]
 
-    numUniqueValues = [len(np.unique(data[:][index])) for index in allFeatureIndices]
-
-    print(numUniqueValues)
+    # Using * to unwrap coordinate tuple into indexing arguments.
+    numUniqueValues = [len(np.unique(data[:,*indices])) for indices in allFeatureIndices]
 
     continuousFeatures = [allFeatureIndices[i] for i, unique_count in enumerate(numUniqueValues) if unique_count > categoricalLimit]
     categoricalFeatures = np.delete(allFeatureIndices, continuousFeatures)
 
     return numUniqueValues, continuousFeatures, categoricalFeatures
+
+
 
 def featureDistributions(data, features, binCount):
     """
@@ -77,8 +80,8 @@ def featureDistributions(data, features, binCount):
 
     print("Calculating Histograms.")
 
-    for featureIndex in tqdm.tqdm(features):
-        frequencies, edges = np.histogram(data[:,featureIndex], bins = binCount, density=True)
+    for featureIndex in features:
+        frequencies, edges = np.histogram(data[:,*featureIndex], bins = binCount, density=True)
 
         binEdges[featureIndex] = edges
         probabilities[featureIndex] = frequencies/sum(frequencies)
