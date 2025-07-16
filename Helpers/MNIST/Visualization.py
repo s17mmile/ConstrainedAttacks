@@ -14,8 +14,6 @@ def compare_MNIST784(originalImage, originalLabel, perturbedImage, perturbedLabe
 
     print("Limits: " + str(vmin) + " - " + str(vmax))
 
-    print(perturbedImage[392])
-
     ax[0,0].set_title("Old Label: " + str(np.argmax(originalLabel)))
     ax[0,0].imshow(np.reshape(originalImage, [28,28]), vmin = vmin, vmax = vmax)
 

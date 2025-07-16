@@ -29,23 +29,24 @@ def feasibilityProjector(example):
     return example
 
 def constrainer(example):
-    for i in range(28):
-        example[i] = 10
-        example[28*i] = 10
-        example[28*i+27] = 10
-        example[783-i] = 10
-    return example
+    
+    #     example[i] = 0
+    #     example[28*i] = 0
+    #     example[28*i+27] = 0
+    #     example[783-i] = 0
+
+    return np.clip(example, 0, 1)
 
 
 
 # Input file paths
 datasetPath = "Datasets/MNIST/train_data.npy"
 targetPath = "Datasets/MNIST/train_target.npy"
-modelPath = "Models/MNIST/base_model.keras"
+modelPath = "Models/MNIST/maxpool_model.keras"
 
 # Output file paths
 adversaryPath = "Datasets/MNIST/PGD_train_data.npy"
-newLabelPath = "Datasets/MNIST/PGD_train_label.npy"
+newLabelPath = "Datasets/MNIST/PGD_train_labels.npy"
 successPath = "Datasets/MNIST/PGD_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
@@ -81,7 +82,7 @@ if __name__ == "__main__":
         stepcount = stepcount,
         stepsize = stepsize,
         feasibilityProjector = feasibilityProjector,
-        constrainer = None,
+        constrainer = constrainer,
         workercount = workercount,
         chunksize = chunksize
     )

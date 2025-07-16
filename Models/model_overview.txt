@@ -1,0 +1,12 @@
+MNIST:
+    maxpooled_model: "Regular" MNIST Model using convolution, maxpooling and softmax. Exact same as in the keras mnsit tutorial.
+    dense_model: Uses a handful of dense layers - no convolving or pooling. Input shape ist (784,), so flatten examples if you want to ue it.
+
+ImageNet:
+    base_model: Pretrained ImageNet v2 model, uses all kinds of different layers.
+
+TopoDNN:
+    All these mdoels are pretrained and taken from FAIR4HEP's Top Tagger Repo and converted into .keras format.
+
+CIFAR-10:
+    base_model: selft-trained CIFAR model with an architecture expanded from the MNIST Model's layout.

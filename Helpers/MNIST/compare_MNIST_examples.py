@@ -9,10 +9,7 @@ from sklearn.model_selection import train_test_split
 
 from Helpers.MNIST.Visualization import compare_MNIST784
 
-trainTestSplitSeed = 42
 
-originalDatasetPath = "Datasets/MNIST/MNIST784_data.npy"
-originalLabelPath = "Datasets/MNIST/MNIST784_target.npy"
 
 # Specify which attack's results to use
 # method = "RDSA"
@@ -21,22 +18,22 @@ method = "PGD"
 
 
 
-perturbedDatasetPath = "Datasets/MNIST/MNIST784_adv_" + method + "_data.npy"
-perturbedLabelPath = "Datasets/MNIST/MNIST784_adv_" + method + "_labels.npy"
+originalDatasetPath = "Datasets/MNIST/train_data.npy"
+originalLabelPath = "Datasets/MNIST/train_target.npy"
+
+perturbedDatasetPath = "Datasets/MNIST/" + method + "_train_data.npy"
+perturbedLabelPath = "Datasets/MNIST/" + method + "_train_labels.npy"
 
 if __name__ == "__main__":
     X = np.load(originalDatasetPath, allow_pickle=True)
     Y = np.load(originalLabelPath, allow_pickle=True)
 
-    # Perform train-test-split to make sure we match the correct modified examples to the correct originals.
-    # For this to work, the splitting seed needs to be the same as during the attack.
-    # (TODO make this nicer? Maybe save train and test data separately on the device.)
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=trainTestSplitSeed)
+    X_attacked = np.load(perturbedDatasetPath, allow_pickle=True)
+    Y_attacked = np.load(perturbedLabelPath, allow_pickle=True)
 
-    X_test_attacked = np.load(perturbedDatasetPath, allow_pickle=True)
-    Y_test_attacked = np.load(perturbedLabelPath, allow_pickle=True)
+    print(X.shape)
 
-    print("Indices: 0-" + str(X_test_attacked.shape[0]-1))
+    print("Indices: 0-" + str(Y_attacked.shape[0]-1))
 
     while True:
         index = input("Image index:")
@@ -45,4 +42,4 @@ if __name__ == "__main__":
         except:
             break
 
-        compare_MNIST784(X_test[index], Y_test[index], X_test_attacked[index], Y_test_attacked[index], index)
+        compare_MNIST784(X[index], Y[index], X_attacked[index], Y_attacked[index], index)

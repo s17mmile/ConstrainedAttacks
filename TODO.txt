@@ -15,10 +15,11 @@ Tensorflow previous version: 2.16.1
     --> Exception for ImageNet, as I cannot find the training data: use one of the three test sets for augmentation, one for evaluation.
 
 --> YOU ARE HERE
-Memory Mapping
+Memory Mapping??
 Move RDSA Prep into parallel_constrained_RDSA function
 Test with flattened data
 Fix the damn indexing in the RDSA helpers
+Figure out if there's a nice way to avoid constant tensor <-> array conversions in constrained FGSM and PGD 
 
 2. With datasets and helpers having been renamed and shifted around, fix the existing attack scripts.
     --> Include Memory Mapping or use numpy archives instead of saving it all ass one big array.

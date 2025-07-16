@@ -10,9 +10,7 @@ sys.path.append(os.getcwd())
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ["KERAS_BACKEND"] = "tensorflow"
-
-# Hiding tensorflow performance warning for CPU-specific instruction set extensions
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 
 import keras
 
@@ -26,20 +24,22 @@ import Attacks.constrained_RDSA as cRDSA
 
 
 
-trainTestSplitSeed = 42
+def constrainer(example):
+    return np.clip(example, 0, 1)
 
-evaluateBase = False
 
-dataset_name = "mnist_784"
-dataset_path = "Datasets/MNIST/MNIST784_data.npy"
-labels_path = "Datasets/MNIST/MNIST784_target.npy"
-force_download = False
-save_locally = True
 
-model_path = "Models/MNIST/best_model.keras"
-results_path = "Results/TestBaseModel/"
+# Input file paths
+datasetPath = "Datasets/MNIST/train_data.npy"
+targetPath = "Datasets/MNIST/train_target.npy"
+modelPath = "Models/MNIST/maxpool_model.keras"
 
-categoricalFeatureMaximum = 50
+# Output file paths
+adversaryPath = "Datasets/MNIST/RDSA_train_data.npy"
+newLabelPath = "Datasets/MNIST/RDSA_train_labels.npy"
+successPath = "Datasets/MNIST/RDSA_fooling_success.npy"
+
+categoricalFeatureMaximum = 180
 binCount = 100
 perturbedFeatureCount = 200
 RDSA_attempts = 100
@@ -47,28 +47,33 @@ RDSA_attempts = 100
 n = 100
 workercount = 8
 chunksize = 16
-adversaryFolder = "Datasets/MNIST/"
 
 if __name__ == "__main__":
 
     # Load dataset
-    # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normaized and categorized,
-    if os.path.isfile(dataset_path) and os.path.isfile(labels_path) and not force_download:
-        print("Found local dataset and labels.")
-        data= np.load(dataset_path, allow_pickle=True)
-        target = np.load(labels_path, allow_pickle=True)
+    # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
+    if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
+        print("Found local dataset and target.")
+        data = np.load(datasetPath, allow_pickle=True)
+        target = np.load(targetPath, allow_pickle=True)
+        print("Data shape: ", data.shape)
+        print("Target Shape: ", target.shape)
     else:
-        print("Did not find dataset. Make sure it is downloaded and properly preprocessed.")
+        print("Did not find dataset or target. Make sure it is downloaded and properly preprocessed using the given helper script.")
+        quit()
 
     # Load pre-trained Model
-    model = keras.models.load_model(model_path)
+    model = keras.models.load_model(modelPath)
 
+
+
+    # RDSA Preparation --> TODO move this into RDSA attack script?
     # Find indices of features to be considered continuous/categorical.
-    numUniqueValues, continuous, categorical = RDSA_Help.featureContinuity(X_test, categoricalFeatureMaximum)
+    numUniqueValues, continuous, categorical = RDSA_Help.featureContinuity(data, categoricalFeatureMaximum)
 
     # Generate probability density function for each continuous feature.
     # Non-continuous features are given an empty placeholder
-    binEdges, binProbabilites  = RDSA_Help.featureDistributions(X_test, continuous, binCount)
+    binEdges, binProbabilites  = RDSA_Help.featureDistributions(data, continuous, binCount)
 
     # Randomly choose a given number of continuous features to be perturbed for the first n examples
     perturbationIndexLists = [random.sample(continuous, perturbedFeatureCount) for i in range(n)]
@@ -84,13 +89,15 @@ if __name__ == "__main__":
         perturbationIndexLists = perturbationIndexLists,
         binEdges = binEdges,
         binProbabilites = binProbabilites,
-        constrainer = None,
+        constrainer = constrainer,
         workercount = workercount,
         chunksize = chunksize
     )
 
-    print("saving")
+    print("Saving adversaries...")
 
-    np.save(adversaryFolder + "MNIST784_adv_RDSA_data.npy", adversaries)
-    np.save(adversaryFolder + "MNIST784_adv_RDSA_labels.npy", newLabels)
-    np.save(adversaryFolder + "MNIST784_adv_RDSA_indicators.npy", success)
+    np.save(adversaryPath, adversaries)
+    np.save(newLabelPath, newLabels)
+    np.save(successPath, success)
+
+    print("Done.")

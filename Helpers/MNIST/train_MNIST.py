@@ -25,6 +25,8 @@ print(target.shape[0], "test samples")
 num_classes = 10
 input_shape = (28, 28, 1)
 
+# This is the Keras example architecture for MNIST. It produces strange loss gradients, which are quite often zero.
+# 
 model = keras.Sequential(
     [
         keras.layers.Input(shape=input_shape),

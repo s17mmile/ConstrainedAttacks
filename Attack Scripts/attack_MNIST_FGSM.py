@@ -22,14 +22,31 @@ from sklearn.model_selection import train_test_split
 # import Helpers.RDSA_Helpers as RDSA_Help
 import Attacks.constrained_FGSM as cFGSM
 
+
+
+# Rescale an arrary linearly from its original range into a given one.
+def linearRescale(array, newMin, newMax):
+    minimum, maximum = np.min(array), np.max(array)
+    m = (newMax - newMin) / (maximum - minimum)
+    b = newMin - m * minimum
+    scaledArray = m * array + b
+    # Remove rounding errors by clipping. The difference is tiny.
+    return np.clip(scaledArray, newMin, newMax)
+
+# Todo write constrainer that re-scales everything linearly instead of just clipping it.
+def constrainer(example):
+    return linearRescale(example,0,1)
+
+
+
 # Input file paths
 datasetPath = "Datasets/MNIST/train_data.npy"
 targetPath = "Datasets/MNIST/train_target.npy"
-modelPath = "Models/MNIST/base_model.keras"
+modelPath = "Models/MNIST/maxpool_model.keras"
 
 # Output file path for fooling success indicators 
 adversaryPath = "Datasets/MNIST/FGSM_train_data.npy"
-newLabelPath = "Datasets/MNIST/FGSM_train_label.npy"
+newLabelPath = "Datasets/MNIST/FGSM_train_labels.npy"
 successPath = "Datasets/MNIST/FGSM_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
@@ -40,7 +57,6 @@ workercount = 8
 chunksize = 16
 
 if __name__ == "__main__":
-
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
     if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
@@ -62,7 +78,7 @@ if __name__ == "__main__":
         labels = labels[:n],
         lossObject = lossObject,
         epsilon = epsilon,
-        constrainer = None,
+        constrainer = constrainer,
         workercount = workercount,
         chunksize = chunksize
     )
