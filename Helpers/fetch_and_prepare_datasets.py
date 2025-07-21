@@ -89,9 +89,9 @@ if (get_cifar):
         x_train = x_train.astype("float64")/255.0
         x_test = x_test.astype("float64")/255.0
 
-        # Data format: add extra dimension to make each smaple (28,28,1) instead of (28,28)
-        x_train = np.expand_dims(x_train, -1)
-        x_test = np.expand_dims(x_test, -1)
+        # Data format: add extra dimension to make each smaple (28,28,3,1) instead of (28,28)
+        # x_train = np.expand_dims(x_train, -1)
+        # x_test = np.expand_dims(x_test, -1)
 
         # Create one-hot targets
         target_train = np.zeros((x_train.shape[0], 10)).astype(np.int64)

@@ -76,6 +76,8 @@ def constrained_PGD(model, example, label, lossObject, stepcount = 10, stepsize 
     adversary = adversary.numpy()[0]
     newLabel = newLabel.numpy()[0]
 
+    print("Calculated Adversary.")
+
     return adversary, newLabel, (np.argmax(newLabel) != np.argmax(label))
 
 

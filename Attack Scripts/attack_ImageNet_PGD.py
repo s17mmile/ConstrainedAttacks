@@ -49,12 +49,14 @@ chunksize = 16
 
 if __name__ == "__main__":
 
+    print("THIS SCRIPT CURRENTLY HAS MEMORY ISSUES OR ISSUES WITH MEMMAP/MULTIPROCESSING THAT HAVE NOT BEEN FULLY DIAGNOSED. Proceed with care.")
+
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
     if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
         print("Found local dataset and labels.")
-        data = np.load(datasetPath, allow_pickle=True, mmap_mode="r")
-        target = np.load(targetPath, allow_pickle=True, mmap_mode="r")
+        data = np.load(datasetPath, allow_pickle=True)
+        target = np.load(targetPath, allow_pickle=True)
     else:
         print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()

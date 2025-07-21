@@ -32,6 +32,8 @@ def compare_MNIST784(originalImage, originalLabel, perturbedImage, perturbedLabe
     ax[1,1].set_xticks(np.arange(0,10))
     ax[1,1].stairs(perturbedLabel, edges)
 
+    plt.savefig("Results/MNIST/MNIST_FGSM_Example.png")
+
     plt.show()
 
 def show_MNIST784(image):

@@ -56,7 +56,7 @@ model.compile(
     loss=keras.losses.CategoricalCrossentropy(),
     optimizer=keras.optimizers.Adam(learning_rate=1e-3),
     metrics=[
-        keras.metrics.CategoricalAccuracy(name="acc"),
+        keras.metrics.CategoricalAccuracy(),
     ],
 )
 
@@ -74,13 +74,13 @@ callbacks = [
 model.fit(
     x_train,
     y_train,
+    validation_split = 0.15,
     batch_size=batch_size,
     epochs=epochs,
-    validation_split = 0.15,
     callbacks=callbacks,
 )
 
-model.save("models/CIFAR-10/base_model.keras")
+model.save("Models/CIFAR-10/base_model.keras")
 
 # Possible base model improvement by incorporating flips/shifts to augment data. ImageDataGenerator deprecated with new keras, though. Ah well.
 # # Small non-adversarial augmentation step once the previous fit seems to have plateaued --> Flip/Shift training images.

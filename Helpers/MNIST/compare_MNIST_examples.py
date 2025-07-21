@@ -13,8 +13,8 @@ from Helpers.MNIST.Visualization import compare_MNIST784
 
 # Specify which attack's results to use
 # method = "RDSA"
-# method = "FGSM"
-method = "PGD"
+method = "FGSM"
+# method = "PGD"
 
 
 

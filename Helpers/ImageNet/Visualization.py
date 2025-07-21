@@ -73,4 +73,6 @@ def compare_ImageNet(originalImage, originalLabel, perturbedImage, perturbedLabe
     ax[1,1].set_xticks(np.arange(0,categoryCount+1,categoryCount/10))
     ax[1,1].stairs(perturbedLabel, edges)
 
+    # plt.savefig("Results/ImageNet/ImageNet_PGD_Example.png")
+
     plt.show()

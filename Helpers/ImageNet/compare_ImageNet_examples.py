@@ -26,8 +26,8 @@ perturbedDatasetPath = "Datasets/ImageNet/" + method + "_threshold_data.npy"
 perturbedLabelPath = "Datasets/ImageNet/" + method + "_threshold_labels.npy"
 
 if __name__ == "__main__":
-    X = np.load(originalDatasetPath, allow_pickle=True)
-    Y = np.load(originalLabelPath, allow_pickle=True)
+    X = np.load(originalDatasetPath, allow_pickle=True, mmap_mode="r")
+    Y = np.load(originalLabelPath, allow_pickle=True, mmap_mode="r")
 
     X_attacked = np.load(perturbedDatasetPath, allow_pickle=True)
     Y_attacked = np.load(perturbedLabelPath, allow_pickle=True)
