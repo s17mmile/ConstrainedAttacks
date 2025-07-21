@@ -22,6 +22,21 @@ import Attacks.constrained_FGSM as cFGSM
 
 
 
+# Rescale an arrary linearly from its original range into a given one.
+def linearRescale(array, newMin, newMax):
+    minimum, maximum = np.min(array), np.max(array)
+    m = (newMax - newMin) / (maximum - minimum)
+    b = newMin - m * minimum
+    scaledArray = m * array + b
+    # Remove rounding errors by clipping. The difference is tiny.
+    return np.clip(scaledArray, newMin, newMax)
+
+# Todo write constrainer that re-scales everything linearly instead of just clipping it.
+def constrainer(example):
+    return linearRescale(example,0,1)
+
+
+
 dataset_path = "Datasets/ImageNet/threshold_data.npy"
 target_path = "Datasets/ImageNet/threshold_target.npy"
 adversaryFolder = "Datasets/ImageNet/"
@@ -32,7 +47,7 @@ model = keras.applications.MobileNetV2(include_top=True, weights='imagenet')
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
 
-n = 1000
+n = 100
 workercount = 8
 chunksize = 10
 
@@ -56,8 +71,8 @@ if __name__ == "__main__":
     # Perform parallel FGSM (on first n testing samples)
     adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
         model = model,
-        dataset = X[:10*n:10],
-        labels = Y[:10*n:10],
+        dataset = data[n],
+        labels = target[n],
         lossObject = lossObject,
         epsilon = epsilon,
         constrainer = None,

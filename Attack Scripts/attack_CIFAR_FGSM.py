@@ -36,19 +36,19 @@ def constrainer(example):
 
 
 # Input file paths
-datasetPath = "Datasets/CIFAR-10/train_data.npy"
-targetPath = "Datasets/CIFAR-10/train_target.npy"
-modelPath = "Models/CIFAR-10/base_model.keras"
+datasetPath = "Datasets/CIFAR10/train_data.npy"
+targetPath = "Datasets/CIFAR10/train_target.npy"
+modelPath = "Models/CIFAR10/base_model.keras"
 
 # Output file paths
-adversaryPath = "Datasets/CIFAR-10/FGSM_train_data.npy"
-newLabelPath = "Datasets/CIFAR-10/FGSM_train_labels.npy"
-successPath = "Datasets/CIFAR-10/FGSM_fooling_success.npy"
+adversaryPath = "Adversaries/CIFAR10/FGSM_train_data.npy"
+newLabelPath = "Adversaries/CIFAR10/FGSM_train_labels.npy"
+successPath = "Adversaries/CIFAR10/FGSM_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
 
-n = 100
+n = 128
 workercount = 8
 chunksize = 16
 

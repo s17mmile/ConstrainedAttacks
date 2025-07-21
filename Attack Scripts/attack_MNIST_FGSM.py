@@ -15,7 +15,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 import keras
 
 # Local imports
-# import Helpers.RDSA_Helpers as RDSA_Help
 import Attacks.constrained_FGSM as cFGSM
 
 
@@ -41,14 +40,13 @@ targetPath = "Datasets/MNIST/train_target.npy"
 modelPath = "Models/MNIST/maxpool_model.keras"
 
 # Output file paths
-adversaryPath = "Datasets/MNIST/FGSM_train_data.npy"
-newLabelPath = "Datasets/MNIST/FGSM_train_labels.npy"
-successPath = "Datasets/MNIST/FGSM_fooling_success.npy"
+adversaryPath = "Adversaries/MNIST/FGSM_train_data.npy"
+newLabelPath = "Adversaries/MNIST/FGSM_train_labels.npy"
+successPath = "Adversaries/MNIST/FGSM_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
 
-n = 100
 workercount = 8
 chunksize = 16
 
@@ -67,11 +65,11 @@ if __name__ == "__main__":
     model = keras.models.load_model(modelPath)
     model.summary()
 
-    # Perform parallel FGSM (on first n testing samples)
+    # Perform parallel FGSM
     adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
         model = model,
-        dataset = data[:n],
-        labels = target[:n],
+        dataset = data,
+        labels = target,
         lossObject = lossObject,
         epsilon = epsilon,
         constrainer = constrainer,

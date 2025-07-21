@@ -6,3 +6,13 @@
     --> Behaviour is very much dependent on architecture. Not sure if the filter count in the conv2d layers is critical.
     --> I'd have thought it's besser to have it decrease instead of increase throughout the model structure.
     
+Python/Package versions:
+Python 3.11.5/3.11.9 (both worked)
+numpy 1.26.4
+keras 3.9.2
+tensorflow 2.16.1
+pytables 3.10.2
+
+Code credit:
+TopoDNN preprocessing (FAIR4HEP)
+evaluate_model.py (Timo?)

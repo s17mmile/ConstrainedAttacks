@@ -22,8 +22,8 @@ originalLabelPath = "Datasets/ImageNet/threshold_target.npy"
 method = "FGSM"
 # method = "PGD"
 
-perturbedDatasetPath = "Datasets/ImageNet/" + method + "_threshold_data.npy"
-perturbedLabelPath = "Datasets/ImageNet/" + method + "_threshold_labels.npy"
+perturbedDatasetPath = "Adversaries/ImageNet/" + method + "_threshold_data.npy"
+perturbedLabelPath = "Adversaries/ImageNet/" + method + "_threshold_labels.npy"
 
 if __name__ == "__main__":
     X = np.load(originalDatasetPath, allow_pickle=True, mmap_mode="r")

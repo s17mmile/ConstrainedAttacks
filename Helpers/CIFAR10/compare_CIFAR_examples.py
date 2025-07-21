@@ -11,21 +11,21 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
 import keras
 
-from Helpers.MNIST.Visualization import compare_MNIST784
+from Helpers.CIFAR10.Visualization import compare_CIFAR10
 
 
 
 # Specify which attack's results to use
 method = input("Attack method (RDSA/FGSM/PGD): ")
 
-model = keras.models.load_model("Models/MNIST/maxpool_model.keras")
+model = keras.models.load_model("Models/CIFAR10/base_model.keras")
 
-originalDatasetPath = "Datasets/MNIST/train_data.npy"
-originalTargetPath = "Datasets/MNIST/train_target.npy"
+originalDatasetPath = "Datasets/CIFAR10/train_data.npy"
+originalTargetPath = "Datasets/CIFAR10/train_target.npy"
 
-perturbedDatasetPath = "Adversaries/MNIST/" + method + "_train_data.npy"
-perturbedLabelPath = "Adversaries/MNIST/" + method + "_train_labels.npy"
-successPath = "Adversaries/MNIST/" + method + "_fooling_success.npy"
+perturbedDatasetPath = "Adversaries/CIFAR10/" + method + "_train_data.npy"
+perturbedLabelPath = "Adversaries/CIFAR10/" + method + "_train_labels.npy"
+successPath = "Adversaries/CIFAR10/" + method + "_fooling_success.npy"
 
 if __name__ == "__main__":
     X = np.load(originalDatasetPath, allow_pickle=True)
@@ -52,4 +52,5 @@ if __name__ == "__main__":
             break
 
         originalLabel = model(np.array([X[index]]))[0]
-        compare_MNIST784(X[index], originalLabel, Y[index], X_attacked[index], Y_attacked[index], index)
+        print(originalLabel)
+        compare_CIFAR10(X[index], originalLabel, Y[index], X_attacked[index], Y_attacked[index], index)

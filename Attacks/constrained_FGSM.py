@@ -101,6 +101,7 @@ def parallel_constrained_FGSM(model, dataset, labels, lossObject, epsilon = 0.1,
             total = dataset.shape[0]), chunksize=chunksize)
     
     # Format data for output
+    print("Formatting results...")
     for event in results:
         adversaries.append(event[0])
         newLabels.append(event[1])

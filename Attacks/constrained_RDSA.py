@@ -12,7 +12,7 @@ from itertools import repeat
 import tensorflow as tf
 import keras
 
-
+import Helpers.RDSA_Helpers as RDSA_Help
 
 def constrained_RDSA(model, example, label, steps, perturbationIndices, binEdges, binProbabilites, constrainer = None):
     '''
@@ -67,7 +67,7 @@ def constrained_RDSA(model, example, label, steps, perturbationIndices, binEdges
     # If none of the attempts yielded fooling success, return with a fail state. We might as well still keep track of the adversary as a failed fooling attempt (or rather, one of many). 
     return adversary, newLabel, False
 
-def parallel_constrained_RDSA(model, dataset, labels, steps, perturbationIndexLists, binEdges, binProbabilites, constrainer = None, workercount = 1, chunksize = 4):
+def parallel_constrained_RDSA(model, dataset, labels, steps, categoricalFeatureMaximum, binCount, perturbedFeatureCount, constrainer = None, workercount = 1, chunksize = 4, n = None):
     '''
         Performs constrained RDSA attack on a whole set of examples with a given constraining function (if given).
         The use of tqdm means that a progress bar will indicate progress during computation.
@@ -77,16 +77,12 @@ def parallel_constrained_RDSA(model, dataset, labels, steps, perturbationIndexLi
             dataset: Set of model inputs. 2D numpy array.
             labels: the correct classification label (vector!) for each instance. 2D numpy array.
             steps: maximum number of shuffling attempts. Integer.
-            perturbationIndexLists: Lists of feature indices that should be shuffled (different for each example). 2D numpy array.
-            binEdges: Array of bin edge vectors (in ascending order) for the variables to be shuffled.
-            binProbabilites: Array of probability distributions for the variables to be shuffled.
-                --> Each variable will be shuffled by randomly sampling a bin index from the distribution.
-                --> Since the perturbed variables are assumed to be continuous, the actual value is chosen uniformly at random from the selected bin.
-                --> Note: There is always one more bin edge than there are bins. This will be corrected by randomly choosing a lower bin edge, excluding the highest one.
+
             constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
 
             workercount: How many threads should run in parallel. Recommended to be about half of the running device's thread count. Optional.
             chunksize: chunk size used for the starmap call. Approximately the number of examples assigned to each workrer at a time. Optional.
+            n: If given, only the first n examples will be perturbed. If None, all examples will be perturbed. Optional.
 
         Returns three lists:
             Adversaries (numpy arrays)
@@ -94,14 +90,46 @@ def parallel_constrained_RDSA(model, dataset, labels, steps, perturbationIndexLi
             Booleans to indicate fooling success.
     '''
 
-    # Return value contains a list for each perturbed example, with:
+    # STEP 1: RDSA Preparation
+
+    '''
+        Constructs the following:
+            perturbationIndexLists: Lists of feature indices that should be shuffled (different for each example). 2D numpy array.
+            binEdges: Array of bin edge vectors (in ascending order) for the variables to be shuffled.
+            binProbabilites: Array of probability distributions for the variables to be shuffled.
+                --> Each variable will be shuffled by randomly sampling a bin index from the distribution.
+                --> Since the perturbed variables are assumed to be continuous, the actual value is chosen uniformly at random from the selected bin.
+                --> Note: There is always one more bin edge than there are bins. This will be corrected by randomly choosing a lower bin edge, excluding the highest one.
+    '''
+
+    # n is the number of examples to perturb. If not given, set it to the number of examples in the dataset.
+    if n is None:
+        n = dataset.shape[0]
+
+    # Find indices of features to be considered continuous/categorical.
+    numUniqueValues, continuous, categorical = RDSA_Help.featureContinuity(dataset, categoricalFeatureMaximum)
+
+    # Generate probability density function for each continuous feature.
+    # Non-continuous features are given an empty placeholder
+    binEdges, binProbabilites  = RDSA_Help.featureDistributions(dataset, continuous, binCount)
+
+    # Randomly choose a given number of continuous features to be perturbed for the first n examples
+    perturbationIndexLists = [random.sample(continuous, perturbedFeatureCount) for i in range(n)]
+
+
+
+    # Step 2: Return value contains a list for each perturbed example, with:
         # - the perturbed data
         # - the new label given to this data by the model. If this is different from the original, it's a success
         # - a boolean indicating success
-    # (The final string goes unused for now, could be used to speed up evaluation)
+
     adversaries = []
     newLabels = []
     success = []
+
+    # Limit to first n examples if n is given
+    dataset = dataset[:n]
+    labels = labels[:n]
 
     with multiprocessing.get_context("spawn").Pool(workercount) as p:
         results = p.starmap(constrained_RDSA, tqdm.tqdm(zip(
@@ -110,63 +138,10 @@ def parallel_constrained_RDSA(model, dataset, labels, steps, perturbationIndexLi
                             total = dataset.shape[0]), chunksize=chunksize)
     
     # Format data for output
+    print("Formatting results...")
     for event in results:
         adversaries.append(event[0])
         newLabels.append(event[1])
         success.append(event[2])
 
     return np.array(adversaries), np.array(newLabels), np.array(success)
-
-# ---------------------------------------------------------------------------------------------------------------------------------------------------------
-# DEPRECATED
-
-# Runs RDSA attack on a single example with a given constraining projection function (if given).
-
-# 
-def old_RDSA(event, model_path, loss_func, steps, var_indices, pdfs_init, bin_idxes_init, bin_edges, unique_values, continuous):
-    """
-        Method generating adversarial example given a model and a model input
-
-        :param event: A single model input
-        :param model_path: File path to the saved deep learning model
-        :param loss_func: Loss function used during training the model
-        :param steps: Amount of tries to be done for random shuffling
-        :param var_indices: Which variables should be perturbed
-        :param pdfs_init: Probability vector for the variables to be shuffled
-        :param bin_idxes_init: Bin index vector for the variables to be shuffled
-        :param bin_edges: Bin edges of the underlying 1D distribution histograms
-        :param unique_values: Count of unique values for each variable
-
-        :return: adv: the final adversary after perturbing the input
-    """
-    
-    adv = event[0]
-    label = event[1]
-    len_var = len(adv)
-
-    pdfs = [[] for i in range(len_var)]
-    for i in continuous:
-        pdfs[i] = (stats.rv_discrete(values=(bin_idxes_init[i], pdfs_init[i])))
-    
-    model = keras.models.load_model(model_path)
-
-    for s in range(steps):
-        # Go over all specified variables
-        for featureIndex in var_indices:
-            low_bin = pdfs[featureIndex].rvs(size=1)
-            high_bin = low_bin + 1
-
-            if unique_values[featureIndex] < 250:
-                new_val = bin_edges[featureIndex][low_bin]
-            else:
-                new_val = np.random.uniform(low=bin_edges[featureIndex][low_bin],
-                                            high=bin_edges[featureIndex][high_bin])[0]
-            
-            adv[featureIndex] = new_val
-
-        # Stop once classification get fooled
-        new_label = np.rint(model(tf.reshape(tf.cast(adv, tf.float32), shape=(1, len_var))))[0]
-        if not np.array_equal(new_label, label):
-            return adv, new_label, "SUCCESS"
-
-    return adv, new_label, "FAIL"

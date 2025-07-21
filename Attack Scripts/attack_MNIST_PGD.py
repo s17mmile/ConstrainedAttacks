@@ -24,14 +24,18 @@ import Attacks.constrained_PGD as cPGD
 def feasibilityProjector(example):
     return example
 
-def constrainer(example):
-    
-    #     example[i] = 0
-    #     example[28*i] = 0
-    #     example[28*i+27] = 0
-    #     example[783-i] = 0
+# Rescale an arrary linearly from its original range into a given one.
+def linearRescale(array, newMin, newMax):
+    minimum, maximum = np.min(array), np.max(array)
+    m = (newMax - newMin) / (maximum - minimum)
+    b = newMin - m * minimum
+    scaledArray = m * array + b
+    # Remove rounding errors by clipping. The difference is tiny.
+    return np.clip(scaledArray, newMin, newMax)
 
-    return np.clip(example, 0, 1)
+# Todo write constrainer that re-scales everything linearly instead of just clipping it.
+def constrainer(example):
+    return linearRescale(example,0,1)
 
 
 
@@ -41,17 +45,16 @@ targetPath = "Datasets/MNIST/train_target.npy"
 modelPath = "Models/MNIST/maxpool_model.keras"
 
 # Output file paths
-adversaryPath = "Datasets/MNIST/PGD_train_data.npy"
-newLabelPath = "Datasets/MNIST/PGD_train_labels.npy"
-successPath = "Datasets/MNIST/PGD_fooling_success.npy"
+adversaryPath = "Adversaries/MNIST/PGD_train_data.npy"
+newLabelPath = "Adversaries/MNIST/PGD_train_labels.npy"
+successPath = "Adversaries/MNIST/PGD_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
-stepcount = 50
+stepcount = 20
 stepsize = 0.005
 
-n = 100
 workercount = 8
-chunksize = 16
+chunksize = 128
 
 if __name__ == "__main__":
 
@@ -69,11 +72,11 @@ if __name__ == "__main__":
     model = keras.models.load_model(modelPath)
     model.summary()
 
-    # Perform parallel PGD (on first n testing samples)
+    # Perform parallel PGD
     adversaries, newLabels, success = cPGD.parallel_constrained_PGD(
         model = model,
-        dataset = data[:n],
-        labels = target[:n],
+        dataset = data,
+        labels = target,
         lossObject = lossObject,
         stepcount = stepcount,
         stepsize = stepsize,

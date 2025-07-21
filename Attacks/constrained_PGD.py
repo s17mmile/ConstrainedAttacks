@@ -76,8 +76,6 @@ def constrained_PGD(model, example, label, lossObject, stepcount = 10, stepsize 
     adversary = adversary.numpy()[0]
     newLabel = newLabel.numpy()[0]
 
-    print("Calculated Adversary.")
-
     return adversary, newLabel, (np.argmax(newLabel) != np.argmax(label))
 
 
@@ -120,6 +118,7 @@ def parallel_constrained_PGD(model, dataset, labels, lossObject, stepcount = 10,
             total = dataset.shape[0]), chunksize=chunksize)
     
     # Format data for output
+    print("Formatting results...")
     for event in results:
         adversaries.append(event[0])
         newLabels.append(event[1])

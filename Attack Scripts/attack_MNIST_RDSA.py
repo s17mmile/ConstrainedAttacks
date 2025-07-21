@@ -35,18 +35,17 @@ targetPath = "Datasets/MNIST/train_target.npy"
 modelPath = "Models/MNIST/maxpool_model.keras"
 
 # Output file paths
-adversaryPath = "Datasets/MNIST/RDSA_train_data.npy"
-newLabelPath = "Datasets/MNIST/RDSA_train_labels.npy"
-successPath = "Datasets/MNIST/RDSA_fooling_success.npy"
+adversaryPath = "Adversaries/MNIST/RDSA_train_data.npy"
+newLabelPath = "Adversaries/MNIST/RDSA_train_labels.npy"
+successPath = "Adversaries/MNIST/RDSA_fooling_success.npy"
 
-categoricalFeatureMaximum = 180
+categoricalFeatureMaximum = 150
 binCount = 100
-perturbedFeatureCount = 200
-RDSA_attempts = 100
+perturbedFeatureCount = 100
+RDSA_attempts = 50
 
-n = 100
 workercount = 8
-chunksize = 16
+chunksize = 64
 
 if __name__ == "__main__":
 
@@ -64,31 +63,19 @@ if __name__ == "__main__":
 
     # Load pre-trained Model
     model = keras.models.load_model(modelPath)
+    model.summary()
+    
 
 
-
-    # RDSA Preparation --> TODO move this into RDSA attack script?
-    # Find indices of features to be considered continuous/categorical.
-    numUniqueValues, continuous, categorical = RDSA_Help.featureContinuity(data, categoricalFeatureMaximum)
-
-    # Generate probability density function for each continuous feature.
-    # Non-continuous features are given an empty placeholder
-    binEdges, binProbabilites  = RDSA_Help.featureDistributions(data, continuous, binCount)
-
-    # Randomly choose a given number of continuous features to be perturbed for the first n examples
-    perturbationIndexLists = [random.sample(continuous, perturbedFeatureCount) for i in range(n)]
-
-
-
-    # Perform parallel RDSA (on first n testing samples)
+    # Perform parallel RDSA
     adversaries, newLabels, success = cRDSA.parallel_constrained_RDSA(
         model = model,
-        dataset = data[:n],
-        labels = target[:n],
+        dataset = data,
+        labels = target,
         steps = RDSA_attempts,
-        perturbationIndexLists = perturbationIndexLists,
-        binEdges = binEdges,
-        binProbabilites = binProbabilites,
+        categoricalFeatureMaximum = categoricalFeatureMaximum,
+        binCount = binCount,
+        perturbedFeatureCount = perturbedFeatureCount,
         constrainer = constrainer,
         workercount = workercount,
         chunksize = chunksize
