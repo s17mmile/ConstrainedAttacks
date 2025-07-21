@@ -32,7 +32,7 @@ def displayImage(image, description, model):
 
 
 # Compare an ImageNet instance with a perturbed counterpart
-def compare_ImageNet(originalImage, originalLabel, perturbedImage, perturbedLabel, targetLabel, index):
+def compare_ImageNet(originalImage, originalLabel, target, perturbedImage, perturbedLabel, index):
 
     # For display purposes, map values [-1,1] (as they are in the dataset) to [0,1] for each colour channel (for imshow to work with)
     originalImage = linearRescale(originalImage, 0, 1)
@@ -40,7 +40,7 @@ def compare_ImageNet(originalImage, originalLabel, perturbedImage, perturbedLabe
     
     f, ax = plt.subplots(2,2, figsize = (12,12))
 
-    _, targetLabelName, _ = get_imagenet_label(np.array([targetLabel]))
+    _, targetLabelName, _ = get_imagenet_label(np.array([target]))
     f.suptitle("Original vs. adversarial example with index " + str(index) + ". Target label: " + targetLabelName)
 
     vmin = min(np.min(originalImage), np.min(perturbedImage))

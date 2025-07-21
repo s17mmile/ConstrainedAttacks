@@ -39,12 +39,13 @@ def constrained_PGD(model, example, label, lossObject, stepcount = 10, stepsize 
 
     # Data formatting for use with GradientTape and as a model input
     # --> Within this function, manipulate everything as tensors. Only transform back to numpy at the end.
+    # print("convert 1")
     adversary = tf.convert_to_tensor(np.array([example]))
 
     # We re-instantiate the GradientTape each time. I'm not sure if this is a preformance loss, but it feels like it.
     # I tried the oersistent tape, but could not get it to work.
     for step in range(stepcount):
-
+        # print("step",step)
         with tf.GradientTape(persistent = True) as tape:
             tape.watch(adversary)
             # Run model on current adversary
@@ -54,28 +55,30 @@ def constrained_PGD(model, example, label, lossObject, stepcount = 10, stepsize 
         
         # Get the gradients of the loss w.r.t to the current adversary.
         gradient = tape.gradient(loss, adversary)
-        # Get the sign of the gradients to create the perturbation -- TODO check this. Do we take the sign or the raw gradient?
+        # Get the sign of the gradients to create the perturbation
         gradient_sign = tf.sign(gradient)
         # Apply Gradient perturbation
         adversary = adversary + stepsize * gradient_sign
 
-        # If given: apply the feasibility projector. Change into numpy array first and back later for ease of use.
+        # If given: apply the feasibility projector.
         if feasibilityProjector is not None:
-            adversary = adversary.numpy()[0]
+            # print("feasibility projector")
             adversary = feasibilityProjector(adversary)
-            adversary = tf.convert_to_tensor(np.array([adversary]))
 
+    # If given: apply the final constrainer.
     if constrainer is not None:
-        adversary = adversary.numpy()[0]
+        # print("constrainer")
         adversary = constrainer(adversary)
-        adversary = tf.convert_to_tensor(np.array([adversary]))
 
+    # print("predict")
     newLabel = model(adversary, training = False)
 
+    # print("convert 2")
     # Convert back to numpy
     adversary = adversary.numpy()[0]
     newLabel = newLabel.numpy()[0]
 
+    # print("return")
     return adversary, newLabel, (np.argmax(newLabel) != np.argmax(label))
 
 

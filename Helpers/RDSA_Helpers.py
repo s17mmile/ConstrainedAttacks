@@ -42,6 +42,8 @@ def featureContinuity(data, categoricalLimit):
         To index the single features, 
     """
 
+    print("Calculating feature continuity...")
+
     # To get proper feature counts - since every single number in the array is a feature (for images: each channel for each pixel) - we cannot just use shape[1] for the featureCount and index like that.
     # Instead, we use a small helper (transformIndex) to transform a single index into a multidimensional one for easy looping.
     exampleShape = data.shape[1:]
@@ -55,6 +57,8 @@ def featureContinuity(data, categoricalLimit):
 
     continuousFeatures = [allFeatureIndices[i] for i, unique_count in enumerate(numUniqueValues) if unique_count > categoricalLimit]
     categoricalFeatures = np.delete(allFeatureIndices, continuousFeatures)
+
+    print("Done.")
 
     return numUniqueValues, continuousFeatures, categoricalFeatures
 

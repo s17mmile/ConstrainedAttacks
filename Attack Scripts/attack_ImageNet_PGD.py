@@ -12,6 +12,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ["KERAS_BACKEND"] = "tensorflow"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 
+import tensorflow as tf
 import keras
 
 # Local imports
@@ -20,12 +21,25 @@ import Attacks.constrained_PGD as cPGD
 
 
 
-# Takes in and returns an example (as a 1D numpy array) and applies a constraint. For now, this constraint is fully arbitrary. 
+# Takes in and returns an example (tensor) and applies a constraint. 
 def feasibilityProjector(example):
     return example
 
+# Rescale an arrary linearly from its original range into a given one.
+def linearRescale(array, newMin, newMax):
+    minimum, maximum = np.min(array), np.max(array)
+    m = (newMax - newMin) / (maximum - minimum)
+    b = newMin - m * minimum
+    scaledArray = m * array + b
+    # Remove rounding errors by clipping. The difference is tiny.
+    return np.clip(scaledArray, newMin, newMax)
+
+# Todo write constrainer that re-scales everything linearly instead of just clipping it.
 def constrainer(example):
-    return np.clip(example, 0, 1)
+    example = example.numpy()[0]
+    linearRescale(example,0,1)
+    example = tf.convert_to_tensor(np.array([example]))
+    return example
 
 
 
@@ -35,21 +49,19 @@ targetPath = "Datasets/ImageNet/threshold_target.npy"
 modelPath = "Models/ImageNet/base_model.keras"
 
 # Output file paths
-adversaryPath = "Datasets/ImageNet/PGD_threshold_data.npy"
-newLabelPath = "Datasets/ImageNet/PGD_threshold_labels.npy"
-successPath = "Datasets/ImageNet/PGD_threshold_fooling_success.npy"
+adversaryPath = "Adversaries/ImageNet/PGD_threshold_data.npy"
+newLabelPath = "Adversaries/ImageNet/PGD_threshold_labels.npy"
+successPath = "Adversaries/ImageNet/PGD_threshold_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
-stepcount = 50
+stepcount = 20
 stepsize = 0.005
 
-n = 16*8
+n = 128
 workercount = 8
-chunksize = 16
+chunksize = 8
 
 if __name__ == "__main__":
-
-    print("THIS SCRIPT CURRENTLY HAS MEMORY ISSUES OR ISSUES WITH MEMMAP/MULTIPROCESSING THAT HAVE NOT BEEN FULLY DIAGNOSED. Proceed with care.")
 
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
@@ -65,7 +77,7 @@ if __name__ == "__main__":
     model = keras.models.load_model(modelPath)
     model.summary()
 
-    # Perform parallel PGD (on first n testing samples)
+    # Perform parallel PGD
     adversaries, newLabels, success = cPGD.parallel_constrained_PGD(
         model = model,
         dataset = data[:n],

@@ -1,12 +1,18 @@
-import timeit
+def transformIndex(index, shape):
+    assert index >= 0
+    assert index < np.prod(shape)
 
-t1 = timeit.default_timer()
+    transformedIndex = []
 
-for i in range(10):
-    for j in range(10):
-        for k in range(10):
-            print(i,j,k)
+    remainder = index
 
-t2 = timeit.default_timer()
+    for dimension in shape:
+        coordinate = remainder % dimension
+        remainder = int(remainder/dimension)
+        transformedIndex.append(coordinate)
 
-print(t2-t1)
+    return tuple(transformedIndex)
+
+
+
+allFeatureIndices = [transformIndex(i,exampleShape) for i in range(featureCount)]

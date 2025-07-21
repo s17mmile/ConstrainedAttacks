@@ -10,9 +10,7 @@ sys.path.append(os.getcwd())
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ["KERAS_BACKEND"] = "tensorflow"
-
-# Hiding tensorflow performance warning for CPU-specific instruction set extensions
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 
 import keras
 
@@ -37,51 +35,54 @@ def constrainer(example):
 
 
 
-dataset_path = "Datasets/ImageNet/threshold_data.npy"
-target_path = "Datasets/ImageNet/threshold_target.npy"
-adversaryFolder = "Datasets/ImageNet/"
+# Input file paths
+datasetPath = "Datasets/ImageNet/threshold_data.npy"
+targetPath = "Datasets/ImageNet/threshold_target.npy"
+modelPath = "Models/ImageNet/base_model.keras"
 
-# Load pre-trained Model
-model = keras.applications.MobileNetV2(include_top=True, weights='imagenet')
+# Output file paths
+adversaryPath = "Adversaries/ImageNet/FGSM_threshold_data.npy"
+newLabelPath = "Adversaries/ImageNet/FGSM_threshold_labels.npy"
+successPath = "Adversaries/ImageNet/FGSM_threshold_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
 
-n = 100
+n = 128
 workercount = 8
-chunksize = 10
-
-
+chunksize = 16
 
 if __name__ == "__main__":
-
     # Load dataset
-    # For the purposes of ImageNet, this assumes that the dataset has been downloaded and compiled into a single .npy file
-    # This numpy array holds all images, preprocessed using the "preprocess" helper function.
-    # If this has not occured, use the compileDownload() helper function to create it.
-    if os.path.isfile(dataset_path) and os.path.isfile(target_path):
+    # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
+    if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
         print("Found local dataset and labels.")
-        data = np.load(dataset_path, allow_pickle=True)
-        target = np.load(target_path, allow_pickle=True)
+        data = np.load(datasetPath, allow_pickle=True)
+        target = np.load(targetPath, allow_pickle=True)
     else:
-        print("No dataset found. Ensure you have a compiled dataset (use compileDownload() helper) and the path to it is correct.")
+        print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()
 
+    # Load pre-trained Model
+    model = keras.models.load_model(modelPath)
+    model.summary()
 
     # Perform parallel FGSM (on first n testing samples)
     adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
         model = model,
-        dataset = data[n],
-        labels = target[n],
+        dataset = data[:n],
+        labels = target[:n],
         lossObject = lossObject,
         epsilon = epsilon,
-        constrainer = None,
+        constrainer = constrainer,
         workercount = workercount,
         chunksize = chunksize
     )
 
-    print("saving")
+    print("Saving adversaries...")
 
-    np.save(adversaryFolder + "ImageNetv2_adv_FGSM_data.npy", adversaries)
-    np.save(adversaryFolder + "ImageNetv2_adv_FGSM_labels.npy", newLabels)
-    np.save(adversaryFolder + "ImageNetv2_adv_FGSM_indicators.npy", success)
+    np.save(adversaryPath, adversaries)
+    np.save(newLabelPath, newLabels)
+    np.save(successPath, success)
+
+    print("Done.")
