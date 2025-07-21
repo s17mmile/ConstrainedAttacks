@@ -12,6 +12,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ["KERAS_BACKEND"] = "tensorflow"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 
+import tensorflow as tf
 import keras
 
 # Local imports
@@ -30,7 +31,10 @@ def linearRescale(array, newMin, newMax):
 
 # Todo write constrainer that re-scales everything linearly instead of just clipping it.
 def constrainer(example):
-    return linearRescale(example,0,1)
+    example = example.numpy()[0]
+    linearRescale(example,0,1)
+    example = tf.convert_to_tensor(np.array([example]))
+    return example
 
 
 
