@@ -28,6 +28,8 @@ def linearRescale(array, newMin, newMax):
 def constrainer(example):
     return linearRescale(example,0,1)
 
+def stepsize(step):
+    return 0.1*(1/np.sqrt(2))**step
 
 # This extra specifier is necessary to use multiprocessing without getting a recursion error.
 if __name__ == "__main__":
@@ -41,7 +43,7 @@ if __name__ == "__main__":
         newLabelPath="Adversaries/CIFAR10/PGD_train_labels.npy",
         lossObject=keras.losses.CategoricalCrossentropy(),
         stepcount=20,
-        stepsize=0.005,
+        stepsize=stepsize,
         n=1024,
         workercount=8,
         chunksize=64,

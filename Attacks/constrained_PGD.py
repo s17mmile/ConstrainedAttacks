@@ -62,7 +62,7 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
         # Get the sign of the gradients to create the perturbation
         gradient_sign = tf.sign(gradient)
         # Apply Gradient perturbation
-        adversary = adversary + stepsize * gradient_sign
+        adversary = adversary + stepsize(step) * gradient_sign
 
         # If given: apply the feasibility projector.
         if feasibilityProjector is not None:

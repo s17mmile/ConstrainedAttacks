@@ -20,6 +20,11 @@ from Attacks.attack_dispatch import AttackDispatcher
 def constrainer(example):
     return example
 
+def stepsize(step):
+    return 0.1*(1/np.sqrt(2))**step
+
+
+
 # This extra specifier is necessary to use multiprocessing without getting a recursion error.
 if __name__ == "__main__":
 
@@ -32,7 +37,7 @@ if __name__ == "__main__":
         newLabelPath="Adversaries/TopoDNN/PGD_train_labels.npy",
         lossObject=keras.losses.BinaryCrossentropy(),
         stepcount=20,
-        stepsize=0.01,
+        stepsize=stepsize,
         n=1024*8,
         workercount=8,
         chunksize=512,

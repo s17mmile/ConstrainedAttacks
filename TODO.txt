@@ -31,6 +31,8 @@ Write attack dispatcher script so I can just keep the actually launched .py file
 
 Create Histogram creator script
 
+PGD variable stepsize: update comments
+
 Apply and measure different distance metrics
 
 Figure out at what point in the process I want to run the model on all the unchanged examples to creat confusion matrix.
