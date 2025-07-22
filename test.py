@@ -1,11 +1,9 @@
 import numpy as np
-import os
 
-x_old = np.load("Adversaries/CIFAR10/FGSM_train_data_old.npy", allow_pickle=True)
-y_old = np.load("Adversaries/CIFAR10/FGSM_train_data_old.npy", allow_pickle=True)
+t = np.load("Datasets/TopoDNN/train_target.npy")[:1024]
+y = np.load("Adversaries/TopoDNN/RDSA_train_labels_10.npy")[:1024]
 
-x_new = np.load("Adversaries/CIFAR10/FGSM_train_data.npy", allow_pickle=True)
-y_new = np.load("Adversaries/CIFAR10/FGSM_train_data.npy", allow_pickle=True)
+for a,b in zip(t,y):
+    print(a,b)
 
-print(np.unique(x_old == x_new, return_counts=True))
-print(np.unique(y_old == y_new, return_counts=True))
+print(np.unique(np.argmax(t,axis=1)==np.argmax(y, axis=1), return_counts=True))

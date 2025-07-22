@@ -2,6 +2,7 @@ import numpy as np
 import os
 import sys
 import warnings
+import timeit
 
 sys.path.append(os.getcwd())
 
@@ -170,6 +171,10 @@ def AttackDispatcher(**kwargs):
             assert isinstance(perturbedFeatureCount, int) and perturbedFeatureCount > 0, "Perturbed feature count must be a positive integer."
             assert perturbedFeatureCount <= np.prod(input_shape), f"The number of features to perturb ({perturbedFeatureCount}) must not exceed the number of input variables ({np.prod(input_shape)})."
 
+    
+
+    t1 = timeit.default_timer()
+
 
 
     # Load dataset, without mmap_mode this time.
@@ -182,7 +187,11 @@ def AttackDispatcher(**kwargs):
     except Exception as e:
         raise ValueError(f"Failed to load model from {modelPath}:\n\n{e}")
     
-    model.summary()
+    # model.summary()
+
+
+
+    t2 = timeit.default_timer()
 
 
 
@@ -227,7 +236,10 @@ def AttackDispatcher(**kwargs):
             n=n
         )
 
+    t3 = timeit.default_timer()
 
+    print("Time to load:", t2-t1)
+    print("Time to attack:", t3-t2)
 
     # Flexible saving mechanism that avoids overwriting existing files unless forced explicitly allowed.
     if not os.path.isfile(adversaryPath) or force_overwrite or input("Adversary file already exists. Overwrite? (y/n): ").lower() == "y":

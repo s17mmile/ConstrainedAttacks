@@ -34,11 +34,11 @@ if __name__ == "__main__":
 
     AttackDispatcher(
         attack_type="FGSM",
-        datasetPath="Datasets/CIFAR10/train_data.npy",
-        targetPath="Datasets/CIFAR10/train_target.npy",
-        modelPath="Models/CIFAR10/base_model.keras",
-        adversaryPath="Adversaries/CIFAR10/FGSM_train_data.npy",
-        newLabelPath="Adversaries/CIFAR10/FGSM_train_labels.npy",
+        datasetPath="Datasets/MNIST/train_data.npy",
+        targetPath="Datasets/MNIST/train_target.npy",
+        modelPath="Models/MNIST/maxpool_model.keras",
+        adversaryPath="Adversaries/MNIST/FGSM_train_data.npy",
+        newLabelPath="Adversaries/MNIST/FGSM_train_labels.npy",
         lossObject=keras.losses.CategoricalCrossentropy(),
         epsilon=0.1,
         n=1024,
@@ -47,4 +47,3 @@ if __name__ == "__main__":
         constrainer=constrainer,
         force_overwrite=False
     )
-

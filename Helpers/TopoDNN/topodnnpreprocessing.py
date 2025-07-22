@@ -146,6 +146,44 @@ def topodnn_preprocess(input_filename):
     # Format conversion
     df_as_array = df_pt_eta_phi_flipped.to_numpy()
 
+    debug = True
+    if (debug):
+        # Outputs so I know what I'm working with.
+        print(df_pt_eta_phi_flipped)
+
+        print("\n\npT")
+        # print(df_as_array[:,0::3])
+
+        print("Minimum pT")
+        print(np.min(df_as_array[:,0::3]))
+
+        print("Maximum pT")
+        print(np.max(df_as_array[:,0::3]))
+
+
+
+        print("\n\neta")
+        # print(df_as_array[:,1::3])
+
+        print("Minimum eta")
+        print(np.min(df_as_array[:,1::3]))
+
+        print("Maximum eta")
+        print(np.max(df_as_array[:,1::3]))
+
+
+
+        print("\n\nphi")
+        # print(df_as_array[:,2::3])
+
+        print("Minimum phi")
+        print(np.min(df_as_array[:,2::3]))
+
+        print("Maximum phi")
+        print(np.max(df_as_array[:,2::3]))
+
+
+
     # Extract events by excluding the final column. This final column includes the labels, which still need to be converted into one-hot target vectors.
     data, labels = np.hsplit(df_as_array, [90])
     labels = labels.astype(int)

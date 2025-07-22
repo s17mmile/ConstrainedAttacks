@@ -37,7 +37,7 @@ def constrained_FGSM(model, example, target, lossObject, epsilon = 0.01, constra
 
     with tf.GradientTape() as tape:
         tape.watch(exampleTensor)
-        prediction = model(exampleTensor)[0]
+        prediction = model(exampleTensor, training = False)[0]
         loss = lossObject(target, prediction)
 
     # Get the gradients of the loss w.r.t to the input example.
@@ -48,7 +48,9 @@ def constrained_FGSM(model, example, target, lossObject, epsilon = 0.01, constra
     adversary = exampleTensor + epsilon * gradient_sign
 
     if constrainer is not None:
+        adversary = adversary.numpy()[0]
         adversary = constrainer(adversary)
+        adversary = tf.convert_to_tensor([adversary])
 
     newLabel = model(adversary, training = False)
 

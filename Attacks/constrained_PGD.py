@@ -48,7 +48,7 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
         with tf.GradientTape(persistent = True) as tape:
             tape.watch(adversary)
             # Run model on current adversary
-            prediction = model(adversary)[0]
+            prediction = model(adversary, training = False)[0]
 
             # Stop early if the prediction is already incorrect.
             if np.argmax(prediction) != np.argmax(target):
@@ -66,11 +66,15 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
 
         # If given: apply the feasibility projector.
         if feasibilityProjector is not None:
+            adversary = adversary.numpy()[0]
             adversary = feasibilityProjector(adversary)
+            adversary = tf.convert_to_tensor([adversary])
 
     # If given: apply the final constrainer.
     if constrainer is not None:
+        adversary = adversary.numpy()[0]
         adversary = constrainer(adversary)
+        adversary = tf.convert_to_tensor([adversary])
 
     newLabel = model(adversary, training = False)
 

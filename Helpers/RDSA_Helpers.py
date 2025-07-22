@@ -53,7 +53,9 @@ def featureContinuity(data, categoricalLimit):
     allFeatureIndices = [transformIndex(i,exampleShape) for i in range(featureCount)]
 
     # Using * to unwrap coordinate tuple into indexing arguments.
-    numUniqueValues = [len(np.unique(data[:,*indices])) for indices in allFeatureIndices]
+    numUniqueValues = [len(np.unique(data[:,*indices])) for indices in tqdm.tqdm(allFeatureIndices)]
+
+    # print(numUniqueValues)
 
     continuousFeatures = [allFeatureIndices[i] for i, unique_count in enumerate(numUniqueValues) if unique_count > categoricalLimit]
     categoricalFeatures = np.delete(allFeatureIndices, continuousFeatures)
@@ -77,14 +79,14 @@ def featureDistributions(data, features, binCount):
     exampleShape = data.shape[1:]
     featureCount = np.prod(exampleShape)
 
-    print("Initializing histograms.")
+    print("Initializing histograms...")
 
     binEdges = np.empty(exampleShape+(binCount+1,))
     probabilities = np.empty(exampleShape+(binCount,))
 
-    print("Calculating Histograms.")
+    print("Calculating Histograms...")
 
-    for featureIndex in features:
+    for featureIndex in tqdm.tqdm(features):
         frequencies, edges = np.histogram(data[:,*featureIndex], bins = binCount, density=True)
 
         binEdges[featureIndex] = edges

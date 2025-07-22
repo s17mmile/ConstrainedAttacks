@@ -33,18 +33,18 @@ def constrainer(example):
 if __name__ == "__main__":
 
     AttackDispatcher(
-        attack_type="FGSM",
-        datasetPath="Datasets/CIFAR10/train_data.npy",
-        targetPath="Datasets/CIFAR10/train_target.npy",
-        modelPath="Models/CIFAR10/base_model.keras",
-        adversaryPath="Adversaries/CIFAR10/FGSM_train_data.npy",
-        newLabelPath="Adversaries/CIFAR10/FGSM_train_labels.npy",
+        attack_type="PGD",
+        datasetPath="Datasets/ImageNet/threshold_data.npy",
+        targetPath="Datasets/ImageNet/threshold_target.npy",
+        modelPath="Models/ImageNet/base_model.keras",
+        adversaryPath="Adversaries/ImageNet/PGD_threshold_data.npy",
+        newLabelPath="Adversaries/ImageNet/PGD_threshold_labels.npy",
         lossObject=keras.losses.CategoricalCrossentropy(),
-        epsilon=0.1,
+        stepcount=20,
+        stepsize=0.01,
         n=1024,
         workercount=8,
         chunksize=64,
         constrainer=constrainer,
         force_overwrite=False
     )
-

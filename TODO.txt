@@ -18,19 +18,26 @@ Tensorflow previous version: 2.16.1
 Update MNIST comparison script to show target and label instead of "old label" as it's inaccurate.
 
 PGD: variable step size?
-PGD: early stopping
 
 RDSA: Decide on proper parameters for TopoDNN
 
-Use del in more places to save memory
-
-Make constrainers a local import!
+Make constrainers and other useful a local import --> Helpers.constrainers or sth
 
 Redo the "prediction success" outputs as the indexing can be wrong.
     --> Rename "success" arrays into something more appropriate (currently, it's 1 if the input is MISclassified, so 1-accuracy)
     --> Actually just get rid of the stupid success arrays. We have the labels, we can just check that in evaluation/display.
 
 Write attack dispatcher script so I can just keep the actually launched .py file as a set of parameters followed by a single function call.
+
+Create Histogram creator script
+
+Apply and measure different distance metrics
+
+Figure out at what point in the process I want to run the model on all the unchanged examples to creat confusion matrix.
+
+Can PGD and RDSA be combined somehow?
+
+TopoDNN: Count constituents
 
 Introduce restrictions.
     --> For topodnn, find some shit that makes sense that isn't just Energy Conservation.

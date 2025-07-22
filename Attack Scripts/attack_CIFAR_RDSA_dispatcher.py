@@ -29,22 +29,24 @@ def constrainer(example):
     return linearRescale(example,0,1)
 
 
+
 # This extra specifier is necessary to use multiprocessing without getting a recursion error.
 if __name__ == "__main__":
 
     AttackDispatcher(
-        attack_type="FGSM",
+        attack_type="RDSA",
         datasetPath="Datasets/CIFAR10/train_data.npy",
         targetPath="Datasets/CIFAR10/train_target.npy",
         modelPath="Models/CIFAR10/base_model.keras",
-        adversaryPath="Adversaries/CIFAR10/FGSM_train_data.npy",
-        newLabelPath="Adversaries/CIFAR10/FGSM_train_labels.npy",
-        lossObject=keras.losses.CategoricalCrossentropy(),
-        epsilon=0.1,
+        adversaryPath="Adversaries/CIFAR10/RDSA_train_data.npy",
+        newLabelPath="Adversaries/CIFAR10/RDSA_train_labels.npy",
+        attempts=25,
+        categoricalFeatureMaximum=100,
+        binCount=100,
+        perturbedFeatureCount=300,
         n=1024,
         workercount=8,
         chunksize=64,
         constrainer=constrainer,
         force_overwrite=False
     )
-

@@ -61,10 +61,21 @@ def constrained_RDSA(model, example, target, steps, perturbationIndices, binEdge
 
         # To extract the integer label, we search for the index of the highest entry in the prediction vector.
         if np.argmax(newLabel) != np.argmax(target):
+            print()
+            print(newLabel)
+            print(target)
+            print(s)
             break
+            
+        if s==steps-1:
+            print(newLabel)
+            print(target)
+            print("fail")
 
     # If none of the attempts yielded fooling success, return with a fail state. We might as well still keep track of the adversary as a failed fooling attempt (or rather, one of many). 
     return adversary, newLabel
+
+
 
 def parallel_constrained_RDSA(model, dataset, targets, steps, categoricalFeatureMaximum, binCount, perturbedFeatureCount, constrainer = None, workercount = 1, chunksize = 4, n = None):
     '''
