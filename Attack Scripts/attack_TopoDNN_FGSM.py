@@ -18,22 +18,7 @@ import keras
 # Local imports
 import Attacks.constrained_FGSM as cFGSM
 
-
-
-# Rescale an arrary linearly from its original range into a given one.
-def linearRescale(array, newMin, newMax):
-    minimum, maximum = np.min(array), np.max(array)
-    m = (newMax - newMin) / (maximum - minimum)
-    b = newMin - m * minimum
-    scaledArray = m * array + b
-    # Remove rounding errors by clipping. The difference is tiny.
-    return np.clip(scaledArray, newMin, newMax)
-
-# Todo write constrainer that re-scales everything linearly instead of just clipping it.
 def constrainer(example):
-    example = example.numpy()[0]
-    linearRescale(example,0,1)
-    example = tf.convert_to_tensor(np.array([example]))
     return example
 
 

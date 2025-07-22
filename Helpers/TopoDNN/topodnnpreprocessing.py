@@ -12,6 +12,13 @@ import sys, os
 from sklearn.metrics import roc_curve
 import tqdm
 
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ["KERAS_BACKEND"] = "tensorflow"
+
+from keras.utils import to_categorical
+
+
+
 def get_pt_eta_phi_v(px, py, pz):
     '''Provides pt, eta, and phi given px, py, pz'''
     # Init variables
@@ -64,6 +71,7 @@ def topodnn_preprocess(input_filename):
 
     df = df.reset_index()
     df_pt_eta_phi["is_signal_new"] = df["is_signal_new"]
+
     del df
 
     MIN_PT = 0.0
@@ -137,18 +145,19 @@ def topodnn_preprocess(input_filename):
 
     # Format conversion
     df_as_array = df_pt_eta_phi_flipped.to_numpy()
-    
-    # Extract events by excluding the final column. This final column includes the labels, which still need to be converted into one-hot target vectors.
-    data, labels = np.vsplit(df_as_array, [89])
-    labels = labels[0].astype(int)
 
-    # Extract target values and create one-hot arrays for each.
-    event_count = labels.shape[0]
-    target = np.zeros((event_count, 2))
-    target[np.arange(event_count), labels] = 1
+    # Extract events by excluding the final column. This final column includes the labels, which still need to be converted into one-hot target vectors.
+    data, labels = np.hsplit(df_as_array, [90])
+    labels = labels.astype(int)
+
+    # Convert labels to one-hot target vectors
+    target = to_categorical(labels, num_classes=2)
 
     # Saving
-    print("Saving.")
-
+    print("Saving dataset...")
     np.save(input_filename.replace(".h5", "_data.npy"), data)
+    
+    print("Saving target...")
     np.save(input_filename.replace(".h5", "_target.npy"), target)
+
+    print("Done.")

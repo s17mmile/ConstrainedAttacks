@@ -19,6 +19,7 @@ Update MNIST comparison script to show target and label instead of "old label" a
 PGD: variable step size?
 PGD: early stopping
 Use del in more places to save memory
+Make constrainers a local import!
 Redo the "prediction success" outputs as the indexing can be wrong.
     --> Rename "success" arrays into something more appropriate (currently, it's 1 if the input is MISclassified, so 1-accuracy)
     --> Actually just get rid of the stupid success arrays. We have the labels, we can just check that in evaluation/display.
@@ -31,3 +32,7 @@ Introduce restrictions.
     --> Conclusion: does the same restriction applied to the same task produce comparable results?
     
 Retrain Models. Evaluate Performance.
+
+Make a nice readme.
+
+Check comments of each attack function to make sure the details are correct.

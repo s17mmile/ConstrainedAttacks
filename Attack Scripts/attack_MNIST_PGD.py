@@ -34,7 +34,6 @@ def linearRescale(array, newMin, newMax):
     # Remove rounding errors by clipping. The difference is tiny.
     return np.clip(scaledArray, newMin, newMax)
 
-# Todo write constrainer that re-scales everything linearly instead of just clipping it.
 def constrainer(example):
     example = example.numpy()[0]
     linearRescale(example,0,1)

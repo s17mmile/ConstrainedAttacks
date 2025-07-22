@@ -16,6 +16,8 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 
 import keras
 
+from keras.utils import to_categorical
+
 from ImageNet.compileDownload import compileDownload
 from TopoDNN.topodnnpreprocessing import topodnn_preprocess
 
@@ -28,7 +30,7 @@ get_imagenet = True
 get_topodnn = True
 
 # Create proper directory structure for Datasets folder
-folders = ["Datasets", "Datasets/MNIST", "Datasets/ImageNet", "Datasets/CIFAR-10", "Datasets/TopoDNN"]
+folders = ["Datasets", "Datasets/MNIST", "Datasets/ImageNet", "Datasets/CIFAR10", "Datasets/TopoDNN"]
 
 for name in folders:
     if not os.path.isdir(name):
@@ -57,11 +59,8 @@ if (get_mnist):
         x_test = np.expand_dims(x_test, -1)
 
         # Create one-hot labels
-        target_train = np.zeros((x_train.shape[0], 10)).astype(np.int64)
-        target_train[np.arange(x_train.shape[0]), y_train.flatten()] = 1
-
-        target_test = np.zeros((x_test.shape[0], 10)).astype(np.int64)
-        target_test[np.arange(x_test.shape[0]), y_test.flatten()] = 1
+        target_train = to_categorical(y_train, num_classes=10)
+        target_test = to_categorical(y_test, num_classes=10)
 
         if not trainDataExists:     np.save("Datasets/MNIST/train_data.npy", x_train)
         if not trainTargetExists:   np.save("Datasets/MNIST/train_target.npy", target_train)
@@ -70,42 +69,35 @@ if (get_mnist):
         
         print("MNIST: Completed.")
 
-# Fetch, save and extract the CIFAR-10 Dataset.
+# Fetch, save and extract the CIFAR10 Dataset.
 # Originally fetched the CIFAR Dataset in batches - this is now commented out as it unnecessarily complex.
-# Keras handily provides the CIFAR-10 Dataset in preprocessed numpy array form. 
+# Keras handily provides the CIFAR10 Dataset in preprocessed numpy array form. 
 print()
 if (get_cifar):
-    trainDataExists = os.path.isfile("Datasets/CIFAR-10/train_data.npy")
-    trainTargetExists = os.path.isfile("Datasets/CIFAR-10/train_target.npy")
-    testDataExists = os.path.isfile("Datasets/CIFAR-10/test_data.npy")
-    testTargetExists = os.path.isfile("Datasets/CIFAR-10/test_target.npy")
+    trainDataExists = os.path.isfile("Datasets/CIFAR10/train_data.npy")
+    trainTargetExists = os.path.isfile("Datasets/CIFAR10/train_target.npy")
+    testDataExists = os.path.isfile("Datasets/CIFAR10/test_data.npy")
+    testTargetExists = os.path.isfile("Datasets/CIFAR10/test_target.npy")
 
     if trainDataExists and trainTargetExists and testDataExists and testTargetExists:
-        print("CIFAR-10: Dataset present.")
+        print("CIFAR10: Dataset present.")
     else:
-        print("CIFAR-10: Fetching Dataset...")
+        print("CIFAR10: Fetching Dataset...")
         (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
 
         # Scale data to range [0,1] instead of [0,255]
         x_train = x_train.astype("float64")/255.0
         x_test = x_test.astype("float64")/255.0
 
-        # Data format: add extra dimension to make each smaple (28,28,3,1) instead of (28,28)
-        # x_train = np.expand_dims(x_train, -1)
-        # x_test = np.expand_dims(x_test, -1)
-
         # Create one-hot targets
-        target_train = np.zeros((x_train.shape[0], 10)).astype(np.int64)
-        target_train[np.arange(x_train.shape[0]), y_train.flatten()] = 1
+        target_train = to_categorical(y_train, num_classes=10)
+        target_test = to_categorical(y_test, num_classes=10)
 
-        target_test = np.zeros((x_test.shape[0], 10)).astype(np.int64)
-        target_test[np.arange(x_test.shape[0]), y_test.flatten()] = 1
-
-        if not trainDataExists:     np.save("Datasets/CIFAR-10/train_data.npy", x_train)
-        if not trainTargetExists:   np.save("Datasets/CIFAR-10/train_target.npy", target_train)
-        if not testDataExists:      np.save("Datasets/CIFAR-10/test_data.npy", x_test)
-        if not testTargetExists:    np.save("Datasets/CIFAR-10/test_target.npy", target_test)
-        print("CIFAR-10: Completed.")
+        if not trainDataExists:     np.save("Datasets/CIFAR10/train_data.npy", x_train)
+        if not trainTargetExists:   np.save("Datasets/CIFAR10/train_target.npy", target_train)
+        if not testDataExists:      np.save("Datasets/CIFAR10/test_data.npy", x_test)
+        if not testTargetExists:    np.save("Datasets/CIFAR10/test_target.npy", target_test)
+        print("CIFAR10: Completed.")
 
 # Fetch, save and extract all three ImageNet v2 testing Datasets.
 # This fetches one of three datasets provided for ImageNet v2, depending on the exact url.

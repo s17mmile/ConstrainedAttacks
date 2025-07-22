@@ -19,6 +19,9 @@ target = np.load("Datasets/TopoDNN/train_target.npy", allow_pickle=True)
 test_data = np.load("Datasets/TopoDNN/test_data.npy", allow_pickle=True)
 test_target = np.load("Datasets/TopoDNN/test_target.npy", allow_pickle=True)
 
+print("data shape:", data.shape)
+print("target shape:", target.shape)
+
 # Specify Model Input
 input_shape = (90,)
 

@@ -49,9 +49,7 @@ def constrained_FGSM(model, example, label, lossObject, epsilon = 0.01, constrai
     adversary = exampleTensor + epsilon * gradient_sign
 
     if constrainer is not None:
-        adversary = adversary.numpy()[0]
         adversary = constrainer(adversary)
-        adversary = tf.convert_to_tensor(np.array([adversary]))
 
     newLabel = model(adversary, training = False)
 

@@ -67,23 +67,18 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
 
         # If given: apply the feasibility projector.
         if feasibilityProjector is not None:
-            # print("feasibility projector")
             adversary = feasibilityProjector(adversary)
 
     # If given: apply the final constrainer.
     if constrainer is not None:
-        # print("constrainer")
         adversary = constrainer(adversary)
 
-    # print("predict")
     newLabel = model(adversary, training = False)
 
-    # print("convert 2")
     # Convert back to numpy
     adversary = adversary.numpy()[0]
     newLabel = newLabel.numpy()[0]
 
-    # print("return")
     return adversary, newLabel, (np.argmax(newLabel) != np.argmax(target))
 
 

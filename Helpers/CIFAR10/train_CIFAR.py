@@ -7,10 +7,10 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 import keras
 
 # Load the data and split it between train and test sets
-x_train = np.load("Datasets/CIFAR-10/train_data.npy")
-y_train = np.load("Datasets/CIFAR-10/train_target.npy")
-x_test = np.load("Datasets/CIFAR-10/test_data.npy")
-y_test = np.load("Datasets/CIFAR-10/test_target.npy")
+x_train = np.load("Datasets/CIFAR10/train_data.npy")
+y_train = np.load("Datasets/CIFAR10/train_target.npy")
+x_test = np.load("Datasets/CIFAR10/test_data.npy")
+y_test = np.load("Datasets/CIFAR10/test_target.npy")
 
 # Model parameters
 num_classes = 10
@@ -67,7 +67,7 @@ batch_size = 64
 epochs = 50
 
 callbacks = [
-    keras.callbacks.ModelCheckpoint(filepath="Models/CIFAR-10/epoch_{epoch}.keras"),
+    keras.callbacks.ModelCheckpoint(filepath="Models/CIFAR10/epoch_{epoch}.keras"),
     keras.callbacks.EarlyStopping(monitor="val_loss", patience=3),
 ]
 
@@ -80,7 +80,7 @@ model.fit(
     callbacks=callbacks,
 )
 
-model.save("Models/CIFAR-10/base_model.keras")
+model.save("Models/CIFAR10/base_model.keras")
 
 # Possible base model improvement by incorporating flips/shifts to augment data. ImageDataGenerator deprecated with new keras, though. Ah well.
 # # Small non-adversarial augmentation step once the previous fit seems to have plateaued --> Flip/Shift training images.
@@ -90,7 +90,7 @@ model.save("Models/CIFAR-10/base_model.keras")
 # steps_per_epoch = x_train.shape[0] // batch_size
 
 # augment_callbacks = [
-#     keras.callbacks.ModelCheckpoint(filepath="Models/CIFAR-10/augment_epoch_{epoch}.keras"),
+#     keras.callbacks.ModelCheckpoint(filepath="Models/CIFAR10/augment_epoch_{epoch}.keras"),
 #     keras.callbacks.EarlyStopping(monitor="val_loss", patience=3),
 # ]
 
