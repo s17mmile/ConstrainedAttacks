@@ -67,6 +67,8 @@ if __name__ == "__main__":
     model = keras.models.load_model(modelPath)
     model.summary()
 
+    quit()
+
     # Perform parallel FGSM (on first n testing samples)
     adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
         model = model,

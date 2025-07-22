@@ -67,6 +67,7 @@ if (get_mnist):
         if not trainTargetExists:   np.save("Datasets/MNIST/train_target.npy", target_train)
         if not testDataExists:      np.save("Datasets/MNIST/test_data.npy", x_test)
         if not testTargetExists:    np.save("Datasets/MNIST/test_target.npy", target_test)
+        
         print("MNIST: Completed.")
 
 # Fetch, save and extract the CIFAR-10 Dataset.

@@ -19,14 +19,14 @@ import keras
 # --> This is an improved, iterated version of the FGSM attack. Performing this with stepsize = epsilon, stepcount = 1 and feasaibilityProjector = None should yield exactly the same results.
 # --> The feasibilityProjector and final constrainer are given the option to be different, though in some cases it might make sense for the final projection to be the same feasibility constraint as before.
 # In this case, no constrainer argument is required.
-def constrained_PGD(model, example, label, lossObject, stepcount = 10, stepsize = 0.01, feasibilityProjector = None, constrainer = None):
+def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize = 0.01, feasibilityProjector = None, constrainer = None):
     '''
         Performs PGD attack on a single example with a given constraining function (if given). If not feasibilityProjector is given, this is just iuterated gradient descent.
 
         Params:
             model: a pre-trained keras model
             example: singular model input. Should be a simple 1D numpy array. Pass by value!
-            label: the correct classification label for the given instance --> probability vector (presumably, but not necessarily one-hot!). "Correct" Label is interpreted as the argmax.
+            target: the correct classification label for the given instance.
             lossObject: loss function to be used, quantifying the difference between the prediction and correct label. Typically supplied by tensorflow or keras - unsure of exact format.
             stepcount: number of gradient descent and projection cycles that should be performed.
             stepsize: perturbation scaler - constant for now. Scales the gradient (sign?) by this amount for each gradient descent step.
@@ -50,8 +50,13 @@ def constrained_PGD(model, example, label, lossObject, stepcount = 10, stepsize 
             tape.watch(adversary)
             # Run model on current adversary
             prediction = model(adversary)[0]
+
+            # Stop early if the prediction is already incorrect.
+            if np.argmax(prediction) != np.argmax(target):
+                break
+
             # Calculate loss of current adversary prediction
-            loss = lossObject(label, prediction)
+            loss = lossObject(target, prediction)
         
         # Get the gradients of the loss w.r.t to the current adversary.
         gradient = tape.gradient(loss, adversary)
@@ -79,12 +84,12 @@ def constrained_PGD(model, example, label, lossObject, stepcount = 10, stepsize 
     newLabel = newLabel.numpy()[0]
 
     # print("return")
-    return adversary, newLabel, (np.argmax(newLabel) != np.argmax(label))
+    return adversary, newLabel, (np.argmax(newLabel) != np.argmax(target))
 
 
 
 # Runs the constrained_FGSM function in parallel using a starmap 
-def parallel_constrained_PGD(model, dataset, labels, lossObject, stepcount = 10, stepsize = 0.01, feasibilityProjector = None, constrainer = None, workercount = 1, chunksize = 1):
+def parallel_constrained_PGD(model, dataset, targets, lossObject, stepcount = 10, stepsize = 0.01, feasibilityProjector = None, constrainer = None, workercount = 1, chunksize = 1):
     '''
         Performs constrained FGSM attack on a whole set of examples with a given constraining function (if given).
         The use of tqdm means that a progress bar will indicate progress during computation.
@@ -92,7 +97,7 @@ def parallel_constrained_PGD(model, dataset, labels, lossObject, stepcount = 10,
         Params:
             model: pre-trained keras model
             dataset: Set of model inputs. 2D numpy array.
-            labels: the correct classification labels for each instance. 2D numpy array.
+            targets: the correct classification labels for each instance. 2D numpy array.
             lossObject: loss function to be used, quantifying the difference between the prediction and correct label. Typically supplied by tensorflow or keras - unsure of exact format.
             epsilon: perturbation scaler - constant for now. Might modify to iterate towards smallest sufficient modification.
             constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
@@ -117,7 +122,7 @@ def parallel_constrained_PGD(model, dataset, labels, lossObject, stepcount = 10,
 
     with multiprocessing.get_context("spawn").Pool(workercount) as p:
         results = p.starmap(constrained_PGD, tqdm.tqdm(zip(
-            repeat(model), dataset, labels, repeat(lossObject), repeat(stepcount), repeat(stepsize), repeat(feasibilityProjector), repeat(constrainer)),
+            repeat(model), dataset, targets, repeat(lossObject), repeat(stepcount), repeat(stepsize), repeat(feasibilityProjector), repeat(constrainer)),
             total = dataset.shape[0]), chunksize=chunksize)
     
     # Format data for output

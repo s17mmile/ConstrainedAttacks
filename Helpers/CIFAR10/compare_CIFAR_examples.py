@@ -34,13 +34,6 @@ if __name__ == "__main__":
     X_attacked = np.load(perturbedDatasetPath, allow_pickle=True)
     Y_attacked = np.load(perturbedLabelPath, allow_pickle=True)
 
-    success = np.load(successPath, allow_pickle=True)
-
-    print("Fooling Ratio: ")
-    counts = np.unique(success, return_counts=True)
-
-    print(" | " + str(counts[1][1]) + " / " + str(counts[1][0] + counts[1][1]) + " = " + str(counts[1][1] / (counts[1][0] + counts[1][1])) + " | ")
-
     print()
     print("Indices: 0-" + str(Y_attacked.shape[0]-1))
 

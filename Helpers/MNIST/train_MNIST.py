@@ -71,5 +71,3 @@ model.fit(
 )
 
 model.save(modelPath+"base_model.keras")
-
-# score = model.evaluate(x_test, y_test, verbose=0)
