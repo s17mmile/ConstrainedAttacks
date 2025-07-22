@@ -45,8 +45,8 @@ targetPath = "Datasets/CIFAR10/train_target.npy"
 modelPath = "Models/CIFAR10/base_model.keras"
 
 # Output file paths
-adversaryPath = "Adversaries/CIFAR10/FGSM_train_data.npy"
-newLabelPath = "Adversaries/CIFAR10/FGSM_train_labels.npy"
+adversaryPath = "Adversaries/CIFAR10/FGSM_train_data_old.npy"
+newLabelPath = "Adversaries/CIFAR10/FGSM_train_labels_old.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
