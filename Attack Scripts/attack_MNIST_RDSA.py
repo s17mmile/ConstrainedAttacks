@@ -37,7 +37,6 @@ modelPath = "Models/MNIST/maxpool_model.keras"
 # Output file paths
 adversaryPath = "Adversaries/MNIST/RDSA_train_data.npy"
 newLabelPath = "Adversaries/MNIST/RDSA_train_labels.npy"
-successPath = "Adversaries/MNIST/RDSA_fooling_success.npy"
 
 categoricalFeatureMaximum = 150
 binCount = 100
@@ -68,10 +67,10 @@ if __name__ == "__main__":
 
 
     # Perform parallel RDSA
-    adversaries, newLabels, success = cRDSA.parallel_constrained_RDSA(
+    adversaries, newLabels = cRDSA.parallel_constrained_RDSA(
         model = model,
         dataset = data,
-        labels = target,
+        targets = target,
         steps = RDSA_attempts,
         categoricalFeatureMaximum = categoricalFeatureMaximum,
         binCount = binCount,
@@ -85,6 +84,5 @@ if __name__ == "__main__":
 
     np.save(adversaryPath, adversaries)
     np.save(newLabelPath, newLabels)
-    np.save(successPath, success)
-
+    
     print("Done.")

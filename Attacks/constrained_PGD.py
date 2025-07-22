@@ -33,8 +33,7 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
             feasibilityProjector: function that takes in an example (np array) and projects it to a case-specific feasibility region. Typically, this is an orthogonal projection onto a linearly defined subspace.
             constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
 
-        Returns: Adversary (1D numpy array), the label associated with it and a boolean to indicate fooling success.
-            --> If fooling was unsuccessful, return the original example and label along with a False indicator.
+        Returns: Adversary (1D numpy array) and the label associated with it.
     '''
 
     # Data formatting for use with GradientTape and as a model input
@@ -43,7 +42,7 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
     adversary = tf.convert_to_tensor(np.array([example]))
 
     # We re-instantiate the GradientTape each time. I'm not sure if this is a preformance loss, but it feels like it.
-    # I tried the oersistent tape, but could not get it to work.
+    # I tried the persistent tape, but could not get it to work.
     for step in range(stepcount):
         # print("step",step)
         with tf.GradientTape(persistent = True) as tape:
@@ -79,7 +78,7 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
     adversary = adversary.numpy()[0]
     newLabel = newLabel.numpy()[0]
 
-    return adversary, newLabel, (np.argmax(newLabel) != np.argmax(target))
+    return adversary, newLabel
 
 
 
@@ -100,20 +99,17 @@ def parallel_constrained_PGD(model, dataset, targets, lossObject, stepcount = 10
             workercount: How many threads should run in parallel. Recommended to be about half of the running device's thread count. Optional.
             chunksize: chunk size used for the starmap call. Approximately the number of examples assigned to each workrer at a time. Optional.
 
-        Returns three lists:
+        Returns two lists:
             Adversaries (numpy arrays)
             The labels associated with them
-            Booleans to indicate fooling success.
     '''
 
     # Return value contains a list for each perturbed example, with:
         # - the perturbed data
         # - the new label given to this data by the model. If this is different from the original, it's a success
-        # - a boolean indicating success
-    # (The final string goes unused for now, could be used to speed up evaluation)
+
     adversaries = []
     newLabels = []
-    success = []
 
     with multiprocessing.get_context("spawn").Pool(workercount) as p:
         results = p.starmap(constrained_PGD, tqdm.tqdm(zip(
@@ -125,6 +121,5 @@ def parallel_constrained_PGD(model, dataset, targets, lossObject, stepcount = 10
     for event in results:
         adversaries.append(event[0])
         newLabels.append(event[1])
-        success.append(event[2])
 
-    return np.array(adversaries), np.array(newLabels), np.array(success)
+    return np.array(adversaries), np.array(newLabels)

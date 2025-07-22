@@ -14,14 +14,14 @@ import keras
 
 import Helpers.RDSA_Helpers as RDSA_Help
 
-def constrained_RDSA(model, example, label, steps, perturbationIndices, binEdges, binProbabilites, constrainer = None):
+def constrained_RDSA(model, example, target, steps, perturbationIndices, binEdges, binProbabilites, constrainer = None):
     '''
         Performs RDSA attack on a single example with a given constraining function (if given).
 
         Params:
             model: a pre-trained keras model
             example: singular model input as a numpy array. Can be multidimensional.
-            label: the correct classification label for the given instance --> probability vector. "Correct" Label is interpreted as the argmax.
+            target: the correct classification label for the given instance (one-hot)
             steps: maximum number of shuffling attempts
             perturbationIndices: indices of the variables that should be shuffled.
             binEdges: Array of bin edge vectors (in ascending order) for the variables to be shuffled.
@@ -31,8 +31,7 @@ def constrained_RDSA(model, example, label, steps, perturbationIndices, binEdges
                 --> Note: There is always one more bin edge than there are bins. This will be corrected by randomly choosing a lower bin edge, excluding the highest one.
             constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
 
-        Returns: Adversary (1D numpy array), the label associated with it and a boolean to indicate fooling success.
-            --> If fooling was unsuccessful, return the original example and label 
+        Returns: Adversary (1D numpy array) and the label associated with it.
     '''
 
     # Initialize a copy of the given example
@@ -61,13 +60,13 @@ def constrained_RDSA(model, example, label, steps, perturbationIndices, binEdges
         newLabel = model(np.array([adversary]), training = False).numpy()[0]
 
         # To extract the integer label, we search for the index of the highest entry in the prediction vector.
-        if np.argmax(newLabel) != np.argmax(label):
-            return adversary, newLabel, True
+        if np.argmax(newLabel) != np.argmax(target):
+            break
 
     # If none of the attempts yielded fooling success, return with a fail state. We might as well still keep track of the adversary as a failed fooling attempt (or rather, one of many). 
-    return adversary, newLabel, False
+    return adversary, newLabel
 
-def parallel_constrained_RDSA(model, dataset, labels, steps, categoricalFeatureMaximum, binCount, perturbedFeatureCount, constrainer = None, workercount = 1, chunksize = 4, n = None):
+def parallel_constrained_RDSA(model, dataset, targets, steps, categoricalFeatureMaximum, binCount, perturbedFeatureCount, constrainer = None, workercount = 1, chunksize = 4, n = None):
     '''
         Performs constrained RDSA attack on a whole set of examples with a given constraining function (if given).
         The use of tqdm means that a progress bar will indicate progress during computation.
@@ -75,7 +74,7 @@ def parallel_constrained_RDSA(model, dataset, labels, steps, categoricalFeatureM
         Params:
             model: pre-trained keras model
             dataset: Set of model inputs. 2D numpy array.
-            labels: the correct classification label (vector!) for each instance. 2D numpy array.
+            targets: the correct classification label (vector!) for each instance. 2D numpy array.
             steps: maximum number of shuffling attempts. Integer.
 
             constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
@@ -84,10 +83,9 @@ def parallel_constrained_RDSA(model, dataset, labels, steps, categoricalFeatureM
             chunksize: chunk size used for the starmap call. Approximately the number of examples assigned to each workrer at a time. Optional.
             n: If given, only the first n examples will be perturbed. If None, all examples will be perturbed. Optional.
 
-        Returns three lists:
+        Returns two lists:
             Adversaries (numpy arrays)
             The labels associated with them
-            Booleans to indicate fooling success.
     '''
 
     # STEP 1: RDSA Preparation
@@ -125,15 +123,14 @@ def parallel_constrained_RDSA(model, dataset, labels, steps, categoricalFeatureM
 
     adversaries = []
     newLabels = []
-    success = []
 
     # Limit to first n examples if n is given
     dataset = dataset[:n]
-    labels = labels[:n]
+    targets = targets[:n]
 
     with multiprocessing.get_context("spawn").Pool(workercount) as p:
         results = p.starmap(constrained_RDSA, tqdm.tqdm(zip(
-                                repeat(model), dataset, labels, repeat(steps), perturbationIndexLists, repeat(binEdges), repeat(binProbabilites), repeat(constrainer)
+                                repeat(model), dataset, targets, repeat(steps), perturbationIndexLists, repeat(binEdges), repeat(binProbabilites), repeat(constrainer)
                             ),
                             total = dataset.shape[0]), chunksize=chunksize)
     
@@ -142,6 +139,5 @@ def parallel_constrained_RDSA(model, dataset, labels, steps, categoricalFeatureM
     for event in results:
         adversaries.append(event[0])
         newLabels.append(event[1])
-        success.append(event[2])
 
-    return np.array(adversaries), np.array(newLabels), np.array(success)
+    return np.array(adversaries), np.array(newLabels)

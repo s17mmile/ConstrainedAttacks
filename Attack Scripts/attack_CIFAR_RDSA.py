@@ -37,7 +37,6 @@ modelPath = "Models/CIFAR10/base_model.keras"
 # Output file paths
 adversaryPath = "Adversaries/CIFAR10/RDSA_train_data.npy"
 newLabelPath = "Adversaries/CIFAR10/RDSA_train_labels.npy"
-successPath = "Adversaries/CIFAR10/RDSA_fooling_success.npy"
 
 categoricalFeatureMaximum = 150
 binCount = 100
@@ -69,10 +68,10 @@ if __name__ == "__main__":
 
 
     # Perform parallel RDSA
-    adversaries, newLabels, success = cRDSA.parallel_constrained_RDSA(
+    adversaries, newLabels = cRDSA.parallel_constrained_RDSA(
         model = model,
         dataset = data,
-        labels = target,
+        targets = target,
         steps = RDSA_attempts,
         categoricalFeatureMaximum = categoricalFeatureMaximum,
         binCount = binCount,
@@ -87,6 +86,5 @@ if __name__ == "__main__":
 
     np.save(adversaryPath, adversaries)
     np.save(newLabelPath, newLabels)
-    np.save(successPath, success)
 
     print("Done.")

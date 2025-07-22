@@ -31,24 +31,23 @@ modelPath = "Models/TopoDNN/base_model.keras"
 # Output file paths
 adversaryPath = "Adversaries/TopoDNN/FGSM_train_data.npy"
 newLabelPath = "Adversaries/TopoDNN/FGSM_train_labels.npy"
-successPath = "Adversaries/TopoDNN/FGSM_fooling_success.npy"
 
 lossObject = keras.losses.BinaryCrossentropy()
 epsilon = 0.1
 
-n = 128
+n = 1024
 workercount = 8
-chunksize = 16
+chunksize = 64
 
 if __name__ == "__main__":
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
     if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
-        print("Found local dataset and labels.")
+        print("Found local dataset and targets.")
         data = np.load(datasetPath, allow_pickle=True)
         target = np.load(targetPath, allow_pickle=True)
     else:
-        print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
+        print("Did not find dataset or targets. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()
 
     # Load pre-trained Model
@@ -56,10 +55,10 @@ if __name__ == "__main__":
     model.summary()
 
     # Perform parallel FGSM
-    adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
+    adversaries, newLabels = cFGSM.parallel_constrained_FGSM(
         model = model,
         dataset = data[:n],
-        labels = target[:n],
+        targets = target[:n],
         lossObject = lossObject,
         epsilon = epsilon,
         constrainer = constrainer,
@@ -71,6 +70,5 @@ if __name__ == "__main__":
 
     np.save(adversaryPath, adversaries)
     np.save(newLabelPath, newLabels)
-    np.save(successPath, success)
 
     print("Done.")

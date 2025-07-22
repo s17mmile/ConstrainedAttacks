@@ -12,6 +12,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ["KERAS_BACKEND"] = "tensorflow"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 
+import tensorflow as tf
 import keras
 
 # Local imports
@@ -31,7 +32,10 @@ def linearRescale(array, newMin, newMax):
 
 # Todo write constrainer that re-scales everything linearly instead of just clipping it.
 def constrainer(example):
-    return linearRescale(example,0,1)
+    example = example.numpy()[0]
+    linearRescale(example,0,1)
+    example = tf.convert_to_tensor(np.array([example]))
+    return example
 
 
 
@@ -43,24 +47,23 @@ modelPath = "Models/CIFAR10/base_model.keras"
 # Output file paths
 adversaryPath = "Adversaries/CIFAR10/FGSM_train_data.npy"
 newLabelPath = "Adversaries/CIFAR10/FGSM_train_labels.npy"
-successPath = "Adversaries/CIFAR10/FGSM_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
 
-n = 128
+n = 1024
 workercount = 8
-chunksize = 16
+chunksize = 64
 
 if __name__ == "__main__":
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
     if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
-        print("Found local dataset and labels.")
+        print("Found local dataset and targets.")
         data = np.load(datasetPath, allow_pickle=True)
         target = np.load(targetPath, allow_pickle=True)
     else:
-        print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
+        print("Did not find dataset or targets. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()
 
     # Load pre-trained Model
@@ -68,10 +71,10 @@ if __name__ == "__main__":
     model.summary()
 
     # Perform parallel FGSM (on first n testing samples)
-    adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
+    adversaries, newLabels = cFGSM.parallel_constrained_FGSM(
         model = model,
         dataset = data[:n],
-        labels = target[:n],
+        targets = target[:n],
         lossObject = lossObject,
         epsilon = epsilon,
         constrainer = constrainer,
@@ -83,6 +86,5 @@ if __name__ == "__main__":
 
     np.save(adversaryPath, adversaries)
     np.save(newLabelPath, newLabels)
-    np.save(successPath, success)
 
     print("Done.")

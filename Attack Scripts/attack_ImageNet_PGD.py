@@ -21,7 +21,7 @@ import Attacks.constrained_PGD as cPGD
 
 
 
-# Takes in and returns an example (tensor) and applies a constraint. 
+# Takes in and returns an example (tensor) and applies a projection. 
 def feasibilityProjector(example):
     return example
 
@@ -51,7 +51,6 @@ modelPath = "Models/ImageNet/base_model.keras"
 # Output file paths
 adversaryPath = "Adversaries/ImageNet/PGD_threshold_data.npy"
 newLabelPath = "Adversaries/ImageNet/PGD_threshold_labels.npy"
-successPath = "Adversaries/ImageNet/PGD_threshold_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 stepcount = 20
@@ -66,11 +65,11 @@ if __name__ == "__main__":
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
     if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
-        print("Found local dataset and labels.")
+        print("Found local dataset and targets.")
         data = np.load(datasetPath, allow_pickle=True)
         target = np.load(targetPath, allow_pickle=True)
     else:
-        print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
+        print("Did not find dataset or targets. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()
 
     # Load pre-trained Model
@@ -78,10 +77,10 @@ if __name__ == "__main__":
     model.summary()
 
     # Perform parallel PGD
-    adversaries, newLabels, success = cPGD.parallel_constrained_PGD(
+    adversaries, newLabels = cPGD.parallel_constrained_PGD(
         model = model,
         dataset = data[:n],
-        labels = target[:n],
+        targets = target[:n],
         lossObject = lossObject,
         stepcount = stepcount,
         stepsize = stepsize,
@@ -95,6 +94,5 @@ if __name__ == "__main__":
 
     np.save(adversaryPath, adversaries)
     np.save(newLabelPath, newLabels)
-    np.save(successPath, success)
 
     print("Done.")

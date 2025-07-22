@@ -45,23 +45,25 @@ modelPath = "Models/MNIST/maxpool_model.keras"
 # Output file paths
 adversaryPath = "Adversaries/MNIST/FGSM_train_data.npy"
 newLabelPath = "Adversaries/MNIST/FGSM_train_labels.npy"
-successPath = "Adversaries/MNIST/FGSM_fooling_success.npy"
 
 lossObject = keras.losses.CategoricalCrossentropy()
 epsilon = 0.1
 
+n = 1024
 workercount = 8
-chunksize = 16
+chunksize = 64
 
 if __name__ == "__main__":
     # Load dataset
     # If the dataset is saved locally, just use that instead of re-downloading. This assumes that it is already properly normalized and categorized.
     if os.path.isfile(datasetPath) and os.path.isfile(targetPath):
-        print("Found local dataset and labels.")
+        print("Found local dataset and targets.")
         data = np.load(datasetPath, allow_pickle=True)
+        print("Loaded dataset with shape:", data.shape)
         target = np.load(targetPath, allow_pickle=True)
+        print("Loaded target with shape:", target.shape)
     else:
-        print("Did not find dataset or labels. Make sure it is downloaded and properly preprocessed using the given helper script.")
+        print("Did not find dataset or targets. Make sure it is downloaded and properly preprocessed using the given helper script.")
         quit()
 
     # Load pre-trained Model
@@ -69,10 +71,10 @@ if __name__ == "__main__":
     model.summary()
 
     # Perform parallel FGSM
-    adversaries, newLabels, success = cFGSM.parallel_constrained_FGSM(
+    adversaries, newLabels = cFGSM.parallel_constrained_FGSM(
         model = model,
-        dataset = data,
-        labels = target,
+        dataset = data[:n],
+        targets = target[:n],
         lossObject = lossObject,
         epsilon = epsilon,
         constrainer = constrainer,
@@ -84,6 +86,5 @@ if __name__ == "__main__":
 
     np.save(adversaryPath, adversaries)
     np.save(newLabelPath, newLabels)
-    np.save(successPath, success)
 
     print("Done.")

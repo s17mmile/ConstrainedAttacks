@@ -16,14 +16,21 @@ Tensorflow previous version: 2.16.1
 
 --> YOU ARE HERE
 Update MNIST comparison script to show target and label instead of "old label" as it's inaccurate.
+
 PGD: variable step size?
 PGD: early stopping
+
+RDSA: Decide on proper parameters for TopoDNN
+
 Use del in more places to save memory
+
 Make constrainers a local import!
+
 Redo the "prediction success" outputs as the indexing can be wrong.
     --> Rename "success" arrays into something more appropriate (currently, it's 1 if the input is MISclassified, so 1-accuracy)
     --> Actually just get rid of the stupid success arrays. We have the labels, we can just check that in evaluation/display.
 
+Write attack dispatcher script so I can just keep the actually launched .py file as a set of parameters followed by a single function call.
 
 Introduce restrictions.
     --> For topodnn, find some shit that makes sense that isn't just Energy Conservation.
@@ -34,5 +41,7 @@ Introduce restrictions.
 Retrain Models. Evaluate Performance.
 
 Make a nice readme.
+
+Evaluate Performance impact caused by calculating adversaries one-by-one in a function call and not using some numpy array or tensorflow tensor fuckery to have it run several in a single function call in the context of the chosen data structure (array/tensor)...
 
 Check comments of each attack function to make sure the details are correct.
