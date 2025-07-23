@@ -40,3 +40,4 @@ Check comments of each attack function to make sure the details are correct.
 FUTURE:
     Can PGD and RDSA be combined somehow? A physics-oriented gradient-based attack that reduces correlations and retains distributions would be damn near perfect.
     (Evaluate Performance impact caused by calculating adversaries one-by-one in a function call and not using some numpy array or tensorflow tensor fuckery to have it run several in a single function call in the context of the chosen data structure (array/tensor)...)
+    Reduce input and output dataset size by using smaller floats or doing some downsampling. We really do not need 64-bit color depth. Using less fine-grained data might massively speed up our overall performance too.
