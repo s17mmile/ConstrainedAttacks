@@ -22,11 +22,11 @@ def constrained_FGSM(model, example, target, lossObject, epsilon = 0.01, constra
 
         Params:
             model: a pre-trained keras model
-            example: singular model input.
+            example: singular model input. Can be multidimensional.
             target: the correct classification label for the given instance (one-hot).
-            lossObject: loss function to be used, quantifying the difference between the prediction and correct label. Typically supplied by tensorflow or keras - unsure of exact format.
-            epsilon: perturbation scaler - constant for now. Might modify to iterate towards smallest sufficient modification.
-            constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
+            lossObject: loss function to be used, quantifying the difference between the prediction and correct label. Typically supplied by tensorflow or keras.
+            epsilon: perturbation scaler, constant.
+            constrainer: a function which takes in and returns an example as given here, and performs some projection/transformation operation to ensure case-specific feasibility. Optional.
 
         Returns: Adversary (1D numpy array) and the label associated with it.
     '''
@@ -44,9 +44,12 @@ def constrained_FGSM(model, example, target, lossObject, epsilon = 0.01, constra
     gradient = tape.gradient(loss, exampleTensor)
     # Get the sign of the gradients to create the perturbation
     gradient_sign = tf.sign(gradient)
-
+    # Apply perturbation
     adversary = exampleTensor + epsilon * gradient_sign
 
+    # If given: apply the final constrainer.
+    # This can result in a decrease of the loss function, there's not really any way to avoid that.
+    # We essentially hope that adding the constraint doesn't fix the prediction.
     if constrainer is not None:
         adversary = adversary.numpy()[0]
         adversary = constrainer(adversary)
@@ -70,9 +73,9 @@ def parallel_constrained_FGSM(model, dataset, targets, lossObject, epsilon = 0.1
 
         Params:
             model: pre-trained keras model
-            dataset: Set of model inputs. 2D numpy array.
-            targets: the correct classification labels for each instance. 2D numpy array.
-            lossObject: loss function to be used, quantifying the difference between the prediction and correct label. Typically supplied by tensorflow or keras - unsure of exact format.
+            dataset: Set of model inputs, tested using numpy arrays. Similar indexable structures such as tensors may work too.
+            targets: the correct classification labels for each instance, one-hot.
+            lossObject: loss function to be used, quantifying the difference between the prediction and correct label. Typically supplied by tensorflow or keras.
             epsilon: perturbation scaler - constant for now. Might modify to iterate towards smallest sufficient modification.
             constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
 

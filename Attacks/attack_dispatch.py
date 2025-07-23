@@ -186,8 +186,6 @@ def AttackDispatcher(**kwargs):
         model = keras.models.load_model(modelPath)
     except Exception as e:
         raise ValueError(f"Failed to load model from {modelPath}:\n\n{e}")
-    
-    # model.summary()
 
 
 
@@ -279,6 +277,12 @@ def AttackDispatcher(**kwargs):
 
 
     print("Attack complete.")
+
+    # Explicitly clear memory
+    del dataset
+    del target
+    del adversaries
+    del newLabels
 
     return
 

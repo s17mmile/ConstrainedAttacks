@@ -1,56 +1,46 @@
-Write paper while all steps are ongoing.
+TODAY:
 
-Write an extensive README to maybe make the code in this project retain its uselfulness.
+-> Note down all runtimes of overnight run!!!
 
+Investigate ImageNet RDSA Examples, the whole image is super "washed-out", almost white. Must've been some strange edge case with the constrainer...?
+    --> Check the constrainer (linearRescale)
+    --> well that sucks. ImageNet was actually configured for the range [-1,1], not [0,1]. So, the rescale to 0,1 might have fucked up some of the images.
+    --> Re-attack with a separate [-1,1] constrainer as I cannot retrain the ImageNet model...?
+    --> Why is this RDSA only?
+    --> Clear error in reclassification step, as adversary is now no longer in the correct format.
+    --> WHY IS IT SO WHITE?????
+    ok got it
 
-Keras previous version: 3.9.2 (newest?)
-Tensorflow previous version: 2.16.1
+Discuss fundamental difference in how we constrain PGD and RDSA methods! RDSA uses the constrainer like a feasibilityProjector.
+    --> Could it have both? In PGD, the constrainer could fix an adversary. Not so in RDSA.
+    --> I will move the location of the RDSA constrainer for now. In fact, since RDSA is a sampled algorithm, it should remain feasible (as in the value ranges) BY DEFINITION!
 
+Make constrainers and other useful maths stuff (e.g. linearRescale) a local import --> Helpers.constrainers or sth
 
+Write evaluators:
+    Create Histogram creator script
+    Apply and measure different distance metrics
+    Conufsion Matrix (was previous classification correct vs. is perturbed classification correct)
 
-
-1. ImageNet and MNIST: Save training and testing data separately.
-    --> Decide exactly which data should be augmented. 
-    --> I would assume we augment the training data while leaving training data unchanged.
-    --> Exception for ImageNet, as I cannot find the training data: use one of the three test sets for augmentation, one for evaluation.
-
---> YOU ARE HERE
-Update MNIST comparison script to show target and label instead of "old label" as it's inaccurate.
-
-PGD: variable step size?
-
-RDSA: Decide on proper parameters for TopoDNN
-
-Make constrainers and other useful a local import --> Helpers.constrainers or sth
-
-Redo the "prediction success" outputs as the indexing can be wrong.
-    --> Rename "success" arrays into something more appropriate (currently, it's 1 if the input is MISclassified, so 1-accuracy)
-    --> Actually just get rid of the stupid success arrays. We have the labels, we can just check that in evaluation/display.
-
-Write attack dispatcher script so I can just keep the actually launched .py file as a set of parameters followed by a single function call.
-
-Create Histogram creator script
-
-PGD variable stepsize: update comments
-
-Apply and measure different distance metrics
-
-Figure out at what point in the process I want to run the model on all the unchanged examples to creat confusion matrix.
-
-Can PGD and RDSA be combined somehow?
 
 TopoDNN: Count constituents
 
 Introduce restrictions.
     --> For topodnn, find some shit that makes sense that isn't just Energy Conservation.
-    --> Limit angular spread
+    --> Limit angular spread!!
     --> Introduce comparable restrictions for attacks on CIFAR-10 and ImageNet to see if their reactions are similar.
     --> Conclusion: does the same restriction applied to the same task produce comparable results?
     
 Retrain Models. Evaluate Performance.
 
 Make a nice readme.
-
-Evaluate Performance impact caused by calculating adversaries one-by-one in a function call and not using some numpy array or tensorflow tensor fuckery to have it run several in a single function call in the context of the chosen data structure (array/tensor)...
+Write Dataset and Model Overviews.
 
 Check comments of each attack function to make sure the details are correct.
+
+
+
+
+FUTURE:
+    Can PGD and RDSA be combined somehow? A physics-oriented gradient-based attack that reduces correlations and retains distributions would be damn near perfect.
+    (Evaluate Performance impact caused by calculating adversaries one-by-one in a function call and not using some numpy array or tensorflow tensor fuckery to have it run several in a single function call in the context of the chosen data structure (array/tensor)...)

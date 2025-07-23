@@ -31,6 +31,7 @@ def displayImage(image, description, model):
     plt.show()
 
 
+
 # Compare an ImageNet instance with a perturbed counterpart
 def compare_ImageNet(originalImage, originalLabel, target, perturbedImage, perturbedLabel, index):
 
@@ -43,18 +44,13 @@ def compare_ImageNet(originalImage, originalLabel, target, perturbedImage, pertu
     _, targetLabelName, _ = get_imagenet_label(np.array([target]))
     f.suptitle("Original vs. adversarial example with index " + str(index) + ". Target label: " + targetLabelName)
 
-    vmin = min(np.min(originalImage), np.min(perturbedImage))
-    vmax = max(np.max(originalImage), np.max(perturbedImage))
-
-    print("Limits: " + str(vmin) + " - " + str(vmax))
-
     _, originalLabelName, originalConfidence = get_imagenet_label(np.array([originalLabel]))
     ax[0,0].set_title('{} : {:.2f}% Confidence'.format(originalLabelName, originalConfidence*100))
-    ax[0,0].imshow(originalImage, vmin = vmin, vmax = vmax)
+    ax[0,0].imshow(originalImage)
 
     _, perturbedLabelName, perturbedConfidence = get_imagenet_label(np.array([perturbedLabel]))
     ax[0,1].set_title('{} : {:.2f}% Confidence'.format(perturbedLabelName, perturbedConfidence*100))
-    ax[0,1].imshow(perturbedImage, vmin = vmin, vmax = vmax)
+    ax[0,1].imshow(perturbedImage)
 
 
 

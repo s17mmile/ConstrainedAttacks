@@ -23,9 +23,8 @@ model = keras.models.load_model("Models/CIFAR10/base_model.keras")
 originalDatasetPath = "Datasets/CIFAR10/train_data.npy"
 originalTargetPath = "Datasets/CIFAR10/train_target.npy"
 
-perturbedDatasetPath = "Adversaries/CIFAR10/" + method + "_train_data.npy"
-perturbedLabelPath = "Adversaries/CIFAR10/" + method + "_train_labels.npy"
-successPath = "Adversaries/CIFAR10/" + method + "_fooling_success.npy"
+perturbedDatasetPath = "Adversaries/CIFAR10/" + method + "_train_data_full_ranged.npy"
+perturbedLabelPath = "Adversaries/CIFAR10/" + method + "_train_labels_full_ranged.npy"
 
 if __name__ == "__main__":
     X = np.load(originalDatasetPath, allow_pickle=True)

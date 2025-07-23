@@ -23,9 +23,8 @@ model = keras.models.load_model("Models/MNIST/maxpool_model.keras")
 originalDatasetPath = "Datasets/MNIST/train_data.npy"
 originalTargetPath = "Datasets/MNIST/train_target.npy"
 
-perturbedDatasetPath = "Adversaries/MNIST/" + method + "_train_data.npy"
-perturbedLabelPath = "Adversaries/MNIST/" + method + "_train_labels.npy"
-successPath = "Adversaries/MNIST/" + method + "_fooling_success.npy"
+perturbedDatasetPath = "Adversaries/MNIST/" + method + "_train_data_full_ranged.npy"
+perturbedLabelPath = "Adversaries/MNIST/" + method + "_train_labels_full_ranged.npy"
 
 if __name__ == "__main__":
     X = np.load(originalDatasetPath, allow_pickle=True)

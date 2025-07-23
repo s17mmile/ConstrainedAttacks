@@ -25,15 +25,15 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
 
         Params:
             model: a pre-trained keras model
-            example: singular model input. Should be a simple 1D numpy array. Pass by value!
-            target: the correct classification label for the given instance.
+            example: singular model input.
+            target: the correct classification label for the given instance. One-hot.
             lossObject: loss function to be used, quantifying the difference between the prediction and correct label. Typically supplied by tensorflow or keras - unsure of exact format.
             stepcount: number of gradient descent and projection cycles that should be performed.
-            stepsize: perturbation scaler - constant for now. Scales the gradient (sign?) by this amount for each gradient descent step.
+            stepsize: Callable function that takes in the step number and returns a step size to allow variability. Scales the gradient sign by this amount for each gradient descent step.
             feasibilityProjector: function that takes in an example (np array) and projects it to a case-specific feasibility region. Typically, this is an orthogonal projection onto a linearly defined subspace.
             constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
 
-        Returns: Adversary (1D numpy array) and the label associated with it.
+        Returns: Adversary and the label associated with it.
     '''
 
     # Data formatting for use with GradientTape and as a model input
@@ -71,6 +71,8 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
             adversary = tf.convert_to_tensor([adversary])
 
     # If given: apply the final constrainer.
+    # This can result in a decrease of the loss function, there's not really any way to avoid that.
+    # We essentially hope that adding the constraint doesn't fix the prediction.
     if constrainer is not None:
         adversary = adversary.numpy()[0]
         adversary = constrainer(adversary)
@@ -93,11 +95,13 @@ def parallel_constrained_PGD(model, dataset, targets, lossObject, stepcount = 10
         The use of tqdm means that a progress bar will indicate progress during computation.
 
         Params:
-            model: pre-trained keras model
-            dataset: Set of model inputs. 2D numpy array.
-            targets: the correct classification labels for each instance. 2D numpy array.
+            model: a pre-trained keras model
+            example: singular model input. Should be a simple 1D numpy array. Pass by value!
+            target: the correct classification label for the given instance.
             lossObject: loss function to be used, quantifying the difference between the prediction and correct label. Typically supplied by tensorflow or keras - unsure of exact format.
-            epsilon: perturbation scaler - constant for now. Might modify to iterate towards smallest sufficient modification.
+            stepcount: number of gradient descent and projection cycles that should be performed.
+            stepsize: Callable function that takes in the step number and returns a step size to allow variability. Scales the gradient sign by this amount for each gradient descent step.
+            feasibilityProjector: function that takes in an example (np array) and projects it to a case-specific feasibility region. Typically, this is an orthogonal projection onto a linearly defined subspace.
             constrainer: a function which takes in and returns an example as given here, and performs some projection operation to ensure case-specific feasibility. Optional.
 
             workercount: How many threads should run in parallel. Recommended to be about half of the running device's thread count. Optional.
@@ -110,7 +114,7 @@ def parallel_constrained_PGD(model, dataset, targets, lossObject, stepcount = 10
 
     # Return value contains a list for each perturbed example, with:
         # - the perturbed data
-        # - the new label given to this data by the model. If this is different from the original, it's a success
+        # - the new label assigned to this data by the model
 
     adversaries = []
     newLabels = []

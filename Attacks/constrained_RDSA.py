@@ -52,25 +52,24 @@ def constrained_RDSA(model, example, target, steps, perturbationIndices, binEdge
             
             adversary[*featureIndex] = new_value
 
-        # Apply constraint
-        if constrainer is not None:
-            adversary = constrainer(adversary)
 
         # Calculate the model's new prediction. Creates a 1D numpy array containing the probability associated with each class.
         newLabel = model(np.array([adversary]), training = False).numpy()[0]
 
         # To extract the integer label, we search for the index of the highest entry in the prediction vector.
         if np.argmax(newLabel) != np.argmax(target):
-            print()
-            print(newLabel)
-            print(target)
-            print(s)
             break
-            
-        if s==steps-1:
-            print(newLabel)
-            print(target)
-            print("fail")
+
+
+
+    # If given: apply the final constrainer.
+    # This can result in a decrease of the loss function, there's not really any way to avoid that.
+    # We essentially hope that adding the constraint doesn't fix the prediction.
+    if constrainer is not None:
+        adversary = constrainer(adversary)
+
+    # Calculate the model's new prediction. Creates a 1D numpy array containing the probability associated with each class.
+    newLabel = model(np.array([adversary]), training = False).numpy()[0]
 
     # If none of the attempts yielded fooling success, return with a fail state. We might as well still keep track of the adversary as a failed fooling attempt (or rather, one of many). 
     return adversary, newLabel

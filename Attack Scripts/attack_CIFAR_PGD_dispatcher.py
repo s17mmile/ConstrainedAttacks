@@ -29,7 +29,7 @@ def constrainer(example):
     return linearRescale(example,0,1)
 
 def stepsize(step):
-    return 0.1*(1/np.sqrt(2))**step
+    return 0.08*(1/2)**step
 
 # This extra specifier is necessary to use multiprocessing without getting a recursion error.
 if __name__ == "__main__":
@@ -39,12 +39,12 @@ if __name__ == "__main__":
         datasetPath="Datasets/CIFAR10/train_data.npy",
         targetPath="Datasets/CIFAR10/train_target.npy",
         modelPath="Models/CIFAR10/base_model.keras",
-        adversaryPath="Adversaries/CIFAR10/PGD_train_data.npy",
-        newLabelPath="Adversaries/CIFAR10/PGD_train_labels.npy",
+        adversaryPath="Adversaries/CIFAR10/PGD_train_data_full_ranged_weak.npy",
+        newLabelPath="Adversaries/CIFAR10/PGD_train_labels_full_ranged_weak.npy",
         lossObject=keras.losses.CategoricalCrossentropy(),
         stepcount=20,
         stepsize=stepsize,
-        n=1024,
+        # n=1024,
         workercount=8,
         chunksize=64,
         constrainer=constrainer,
