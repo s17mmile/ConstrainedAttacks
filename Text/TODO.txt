@@ -1,0 +1,42 @@
+Discuss fundamental difference in how we constrain PGD and RDSA methods! RDSA uses the constrainer like a feasibilityProjector.
+    --> Could it have both? In PGD, the constrainer could fix an adversary. Not so in RDSA.
+    --> I will move the location of the RDSA constrainer for now. In fact, since RDSA is a sampled algorithm, it should remain feasible (as in the value ranges) BY DEFINITION!
+    --> Avoid RDSA one-off overhead by saving histograms and continuity on disk?
+
+Quality of life:
+    --> Dispatcher should create output location if directory doesn't exist.
+    --> Properly document each dataset and its shape
+
+Write evaluators:
+    Create Histogram creator script
+    Apply and measure different distance metrics
+    Conufsion Matrix (was previous classification correct vs. is perturbed classification correct)
+
+Constrainer Architecture:
+    --> First, Make constrainers and other useful maths stuff (e.g. linearRescale) a local import --> Helpers.constrainers or sth
+
+Build a proper constrainer for TopoDNN
+    --> Make range constraints for each variable type (pT, eta, phi) --> Limiting Angular Spreads
+    --> Read up on the physics that gets you the Energy
+    --> Energy conservation
+    --> Check out impact of nonexistent constituents --> if a constit is all 0 (doesn't exist), then the algorithm can't create a new one from thin air.
+
+Build extra Testing Constrainers for other models:
+    --> Be careful with the ranges! ImageNet uses [-1,1] while the others use [0,1].
+    --> Add "black/white border" constraints or lines through the image
+
+
+Once we have full perturbed retraining data, both unconstrained/only ranged and constrained:  
+    Write adaptable retrainer script    
+    Retrain Models
+    Evaluate Performance
+
+
+Other:
+Make a nice readme.
+Write Dataset and Model Overviews.
+Check comments of each attack function to make sure the details are correct.
+
+FUTURE:
+    Can PGD and RDSA be combined somehow? A physics-oriented gradient-based attack that reduces correlations and retains distributions would be damn near perfect.
+    (Evaluate Performance impact caused by calculating adversaries one-by-one in a function call and not using some numpy array or tensorflow tensor fuckery to have it run several in a single function call in the context of the chosen data structure (array/tensor)...)
