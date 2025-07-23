@@ -19,7 +19,6 @@ import Attacks.constrained_RDSA as cRDSA
 
 
 
-
 def AttackDispatcher(**kwargs):
 
     '''

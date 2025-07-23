@@ -146,7 +146,7 @@ def topodnn_preprocess(input_filename):
     # Format conversion
     df_as_array = df_pt_eta_phi_flipped.to_numpy()
 
-    debug = True
+    debug = False
     if (debug):
         # Outputs so I know what I'm working with.
         print(df_pt_eta_phi_flipped)

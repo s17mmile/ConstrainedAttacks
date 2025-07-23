@@ -18,8 +18,8 @@ import keras
 
 from keras.utils import to_categorical
 
-from ImageNet.compileDownload import compileDownload
-from TopoDNN.topodnnpreprocessing import topodnn_preprocess
+from Helpers.ImageNet.compileDownload import compileDownload
+from Helpers.TopoDNN.topodnnpreprocessing import topodnn_preprocess
 
 print(os.getcwd())
 
