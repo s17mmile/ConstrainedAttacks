@@ -55,7 +55,7 @@ def constrained_FGSM(model, example, target, lossObject, epsilon = 0.1, constrai
     # This can result in a decrease of the loss function, there's not really any way to avoid that.
     # We essentially hope that adding the constraint doesn't fix the prediction.
     if constrainer is not None:
-        adversary = constrainer(adversary)
+        adversary = constrainer(adversary, example)
 
     # Compte and return the labels if wanted
     if (return_labels):

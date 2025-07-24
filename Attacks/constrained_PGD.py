@@ -42,6 +42,8 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
     # print("convert 1")
     adversary = tf.convert_to_tensor(np.array([example]))
 
+    print(adversary)
+
     # We re-instantiate the GradientTape each time. I'm not sure if this is a preformance loss, but it feels like it.
     # I tried the persistent tape, but could not get it to work.
     for step in range(stepcount):
@@ -65,10 +67,12 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
         # Apply Gradient perturbation
         adversary = adversary + stepsize(step) * gradient_sign
 
+        print(gradient)
+
         # If given: apply the feasibility projector.
         if feasibilityProjector is not None:
             adversary = adversary.numpy()[0]
-            adversary = feasibilityProjector(adversary)
+            adversary = feasibilityProjector(adversary, example)
             adversary = tf.convert_to_tensor([adversary])
 
     # Convert adversary to numpy. A user whould be able to apply custom constrainers to numpy arrays and not have to work with tensors.
@@ -78,7 +82,7 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
     # This can result in a decrease of the loss function, there's not really any way to avoid that.
     # We essentially hope that adding the constraint doesn't fix the prediction.
     if constrainer is not None:
-        adversary = constrainer(adversary)
+        adversary = constrainer(adversary, example)
 
     # Compte and return the labels if wanted
     if (return_labels):

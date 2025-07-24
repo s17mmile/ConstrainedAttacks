@@ -19,8 +19,6 @@ Retraining
     --> b) Should specify architecture and then train using a combination of the OG dataset and (chuunks of various sizes of) the adversarial data.
     --> Test retraining from scratch [using b)] and continued training of existing model [using a)].
 
-
-
 Other:
 Write Dataset and Model Overviews.
 Check comments of each attack function to make sure the details are correct.

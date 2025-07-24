@@ -12,82 +12,54 @@ import tensorflow as tf
 import keras
 
 from Attacks.attack_dispatch import AttackDispatcher
+import Helpers.constrainers as constrainers
 
 
 
-# Arbitrary Constraint for image classifiers
-# Add a one-pixel-wide white box (all color channels gets value 1) around any given image.
-# Example should be 3d numpy array.
-def addBox(example):
-    # Failsafe in case I fucked up the shape
-    if example.ndim != 3:
-        return example
 
-    example[0,:,:] = 1.
-    example[-1,:,:] = 1.
-    example[:,0,:] = 1.
-    example[:,-1,:] = 1.
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+# PGD stepsize specifier.
 
-    return example
-
-# Rescale an arrary linearly from its original range into a given one.
-def linearRescale(array, newMin, newMax):
-    minimum, maximum = np.min(array), np.max(array)
-    m = (newMax - newMin) / (maximum - minimum)
-    b = newMin - m * minimum
-    scaledArray = m * array + b
-    # Remove rounding errors by clipping. The difference is tiny.
-    return np.clip(scaledArray, newMin, newMax)
-
-def constrainer_scale_0_1_box(example):
-    example = linearRescale(example,0,1)
-    example = addBox(example)
-    return example
-
-def constrainer_scale_m1_1_box(example):
-    example = linearRescale(example,-1,1)
-    example = addBox(example)
-    return example
-
-def constrainer_TopoDNN_spreadlimit(example):
-    # Hardcoded minima and maxima across the training dataset
-    min_pT = 0.0
-    max_pT = 1.0
-
-    min_eta = -1.909346
-    max_eta = 2.119423
-
-    min_phi = -1.588196
-    max_phi = 1.443206
-
-    # Constrain pT, eta and phi values by clipping - we might lose some info, but doing a linear rescale here seems like it has more potential to break things than for image classifiers.
-    example[0::3] = np.clip(example[0::3], min_pT, max_pT)
-    example[1::3] = np.clip(example[1::3], min_eta, max_eta)
-    example[2::3] = np.clip(example[2::3], min_phi, max_phi)
-
-    return example
-
+# Exponential decrease to zero in on target. Inspired by binary search.
 def stepsize(step):
     return 0.05*(1/2**step)
 
 
 
 # Selector Panel: Choose which attacks to perform
-CIFAR_FGSM = True
-CIFAR_PGD = True
-CIFAR_RDSA = True
+CIFAR_FGSM = False
+CIFAR_PGD = False
+CIFAR_RDSA = False
 
-ImageNet_FGSM = True
-ImageNet_PGD = True
+ImageNet_FGSM = False
+ImageNet_PGD = False
 ImageNet_RDSA = False
 
-MNIST_FGSM = True
-MNIST_PGD = True
-MNIST_RDSA = True
+MNIST_FGSM = False
+MNIST_PGD = False
+MNIST_RDSA = False
 
-TopoDNN_FGSM = True
-TopoDNN_PGD = True
-TopoDNN_RDSA = True
+# We add some more specifiers for TopoDNN specifically, as we want to try more different constraints.
+# Note that we have two ways of performing the energy constraint.
+# In total, this gives us four adversarial data variations that we want to test:
+    # - clipping only
+    # - clipped and removed new constituents
+    # -  clipped, removed new constituents and energy-shifted all pTs the same amount
+    # -  clipped, removed new constituents and energy-shifted all pTs individually
+
+# The "Base Constraint" is just clipping the variables' values back into original ranges.
+# As of writing this, we already have adversarial topoDNN data that was constrained this way (no feasibilityProjector for PGD, only clip at end).
+# Thus, we do not need to re-run RDSA or FGSM at all! We can simply take the clipped data and apply the constituent conservation and both energy conservation strategies after the fact, saving loads of computation time and disk space.
+TopoDNN_FGSM_clip = False
+TopoDNN_PGD_clip = False
+TopoDNN_RDSA_clip = False
+
+# PGD uses the constrainers as a repeated projection function. Thus, we unfortunately need to re-attack from scratch multiple times, since we cannot just tack the constraint onto the end result.
+TopoDNN_PGD_constits_clip = False
+TopoDNN_PGD_constits_clip_globalEnergy = False
+TopoDNN_PGD_constits_clip_particleEnergy = True
+
+
 
 
 
@@ -108,12 +80,12 @@ if __name__ == "__main__":
                 adversarialLabelPath="Adversaries/CIFAR10/test/FGSM_train_labels.npy",
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 epsilon=0.05,
-                constrainer=constrainer_scale_0_1_box,
+                constrainer=constrainers.constrainer_scale_0_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -132,12 +104,12 @@ if __name__ == "__main__":
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 stepcount=20,
                 stepsize=stepsize,
-                feasibilityProjector=constrainer_scale_0_1_box,
+                constrainer=constrainers.constrainer_scale_0_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -157,12 +129,12 @@ if __name__ == "__main__":
                 categoricalFeatureMaximum=100,
                 binCount=100,
                 perturbedFeatureCount=300,
-                constrainer=constrainer_scale_0_1_box,
+                constrainer=constrainers.constrainer_scale_0_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -182,12 +154,12 @@ if __name__ == "__main__":
                 adversarialLabelPath="Adversaries/ImageNet/test/FGSM_threshold_labels.npy",
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 epsilon=0.05,
-                constrainer=constrainer_scale_m1_1_box,
+                constrainer=constrainers.constrainer_scale_m1_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -206,12 +178,12 @@ if __name__ == "__main__":
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 stepcount=20,
                 stepsize=stepsize,
-                feasibilityProjector=constrainer_scale_m1_1_box,
+                constrainer=constrainers.constrainer_scale_m1_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -231,12 +203,12 @@ if __name__ == "__main__":
                 categoricalFeatureMaximum=150,
                 binCount=200,
                 perturbedFeatureCount=10000,
-                constrainer=constrainer_scale_m1_1_box,
+                constrainer=constrainers.constrainer_scale_m1_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -256,12 +228,12 @@ if __name__ == "__main__":
                 adversarialLabelPath="Adversaries/MNIST/test/FGSM_train_labels.npy",
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 epsilon=0.05,
-                constrainer=constrainer_scale_0_1_box,
+                constrainer=constrainers.constrainer_scale_0_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -280,12 +252,12 @@ if __name__ == "__main__":
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 stepcount=20,
                 stepsize=stepsize,
-                feasibilityProjector=constrainer_scale_0_1_box,
+                constrainer=constrainers.constrainer_scale_0_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -305,19 +277,19 @@ if __name__ == "__main__":
                 categoricalFeatureMaximum=100,
                 binCount=100,
                 perturbedFeatureCount=200,
-                constrainer=constrainer_scale_0_1_box,
+                constrainer=constrainers.constrainer_scale_0_1,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
 
 
 
-    if (TopoDNN_FGSM):
+    if (TopoDNN_FGSM_clip):
         try:
             print("\n\n\nTopoDNN FGSM\n")
             AttackDispatcher(
@@ -330,17 +302,17 @@ if __name__ == "__main__":
                 adversarialLabelPath="Adversaries/TopoDNN/test/FGSM_train_labels.npy",
                 lossObject=keras.losses.BinaryCrossentropy(),
                 epsilon=0.05,
-                constrainer=constrainer_TopoDNN_spreadlimit,
+                constrainer=constrainers.constrainer_TopoDNN_spreadLimit,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
 
-    if (TopoDNN_PGD):
+    if (TopoDNN_PGD_clip):
         try:
             print("\n\n\nTopoDNN PGD\n")
             AttackDispatcher(
@@ -354,17 +326,17 @@ if __name__ == "__main__":
                 lossObject=keras.losses.BinaryCrossentropy(),
                 stepcount=20,
                 stepsize=stepsize,
-                feasibilityProjector=constrainer_TopoDNN_spreadlimit,
+                constrainer=constrainers.constrainer_TopoDNN_spreadLimit,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
 
-    if (TopoDNN_RDSA):
+    if (TopoDNN_RDSA_clip):
         try:
             print("\n\n\nTopoDNN RDSA\n")
             AttackDispatcher(
@@ -379,12 +351,86 @@ if __name__ == "__main__":
                 categoricalFeatureMaximum=100000,
                 binCount=1000,
                 perturbedFeatureCount=15,
-                constrainer=constrainer_TopoDNN_spreadlimit,
+                constrainer=constrainers.constrainer_TopoDNN_spreadLimit,
                 return_labels=True,
                 n=1,
                 force_overwrite=True,
                 workercount=8,
-                chunksize=128
+                chunksize=512
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+
+
+    if (TopoDNN_PGD_constits_clip):
+        try:
+            print("\n\n\nTopoDNN PGD constits clip\n")
+            AttackDispatcher(
+                attack_type="PGD",
+                datasetPath="Datasets/TopoDNN/train_data.npy",
+                targetPath="Datasets/TopoDNN/train_target.npy",
+                modelPath="Models/TopoDNN/base_model.keras",
+                adversaryPath="Adversaries/TopoDNN/conserveConstits_spreadLimit/PGD_train_data.npy",
+                # originalLabelPath="Adversaries/TopoDNN/test/Original_train_labels.npy",
+                # adversarialLabelPath="Adversaries/TopoDNN/test/PGD_train_labels.npy",
+                lossObject=keras.losses.BinaryCrossentropy(),
+                stepcount=20,
+                stepsize=stepsize,
+                feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit,
+                return_labels=False,
+                n=1,
+                force_overwrite=True,
+                workercount=8,
+                chunksize=512
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_PGD_constits_clip_globalEnergy):
+        try:
+            print("\n\n\nTopoDNN PGD constits clip globalEnergy\n")
+            AttackDispatcher(
+                attack_type="PGD",
+                datasetPath="Datasets/TopoDNN/train_data.npy",
+                targetPath="Datasets/TopoDNN/train_target.npy",
+                modelPath="Models/TopoDNN/base_model.keras",
+                adversaryPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/PGD_train_data.npy",
+                # originalLabelPath="Adversaries/TopoDNN/test/Original_train_labels.npy",
+                # adversarialLabelPath="Adversaries/TopoDNN/test/PGD_train_labels.npy",
+                lossObject=keras.losses.BinaryCrossentropy(),
+                stepcount=20,
+                stepsize=stepsize,
+                feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy,
+                return_labels=False,
+                n=1,
+                force_overwrite=True,
+                workercount=8,
+                chunksize=512
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_PGD_constits_clip_particleEnergy):
+        try:
+            print("\n\n\nTopoDNN PGD constits clip particleEnergy\n")
+            AttackDispatcher(
+                attack_type="PGD",
+                datasetPath="Datasets/TopoDNN/train_data.npy",
+                targetPath="Datasets/TopoDNN/train_target.npy",
+                modelPath="Models/TopoDNN/base_model.keras",
+                adversaryPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/PGD_train_data.npy",
+                # originalLabelPath="Adversaries/TopoDNN/test/Original_train_labels.npy",
+                # adversarialLabelPath="Adversaries/TopoDNN/test/PGD_train_labels.npy",
+                lossObject=keras.losses.BinaryCrossentropy(),
+                stepcount=20,
+                stepsize=stepsize,
+                feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy,
+                return_labels=False,
+                n=1,
+                force_overwrite=True,
+                workercount=8,
+                chunksize=512
             )
         except Exception as e:
             print(f"Failure: {e}")
