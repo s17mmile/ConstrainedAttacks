@@ -1,0 +1,93 @@
+Core Hardware: 
+CPU: Intel i7-7800X 6C/12T, 3.5 GHz
+RAM: 64 GB (4x16), DDR4, 2400 MHz (CRUCIAL CT16G4DFD824A) 
+SSD: Samsung 850 EVO 500GB
+GPU: GTX 1080 Ti
+    (not impactful as tests ran on windows native, with CPU-only tensorflow.)
+
+All the attacks were performed in sequence on a single computer over night.
+Since the computer had already been running for a long time beforehand, there should not be any differences introduced by thermal throttling/long-time operation.
+All attacks were performed with a batch size of 128 and a worker count of 8. This does not seem to fully align with the CPUs thread count, however, as task manager showed all logical processors running at full load during the attacks.
+Especially for TopoDNN attacks, I suspect a larger chunksize might be beneficial as each chunk is relatively small. Ah well.
+
+Times below are split by the dataset attacked and data loading/attack running times.
+    --> For RDSA, this is further split to account for the (approximate) runtime of histogram creatino beforehand 
+    --> If one wishes to attack the same dataset with different RDSA configs multiple times, it may be worth it to save the histograms on disk. The overhead is pretty small, though.
+    --> Interestingly, the runtime of RDSA is nonlinear in the number of features to perturb (and presumably quite complex!):
+        - If you perturb only a few features, each perturbation goes fast, but is less likely to result in misclassification, meaning more attampts are needed.
+        - If you perturb many features, each perturbation takes longer but has a higher chance to result in misclassification and return early.
+    --> The below listing includes some of the parameters that each attack was called with (presumably the most important ones!).
+
+
+
+CIFAR-10: 50000 images, 32 pixels x 32 pixels x 3 color channels = 3072 floats per sample. Inputs all in [0,1].
+FGSM/PGD Constrainer: Scale all values to [0,1] and add a 1-pixel white border to the image.
+PGD Feasibility: None
+PGD Max Stepcount: 20
+RDSA Attempts: 25
+RDSA Perturbed Feature Count: 300 (9.76% of total features)
+    FGSM:
+        load: <1s
+        run: ~08m
+    PGD:
+        load: <1s
+        run: ~11m
+    RDSA:
+        load: <1s
+        hist: 15s
+        run: ~23m
+
+ImageNet: 10000 images, 224 pixels x 224 pixels x 3 color channels = 150528 floats per sample. Inputs all in [-1,1].
+FGSM/PGD Constrainer: Scale all values to [-1,1] and add a 1-pixel white border to the image.
+PGD Feasibility: None
+PGD Max Stepcount: 20
+RDSA Attempts: 25
+RDSA Perturbed Feature Count: 10000 (6.6% of total features)
+    FGSM:
+        load: 3s
+        run: ~21m
+    PGD:
+        load: 3s
+        run: ~24m
+    RDSA:
+        load: 3s
+        hist: ~3m
+        run: ~1h 33m
+
+MNIST: 60000 images, 28 pixels x 28 pixels x 1 color channel = 784 floats per sample. Inputs all in [0,1].
+FGSM/PGD Constrainer: Scale all values to [0,1] and add a 1-pixel "white" border to the image.
+PGD Feasibility: None
+PGD Max Stepcount: 20
+RDSA Attempts: 25
+RDSA Perturbed Feature Count: 200 (25.5% of total features)
+    FGSM:
+        load: <1s
+        run: ~3m
+    PGD:
+        load: <1s
+        run: ~10m
+    RDSA:
+        load: <1s
+        hist: <5s
+        run: ~17m
+
+MNIST: 1211000 jets, 30 constituents x 3 variables (pT,eta,phi) = 90 floats per sample (3 fixed in place by preprocessing). Inputs ranged differently by variable type, but all in [-2.5,2.5].
+FGSM/PGD Constrainer: Clip all values back into the range for each variable type (pT,eta,phi separately).
+PGD Feasibility: None
+PGD Max Stepcount: 20
+RDSA Attempts: 25
+RDSA Perturbed Feature Count: 15 (16.6% of total features)
+    FGSM:
+        load: <1s
+        run: ~46m
+    PGD:
+        load: <1s
+        run: ~1h 17m
+    RDSA:
+        load: <1s
+        hist: ~15s
+        run: ~4h 45m
+
+
+
+Total runtime: about 10-11 hours!
