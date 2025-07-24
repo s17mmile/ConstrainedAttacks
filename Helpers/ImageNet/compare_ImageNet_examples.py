@@ -41,5 +41,5 @@ if __name__ == "__main__":
         except:
             break
 
-        originalLabel = model(np.array([X[index]]))[0]
+        originalLabel = model(np.array([X[index]]), training = False)[0]
         compare_ImageNet(X[index], originalLabel, Y[index], X_attacked[index], Y_attacked[index], index)

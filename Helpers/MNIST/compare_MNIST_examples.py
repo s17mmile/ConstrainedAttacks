@@ -23,8 +23,8 @@ model = keras.models.load_model("Models/MNIST/maxpool_model.keras")
 originalDatasetPath = "Datasets/MNIST/train_data.npy"
 originalTargetPath = "Datasets/MNIST/train_target.npy"
 
-perturbedDatasetPath = "Adversaries/MNIST/" + method + "_train_data_full_ranged.npy"
-perturbedLabelPath = "Adversaries/MNIST/" + method + "_train_labels_full_ranged.npy"
+perturbedDatasetPath = "Adversaries/MNIST/scaled_boxed/" + method + "_train_data.npy"
+perturbedLabelPath = "Adversaries/MNIST/scaled_boxed/" + method + "_train_labels.npy"
 
 if __name__ == "__main__":
     X = np.load(originalDatasetPath, allow_pickle=True)
@@ -43,5 +43,5 @@ if __name__ == "__main__":
         except:
             break
 
-        originalLabel = model(np.array([X[index]]))[0]
+        originalLabel = model(np.array([X[index]], training = False))[0]
         compare_MNIST784(X[index], originalLabel, Y[index], X_attacked[index], Y_attacked[index], index)

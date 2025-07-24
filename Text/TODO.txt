@@ -12,23 +12,21 @@ Big changes:
     --> LMAOOOOOOOOOOOOO
 
 Write evaluators:
-    Create Histogram creator script
+    Write Feature and Label Histogram creator scripts
     Apply and measure different distance metrics
-    Conufsion Matrix (was previous classification correct vs. is perturbed classification correct)
+    Confusion Matrix (was previous classification correct vs. is perturbed classification correct) --> Fooling Ratio
+    Correlation Matrix
 
 Constrainer Architecture:
-    --> First, Make constrainers and other useful maths stuff (e.g. linearRescale) a local import --> Helpers.constrainers or sth
+    --> First, Make constrainers and other useful maths stuff (e.g. linearRescale) a local import --> Helpers.constrainers or sth.
+    --> Give constrainers both the original example and adversary candidate as parameters to enable more flexibility.
 
 Build a proper constrainer for TopoDNN
-    --> Make range constraints for each variable type (pT, eta, phi) --> Limiting Angular Spreads
     --> Read up on the physics that gets you the Energy
-    --> Energy conservation
-    --> Check out impact of nonexistent constituents --> if a constit is all 0 (doesn't exist), then the algorithm can't create a new one from thin air.
+    --> Energy conservation. Also apply this as feasibilityProjector.
+    --> Check out impact of nonexistent constituents --> if a constit is all 0 (doesn't exist), then the algorithm can't create a new one from thin air. Also apply this as feasibilityProjector.
 
-Build extra Testing Constrainers for other models:
-    --> Be careful with the ranges! ImageNet uses [-1,1] while the others use [0,1].
-    --> Add "black/white border" constraints or lines through the image
-
+REDO PGD using the constrainer as FeasibilityProjector instead!!!!!
 
 Once we have full perturbed retraining data, both unconstrained/only ranged and constrained:  
     Write adaptable retrainer script    
@@ -45,3 +43,4 @@ FUTURE:
     Can PGD and RDSA be combined somehow? A physics-oriented gradient-based attack that reduces correlations and retains distributions would be damn near perfect.
     (Evaluate Performance impact caused by calculating adversaries one-by-one in a function call and not using some numpy array or tensorflow tensor fuckery to have it run several in a single function call in the context of the chosen data structure (array/tensor)...)
     Reduce input and output dataset size by using smaller floats or doing some downsampling. We really do not need 64-bit color depth. Using less fine-grained data might massively speed up our overall performance too.
+    Constrainers and FeasibilityProjectors should have a more flexible architecture, such as passing in a "Constrainer" class/subclass instance to allow for the passing of more/variable parameters.
