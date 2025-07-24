@@ -17,6 +17,32 @@ import Attacks.constrained_FGSM as cFGSM
 import Attacks.constrained_PGD as cPGD
 import Attacks.constrained_RDSA as cRDSA
 
+# Flexible numpy array saving mechanism that avoids overwriting existing files unless forced explicitly allowed.
+    # Path: full path to a file that should be saved. Includes filename and .npy ending.
+    # Array: To be saved.
+    # name: Used for output.
+    # force_overwrite: if True, overwrites file without asking for extra permission.
+def arraySavingManager(path, array, name, force_overwrite):
+    if not os.path.isfile(path) or force_overwrite or input(f"{name}: file already exists. Overwrite? (y/n): ").lower() == "y":
+        print(f"Saving {name}...")
+        np.save(path, array)
+        print(f"{name} saved.\n")
+
+    elif input(f"Save a copy of {name}? (y/n): ").lower() == "y":
+        print(f"Saving {name} as a copy...")
+
+        copyIndex = 0
+        while os.path.isfile(path.replace(".npy", f"_copy{copyIndex}.npy")):
+            copyIndex += 1
+        
+        np.save(path.replace(".npy", f"_copy{copyIndex}.npy"), array)
+        print(f"{name} saved as a copy.\n")
+
+    else:
+        print(f"{name} not saved. Discarding.\n")
+    
+    return
+
 
 
 def AttackDispatcher(**kwargs):
@@ -35,6 +61,14 @@ def AttackDispatcher(**kwargs):
     # Error handling. In if statement just to be able to collapse it in the IDE.
     check_arg_validity = True
     if (check_arg_validity):
+        # First optional param is super important and sets follow-up requirements, thus checked first.
+        if "return_labels" in kwargs:
+            return_labels = kwargs["return_labels"]
+            assert isinstance(return_labels, bool), "Return_labels must be a boolean."
+        else:
+            warnings.warn("Return_labels not specified, defaulting to False.")
+            return_labels = False    
+
         # Check if required parameters are provided and valid
         assert "attack_type" in kwargs, "Attack type must be specified."
         attack_type = kwargs["attack_type"]
@@ -60,10 +94,18 @@ def AttackDispatcher(**kwargs):
         assert adversaryPath.endswith(".npy"), "Adversary output path must point to a .npy file."
         assert os.path.isdir(os.path.dirname(adversaryPath)), "Adversary output directory does not exist."
 
-        assert "newLabelPath" in kwargs, "New label output path must be provided."
-        newLabelPath = kwargs["newLabelPath"]
-        assert newLabelPath.endswith(".npy"), "New label output path must point to a .npy file."
-        assert os.path.isdir(os.path.dirname(newLabelPath)), "New label output directory does not exist."
+        # If the user wishes to have labels for original and adversarial data computed, they must provide valid file paths to save them at.
+        if (return_labels):
+            assert "originalLabelPath" in kwargs, "Original label output path must be provided."
+            originalLabelPath = kwargs["originalLabelPath"]
+            assert originalLabelPath.endswith(".npy"), "Original label output path must end with .npy."
+            assert os.path.isdir(os.path.dirname(originalLabelPath)), "Original label output directory must exist."
+
+            assert "adversarialLabelPath" in kwargs, "Adversarial label output path must be provided."
+            adversarialLabelPath = kwargs["adversarialLabelPath"]
+            assert adversarialLabelPath.endswith(".npy"), "Adversarial label output path must end with .npy."
+            assert os.path.isdir(os.path.dirname(adversarialLabelPath)), "Adversarial label output directory must exist."
+
 
 
         # Check that the dataset can actualy be loaded and the shapes are compatible.
@@ -88,7 +130,9 @@ def AttackDispatcher(**kwargs):
 
 
 
-        # Check if optional parameters are provided and valid. Set defaults if not provided.
+        # Check if other optional parameters are provided and valid. Set defaults if not provided.
+        
+
         if "n" in kwargs:
             n = kwargs["n"]
             assert isinstance(n, int) and n > 0, "n must be a positive integer."
@@ -170,11 +214,7 @@ def AttackDispatcher(**kwargs):
             assert isinstance(perturbedFeatureCount, int) and perturbedFeatureCount > 0, "Perturbed feature count must be a positive integer."
             assert perturbedFeatureCount <= np.prod(input_shape), f"The number of features to perturb ({perturbedFeatureCount}) must not exceed the number of input variables ({np.prod(input_shape)})."
 
-    
-
     t1 = timeit.default_timer()
-
-
 
     # Load dataset, without mmap_mode this time.
     dataset = np.load(datasetPath, allow_pickle=True)
@@ -186,26 +226,25 @@ def AttackDispatcher(**kwargs):
     except Exception as e:
         raise ValueError(f"Failed to load model from {modelPath}:\n\n{e}")
 
-
-
     t2 = timeit.default_timer()
 
 
 
     if attack_type == "FGSM":
-        adversaries, newLabels = cFGSM.parallel_constrained_FGSM(
+        results = cFGSM.parallel_constrained_FGSM(
             model=model,
             dataset=dataset[:n],
             targets=target[:n],
             lossObject=lossObject,
             epsilon=epsilon,
             constrainer=constrainer,
+            return_labels=return_labels,
             workercount=workercount,
             chunksize=chunksize
         )
 
     elif attack_type == "PGD":
-        adversaries, newLabels = cPGD.parallel_constrained_PGD(
+        results = cPGD.parallel_constrained_PGD(
             model=model,
             dataset=dataset[:n],
             targets=target[:n],
@@ -214,12 +253,13 @@ def AttackDispatcher(**kwargs):
             stepsize=stepsize,
             feasibilityProjector=feasibilityProjector,
             constrainer=constrainer,
+            return_labels=return_labels,
             workercount=workercount,
             chunksize=chunksize
         )
 
     elif attack_type == "RDSA":
-        adversaries, newLabels = cRDSA.parallel_constrained_RDSA(
+        results = cRDSA.parallel_constrained_RDSA(
             model=model,
             dataset=dataset,
             targets=target,
@@ -228,62 +268,31 @@ def AttackDispatcher(**kwargs):
             binCount=binCount,
             perturbedFeatureCount=perturbedFeatureCount,
             constrainer=constrainer,
+            return_labels=return_labels,
             workercount=workercount,
             chunksize=chunksize,
             n=n
         )
+
+
 
     t3 = timeit.default_timer()
 
     print("Time to load:", t2-t1)
     print("Time to attack:", t3-t2)
 
-    # Flexible saving mechanism that avoids overwriting existing files unless forced explicitly allowed.
-    if not os.path.isfile(adversaryPath) or force_overwrite or input("Adversary file already exists. Overwrite? (y/n): ").lower() == "y":
-        print("Saving adversaries...")
-        np.save(adversaryPath, adversaries)
-        print("Adversaries saved.")
-    elif input("Save a copy of the adversaries? (y/n): ").lower() == "y":
-        print("Saving adversaries as a copy...")
-
-        copyIndex = 0
-        while os.path.isfile(adversaryPath.replace(".npy", f"_copy{copyIndex}.npy")):
-            copyIndex += 1
-        
-        np.save(adversaryPath.replace(".npy", f"_copy{copyIndex}.npy"), adversaries)
-        print("Adversaries saved as a copy.")
+    if return_labels:
+        arraySavingManager(adversaryPath, results[0], "Adversaries", force_overwrite)
+        arraySavingManager(originalLabelPath, results[1], "Original Labels", force_overwrite)
+        arraySavingManager(adversarialLabelPath, results[2], "Adversarial Labels", force_overwrite)
     else:
-        print("Adversaries not saved. Discarding adversaries.")
-        del adversaries
-
-    if not os.path.isfile(newLabelPath) or force_overwrite or input("New label file already exists. Overwrite? (y/n): ").lower() == "y":
-        print("Saving new labels...")
-        np.save(newLabelPath, newLabels)
-        print("New labels saved.")
-    elif input("Save a copy of the new labels? (y/n): ").lower() == "y":
-        print("Saving new labels as a copy...")
-
-        copyIndex = 0
-        while os.path.isfile(newLabelPath.replace(".npy", f"_copy{copyIndex}.npy")):
-            copyIndex += 1
-        
-        np.save(newLabelPath.replace(".npy", f"_copy{copyIndex}.npy"), newLabels)
-        print("New labels saved as a copy.")
-    else:
-        print("New labels not saved. Discarding new labels.")
-        del newLabels
-
-
+        arraySavingManager(adversaryPath, results, "Adversaries", force_overwrite)
 
     print("Attack complete.")
 
     # Explicitly clear memory
     del dataset
     del target
-    del adversaries
-    del newLabels
+    del results
 
     return
-
-
-    

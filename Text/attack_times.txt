@@ -10,6 +10,8 @@ Since the computer had already been running for a long time beforehand, there sh
 All attacks were performed with a batch size of 128 and a worker count of 8. This does not seem to fully align with the CPUs thread count, however, as task manager showed all logical processors running at full load during the attacks.
 Especially for TopoDNN attacks, I suspect a larger chunksize might be beneficial as each chunk is relatively small. Ah well.
 
+The results of the specified attacks can be found in Adversaries/xyz/scaled_boxed and Adversaries/TopoDNN/spreadlimited.
+
 Times below are split by the dataset attacked and data loading/attack running times.
     --> For RDSA, this is further split to account for the (approximate) runtime of histogram creatino beforehand 
     --> If one wishes to attack the same dataset with different RDSA configs multiple times, it may be worth it to save the histograms on disk. The overhead is pretty small, though.
