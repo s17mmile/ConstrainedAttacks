@@ -11,6 +11,7 @@ Constrainer Architecture:
 Build a proper constrainer for TopoDNN
     --> Read up on the physics that gets you the Energy
     --> Energy conservation. Also apply this as feasibilityProjector.
+        --> Do I keep every single particle's energy individually constant? Or just work with the bunch?
     --> Check out impact of nonexistent constituents --> if a constit is all 0 (doesn't exist), then the algorithm can't create a new one from thin air. Also apply this as feasibilityProjector.
 
 Retraining

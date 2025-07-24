@@ -108,12 +108,12 @@ if __name__ == "__main__":
                 adversarialLabelPath="Adversaries/CIFAR10/test/FGSM_train_labels.npy",
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 epsilon=0.05,
+                constrainer=constrainer_scale_0_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                constrainer=constrainer_scale_0_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -132,12 +132,12 @@ if __name__ == "__main__":
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 stepcount=20,
                 stepsize=stepsize,
+                feasibilityProjector=constrainer_scale_0_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                feasibilityProjector=constrainer_scale_0_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -157,12 +157,12 @@ if __name__ == "__main__":
                 categoricalFeatureMaximum=100,
                 binCount=100,
                 perturbedFeatureCount=300,
+                constrainer=constrainer_scale_0_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                constrainer=constrainer_scale_0_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -182,12 +182,12 @@ if __name__ == "__main__":
                 adversarialLabelPath="Adversaries/ImageNet/test/FGSM_threshold_labels.npy",
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 epsilon=0.05,
+                constrainer=constrainer_scale_m1_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                constrainer=constrainer_scale_m1_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -206,12 +206,12 @@ if __name__ == "__main__":
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 stepcount=20,
                 stepsize=stepsize,
+                feasibilityProjector=constrainer_scale_m1_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                feasibilityProjector=constrainer_scale_m1_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -231,12 +231,12 @@ if __name__ == "__main__":
                 categoricalFeatureMaximum=150,
                 binCount=200,
                 perturbedFeatureCount=10000,
+                constrainer=constrainer_scale_m1_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                constrainer=constrainer_scale_m1_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -256,12 +256,12 @@ if __name__ == "__main__":
                 adversarialLabelPath="Adversaries/MNIST/test/FGSM_train_labels.npy",
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 epsilon=0.05,
+                constrainer=constrainer_scale_0_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                constrainer=constrainer_scale_0_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -280,12 +280,12 @@ if __name__ == "__main__":
                 lossObject=keras.losses.CategoricalCrossentropy(),
                 stepcount=20,
                 stepsize=stepsize,
+                feasibilityProjector=constrainer_scale_0_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                feasibilityProjector=constrainer_scale_0_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -305,12 +305,12 @@ if __name__ == "__main__":
                 categoricalFeatureMaximum=100,
                 binCount=100,
                 perturbedFeatureCount=200,
+                constrainer=constrainer_scale_0_1_box,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                constrainer=constrainer_scale_0_1_box,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -330,12 +330,12 @@ if __name__ == "__main__":
                 adversarialLabelPath="Adversaries/TopoDNN/test/FGSM_train_labels.npy",
                 lossObject=keras.losses.BinaryCrossentropy(),
                 epsilon=0.05,
+                constrainer=constrainer_TopoDNN_spreadlimit,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                constrainer=constrainer_TopoDNN_spreadlimit,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -354,12 +354,12 @@ if __name__ == "__main__":
                 lossObject=keras.losses.BinaryCrossentropy(),
                 stepcount=20,
                 stepsize=stepsize,
+                feasibilityProjector=constrainer_TopoDNN_spreadlimit,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                feasibilityProjector=constrainer_TopoDNN_spreadlimit,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
@@ -379,12 +379,12 @@ if __name__ == "__main__":
                 categoricalFeatureMaximum=100000,
                 binCount=1000,
                 perturbedFeatureCount=15,
+                constrainer=constrainer_TopoDNN_spreadlimit,
                 return_labels=True,
                 n=1,
+                force_overwrite=True,
                 workercount=8,
-                chunksize=128,
-                constrainer=constrainer_TopoDNN_spreadlimit,
-                force_overwrite=True
+                chunksize=128
             )
         except Exception as e:
             print(f"Failure: {e}")
