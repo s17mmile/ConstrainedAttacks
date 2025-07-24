@@ -423,7 +423,7 @@ if __name__ == "__main__":
                 # originalLabelPath="Adversaries/TopoDNN/test/Original_train_labels.npy",
                 # adversarialLabelPath="Adversaries/TopoDNN/test/PGD_train_labels.npy",
                 lossObject=keras.losses.BinaryCrossentropy(),
-                stepcount=20,
+                stepcount=1,
                 stepsize=stepsize,
                 feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy,
                 return_labels=False,
