@@ -33,7 +33,7 @@ def displayImage(image, description, model):
 
 
 # Compare an ImageNet instance with a perturbed counterpart
-def compare_ImageNet(originalImage, originalLabel, target, perturbedImage, perturbedLabel, index):
+def compare_ImageNet(originalImage, originalLabel, perturbedImage, perturbedLabel, target, index):
 
     # For display purposes, map values [-1,1] (as they are in the dataset) to [0,1] for each colour channel (for imshow to work with)
     originalImage = linearRescale(originalImage, 0, 1)

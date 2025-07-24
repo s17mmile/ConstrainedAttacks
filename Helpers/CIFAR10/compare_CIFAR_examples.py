@@ -21,20 +21,18 @@ method = input("Attack method (RDSA/FGSM/PGD): ")
 model = keras.models.load_model("Models/CIFAR10/base_model.keras")
 
 originalDatasetPath = "Datasets/CIFAR10/train_data.npy"
-originalTargetPath = "Datasets/CIFAR10/train_target.npy"
+perturbedDatasetPath = "Adversaries/CIFAR10/scaled/" + method + "_train_data.npy"
 
-perturbedDatasetPath = "Adversaries/CIFAR10/ranged/" + method + "_train_data_full_ranged.npy"
-perturbedLabelPath = "Adversaries/CIFAR10/ranged/" + method + "_train_labels_full_ranged.npy"
+targetPath = "Datasets/CIFAR10/train_target.npy"
 
 if __name__ == "__main__":
-    X = np.load(originalDatasetPath, allow_pickle=True)
-    Y = np.load(originalTargetPath, allow_pickle=True)
+    X = np.load(originalDatasetPath, allow_pickle=True, mmap_mode="r")
+    X_attacked = np.load(perturbedDatasetPath, allow_pickle=True, mmap_mode="r")
 
-    X_attacked = np.load(perturbedDatasetPath, allow_pickle=True)
-    Y_attacked = np.load(perturbedLabelPath, allow_pickle=True)
+    Y = np.load(targetPath, allow_pickle=True)
 
     print()
-    print("Indices: 0-" + str(Y_attacked.shape[0]-1))
+    print("Indices: 0-" + str(X_attacked.shape[0]-1))
 
     while True:
         index = input("\nImage index:")
@@ -44,5 +42,6 @@ if __name__ == "__main__":
             break
 
         originalLabel = model(np.array([X[index]]), training = False)[0]
-        print(originalLabel)
-        compare_CIFAR10(X[index], originalLabel, Y[index], X_attacked[index], Y_attacked[index], index)
+        perturbedLabel = model(np.array([X_attacked[index]]), training = False)[0]
+        
+        compare_CIFAR10(X[index], originalLabel, X_attacked[index], perturbedLabel, Y[index], index)

@@ -21,20 +21,17 @@ method = input("Attack method (RDSA/FGSM/PGD): ")
 model = keras.models.load_model("Models/MNIST/maxpool_model.keras")
 
 originalDatasetPath = "Datasets/MNIST/train_data.npy"
-originalTargetPath = "Datasets/MNIST/train_target.npy"
-
-perturbedDatasetPath = "Adversaries/MNIST/scaled_boxed/" + method + "_train_data.npy"
-perturbedLabelPath = "Adversaries/MNIST/scaled_boxed/" + method + "_train_labels.npy"
+perturbedDatasetPath = "Adversaries/MNIST/scaled/" + method + "_train_data.npy"
+targetPath = "Datasets/MNIST/train_target.npy"
 
 if __name__ == "__main__":
-    X = np.load(originalDatasetPath, allow_pickle=True)
-    Y = np.load(originalTargetPath, allow_pickle=True)
+    X = np.load(originalDatasetPath, allow_pickle=True, mmap_mode="r")
+    X_attacked = np.load(perturbedDatasetPath, allow_pickle=True, mmap_mode="r")
 
-    X_attacked = np.load(perturbedDatasetPath, allow_pickle=True)
-    Y_attacked = np.load(perturbedLabelPath, allow_pickle=True)
+    Y = np.load(targetPath, allow_pickle=True)
 
     print()
-    print("Indices: 0-" + str(Y_attacked.shape[0]-1))
+    print("Indices: 0-" + str(X_attacked.shape[0]-1))
 
     while True:
         index = input("\nImage index:")
@@ -43,5 +40,7 @@ if __name__ == "__main__":
         except:
             break
 
-        originalLabel = model(np.array([X[index]], training = False))[0]
-        compare_MNIST784(X[index], originalLabel, Y[index], X_attacked[index], Y_attacked[index], index)
+        originalLabel = model(np.array([X[index]]), training = False)[0]
+        perturbedLabel = model(np.array([X_attacked[index]]), training = False)[0]
+
+        compare_MNIST784(X[index], originalLabel, Y[index], X_attacked[index], perturbedLabel, index)

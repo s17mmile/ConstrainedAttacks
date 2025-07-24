@@ -4,7 +4,7 @@ import numpy as np
 # Hard-Code label-class associations as list
 classlabels = ["Aeroplane","Automobile","Bird","Cat","Deer","Dog","Frog","Horse","Ship","Truck"]
 
-def compare_CIFAR10(originalImage, originalLabel, target, perturbedImage, perturbedLabel, index):
+def compare_CIFAR10(originalImage, originalLabel, perturbedImage, perturbedLabel, target, index):
     
     f, ax = plt.subplots(2,2, figsize = (8,8))
 

@@ -68,7 +68,7 @@ def constrainer_TopoDNN_spreadlimit(example):
     return example
 
 def stepsize(step):
-    return 0.1*(1/2**step)
+    return 0.05*(1/2**step)
 
 
 
