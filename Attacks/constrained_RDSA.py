@@ -135,13 +135,11 @@ def parallel_constrained_RDSA(model, dataset, targets, steps, categoricalFeature
 
     with multiprocessing.get_context("spawn").Pool(workercount) as p:
         results = p.starmap(constrained_RDSA, tqdm.tqdm(zip(
-                                repeat(model), dataset, targets, repeat(steps), perturbationIndexLists, repeat(binEdges), repeat(binProbabilites), repeat(constrainer)
+                                repeat(model), dataset, targets, repeat(steps), perturbationIndexLists, repeat(binEdges), repeat(binProbabilites), repeat(constrainer), repeat(return_labels)
                             ),
                             total = dataset.shape[0]), chunksize=chunksize)
     
     # Format data for output
-    print("Formatting results...")
-
     if return_labels:
         adversaries = np.array([event[0] for event in results])
         originalLabels = np.array([event[1] for event in results])

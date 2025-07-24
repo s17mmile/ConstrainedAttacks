@@ -117,12 +117,11 @@ def parallel_constrained_PGD(model, dataset, targets, lossObject, stepcount = 10
 
     with multiprocessing.get_context("spawn").Pool(workercount) as p:
         results = p.starmap(constrained_PGD, tqdm.tqdm(zip(
-            repeat(model), dataset, targets, repeat(lossObject), repeat(stepcount), repeat(stepsize), repeat(feasibilityProjector), repeat(constrainer)),
-            total = dataset.shape[0]), chunksize=chunksize)
+                                repeat(model), dataset, targets, repeat(lossObject), repeat(stepcount), repeat(stepsize), repeat(feasibilityProjector), repeat(constrainer), repeat(return_labels)
+                            ),
+                            total = dataset.shape[0]), chunksize=chunksize)
     
     # Format data for output
-    print("Formatting results...")
-
     if return_labels:
         adversaries = np.array([event[0] for event in results])
         originalLabels = np.array([event[1] for event in results])

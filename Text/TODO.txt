@@ -1,16 +1,3 @@
-Discuss fundamental difference in how we constrain PGD and RDSA methods! RDSA uses the constrainer like a feasibilityProjector.
-    --> Could it have both? In PGD, the constrainer could fix an adversary. Not so in RDSA.
-    --> I will move the location of the RDSA constrainer for now. In fact, since RDSA is a sampled algorithm, it should remain feasible (as in the value ranges) BY DEFINITION!
-    --> Avoid RDSA one-off overhead by saving histograms and continuity on disk?
-
-Quality of life:
-    --> Dispatcher should create output location if directory doesn't exist.
-
-Big changes:
-    --> Change each attack's functionality to return the label assigned to the adversary. Instead, pass a return_labels boolean: if it given, return both the label for the original and perturbed data. If not, only the adversary.
-    --> Massive structural change: we can just apply constrainers after the data generation in the EVALUATION STEPS!!!!! We do not need to make multiple nigh-identical copies of an adversary dataset if the only step changed is in postprocessing.
-    --> LMAOOOOOOOOOOOOO
-
 Write evaluators:
     Write Feature and Label Histogram creator scripts
     Apply and measure different distance metrics
@@ -26,18 +13,17 @@ Build a proper constrainer for TopoDNN
     --> Energy conservation. Also apply this as feasibilityProjector.
     --> Check out impact of nonexistent constituents --> if a constit is all 0 (doesn't exist), then the algorithm can't create a new one from thin air. Also apply this as feasibilityProjector.
 
-REDO PGD using the constrainer as FeasibilityProjector instead!!!!!
+Retraining
+    --> a) Should take a model path and dataset as parameters, also a way to chunk the data for testing at different amounts of retraining.
+    --> b) Should specify architecture and then train using a combination of the OG dataset and (chuunks of various sizes of) the adversarial data.
+    --> Test retraining from scratch [using b)] and continued training of existing model [using a)].
 
-Once we have full perturbed retraining data, both unconstrained/only ranged and constrained:  
-    Write adaptable retrainer script    
-    Retrain Models
-    Evaluate Performance
 
 
 Other:
-Make a nice readme.
 Write Dataset and Model Overviews.
 Check comments of each attack function to make sure the details are correct.
+RDSA discussion: could we implement it without the need for precalc'd histograms? Calculate continuity, then just pick a uniformly random sample from which we pick the value (via a memmap? access might be a bitch). 
 
 FUTURE:
     Can PGD and RDSA be combined somehow? A physics-oriented gradient-based attack that reduces correlations and retains distributions would be damn near perfect.

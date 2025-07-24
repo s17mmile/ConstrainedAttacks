@@ -12,14 +12,18 @@ import numpy as np
 
 
 # -------------------------------------------------------------------------------------------------
-def return_sth(x):
-    if x:
-        return 1,2,3
-    else:
-        return 1
+# def return_sth(x):
+#     if x:
+#         return 1,2,3
+#     else:
+#         return 1
     
-result0 = return_sth(0)
-result1 = return_sth(1)
+# result0 = return_sth(0)
+# result1 = return_sth(1)
 
-print(result0[0])
-print(result1[1])
+# print(result0[0])
+# print(result1[1])
+
+# -------------------------------------------------------------------------------------------------
+# print(os.path.dirname("Adversaries/CIFAR10/scaled/test/depth/xyz.npy"))
+# os.makedirs(os.path.dirname("Adversaries/CIFAR10/scaled/test/depth/moredepth/xyz.npy"))

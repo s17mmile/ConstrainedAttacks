@@ -21,7 +21,7 @@ method = input("Attack method (RDSA/FGSM/PGD): ")
 model = keras.models.load_model("Models/CIFAR10/base_model.keras")
 
 originalDatasetPath = "Datasets/CIFAR10/train_data.npy"
-perturbedDatasetPath = "Adversaries/CIFAR10/scaled/" + method + "_train_data.npy"
+perturbedDatasetPath = "Adversaries/CIFAR10/test/" + method + "_train_data.npy"
 
 targetPath = "Datasets/CIFAR10/train_target.npy"
 
@@ -31,6 +31,8 @@ if __name__ == "__main__":
 
     Y = np.load(targetPath, allow_pickle=True)
 
+    print("Data Shape:")
+    print(X_attacked.shape)
     print()
     print("Indices: 0-" + str(X_attacked.shape[0]-1))
 

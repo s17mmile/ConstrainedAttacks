@@ -22,46 +22,45 @@ import Attacks.constrained_RDSA as cRDSA
     # Array: To be saved.
     # name: Used for output.
     # force_overwrite: if True, overwrites file without asking for extra permission.
-def arraySavingManager(path, array, name, force_overwrite):
+    # verbose: toggles prints.
+def arraySavingManager(path, array, name, force_overwrite, verbose = False):
     if not os.path.isfile(path) or force_overwrite or input(f"{name}: file already exists. Overwrite? (y/n): ").lower() == "y":
-        print(f"Saving {name}...")
+        if verbose: print(f"Saving {name}...")
         np.save(path, array)
-        print(f"{name} saved.\n")
+        if verbose: print(f"{name} saved.")
 
     elif input(f"Save a copy of {name}? (y/n): ").lower() == "y":
-        print(f"Saving {name} as a copy...")
+        if verbose: print(f"Saving {name} as a copy...")
 
         copyIndex = 0
         while os.path.isfile(path.replace(".npy", f"_copy{copyIndex}.npy")):
             copyIndex += 1
         
         np.save(path.replace(".npy", f"_copy{copyIndex}.npy"), array)
-        print(f"{name} saved as a copy.\n")
+        if verbose: print(f"{name} saved as a copy.")
 
     else:
-        print(f"{name} not saved. Discarding.\n")
+        if verbose: print(f"{name} not saved. Discarding.")
     
     return
 
 
 
 def AttackDispatcher(**kwargs):
-
     '''
-        This calls the specified attack given parameters.
+        This calls the specified attack with given parameters.
         These parameters specify:
             - The attack type
-            - Attack-specific params
+            - Attack-specific params, such as stepcount or stepsize
             - The paths to dataset/model/output files
-            - A constrainer function (optional)
+            - A constrainer/feasibility function (optional)
             - Execution parameters n, workercount and chunksize (optional)
         All other arguments are attack-specific and will be passed to the attack function.
     '''
 
-    # Error handling. In if statement just to be able to collapse it in the IDE.
-    check_arg_validity = True
-    if (check_arg_validity):
-        # First optional param is super important and sets follow-up requirements, thus checked first.
+    # Necessary Error handling. In if statement just to be able to collapse it in the IDE.
+    if True:
+        # Whether or not we want to calculate and return labels is super important and sets follow-up requirements, so it is checked first.
         if "return_labels" in kwargs:
             return_labels = kwargs["return_labels"]
             assert isinstance(return_labels, bool), "Return_labels must be a boolean."
@@ -92,19 +91,25 @@ def AttackDispatcher(**kwargs):
         assert "adversaryPath" in kwargs, "Adversary output path must be provided."
         adversaryPath = kwargs["adversaryPath"]
         assert adversaryPath.endswith(".npy"), "Adversary output path must point to a .npy file."
-        assert os.path.isdir(os.path.dirname(adversaryPath)), "Adversary output directory does not exist."
+        if not os.path.isdir(os.path.dirname(adversaryPath)):
+            print("Adversary output directory does not exist. Creating.")
+            os.makedirs(os.path.dirname(adversaryPath))
 
         # If the user wishes to have labels for original and adversarial data computed, they must provide valid file paths to save them at.
         if (return_labels):
             assert "originalLabelPath" in kwargs, "Original label output path must be provided."
             originalLabelPath = kwargs["originalLabelPath"]
             assert originalLabelPath.endswith(".npy"), "Original label output path must end with .npy."
-            assert os.path.isdir(os.path.dirname(originalLabelPath)), "Original label output directory must exist."
+            if not os.path.isdir(os.path.dirname(originalLabelPath)):
+                print("Original label output directory does not exist. Creating.")
+                os.makedirs(originalLabelPath)
 
             assert "adversarialLabelPath" in kwargs, "Adversarial label output path must be provided."
             adversarialLabelPath = kwargs["adversarialLabelPath"]
             assert adversarialLabelPath.endswith(".npy"), "Adversarial label output path must end with .npy."
-            assert os.path.isdir(os.path.dirname(adversarialLabelPath)), "Adversarial label output directory must exist."
+            if not os.path.isdir(os.path.dirname(adversarialLabelPath)):
+                print("Adversarial label output directory does not exist. Creating.")
+                os.makedirs(adversarialLabelPath)
 
 
 
@@ -214,8 +219,6 @@ def AttackDispatcher(**kwargs):
             assert isinstance(perturbedFeatureCount, int) and perturbedFeatureCount > 0, "Perturbed feature count must be a positive integer."
             assert perturbedFeatureCount <= np.prod(input_shape), f"The number of features to perturb ({perturbedFeatureCount}) must not exceed the number of input variables ({np.prod(input_shape)})."
 
-    t1 = timeit.default_timer()
-
     # Load dataset, without mmap_mode this time.
     dataset = np.load(datasetPath, allow_pickle=True)
     target = np.load(targetPath, allow_pickle=True)
@@ -225,8 +228,6 @@ def AttackDispatcher(**kwargs):
         model = keras.models.load_model(modelPath)
     except Exception as e:
         raise ValueError(f"Failed to load model from {modelPath}:\n\n{e}")
-
-    t2 = timeit.default_timer()
 
 
 
@@ -276,11 +277,7 @@ def AttackDispatcher(**kwargs):
 
 
 
-    t3 = timeit.default_timer()
-
-    print("Time to load:", t2-t1)
-    print("Time to attack:", t3-t2)
-
+    print("Saving results.")
     if return_labels:
         arraySavingManager(adversaryPath, results[0], "Adversaries", force_overwrite)
         arraySavingManager(originalLabelPath, results[1], "Original Labels", force_overwrite)
@@ -288,11 +285,12 @@ def AttackDispatcher(**kwargs):
     else:
         arraySavingManager(adversaryPath, results, "Adversaries", force_overwrite)
 
-    print("Attack complete.")
-
     # Explicitly clear memory
     del dataset
     del target
     del results
+    del model
+
+    print("Attack complete.")
 
     return
