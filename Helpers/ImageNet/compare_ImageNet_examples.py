@@ -21,8 +21,8 @@ model = keras.models.load_model("Models/ImageNet/base_model.keras")
 originalDatasetPath = "Datasets/ImageNet/threshold_data.npy"
 originalTargetPath = "Datasets/ImageNet/threshold_target.npy"
 
-perturbedDatasetPath = "Adversaries/ImageNet/ranged/" + method + "_threshold_data_full_ranged.npy"
-perturbedLabelPath = "Adversaries/ImageNet/ranged/" + method + "_threshold_labels_full_ranged.npy"
+perturbedDatasetPath = "Adversaries/ImageNet/scaled_boxed/" + method + "_threshold_data.npy"
+perturbedLabelPath = "Adversaries/ImageNet/scaled_boxed/" + method + "_threshold_labels.npy"
 
 if __name__ == "__main__":
     X = np.load(originalDatasetPath, allow_pickle=True)

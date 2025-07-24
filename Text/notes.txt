@@ -1,11 +1,4 @@
-- The dense layer model for MNIST produces "regular" FGSM adversarials.
-    --> The softmax-activated maxpool model produces banding on the right and bottom of the image, as the gradient apparently is always positive.
-    --> Also, sometimes, the gradients are just zero... everywhere. This may be a result of downsampling in the maxpooling layers and softmax function, as softmax relies on having multiple inputs. 
-    --> The zero gradients may just be due to some property of softmax and the repeated maxpooling, which reduces the input count to softmax a lot.
 
-    --> Behaviour is very much dependent on architecture. Not sure if the filter count in the conv2d layers is critical.
-    --> I'd have thought it's besser to have it decrease instead of increase throughout the model structure.
-    
 Python/Package versions:
 Python 3.11.5/3.11.9 (both worked)
 numpy 1.26.4
@@ -16,3 +9,14 @@ pytables 3.10.2
 Code credit:
 TopoDNN preprocessing (FAIR4HEP)
 evaluate_model.py (Timo?)
+
+
+Observations:
+- The dense layer model for MNIST produces "regular" FGSM adversarials.
+    --> The softmax-activated maxpool model produces banding on the right and bottom of the image, as the gradient apparently is always positive.
+    --> Also, sometimes, the gradients are just zero... everywhere. This may be a result of downsampling in the maxpooling layers and softmax function, as softmax relies on having multiple inputs. 
+    --> The zero gradients may just be due to some property of softmax and the repeated maxpooling, which reduces the input count to softmax a lot.
+
+    --> Behaviour is very much dependent on architecture. Not sure if the filter count in the conv2d layers is critical.
+    --> I'd have thought it's besser to have it decrease instead of increase throughout the model structure.
+    

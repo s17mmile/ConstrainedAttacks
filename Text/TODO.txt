@@ -6,6 +6,11 @@ Discuss fundamental difference in how we constrain PGD and RDSA methods! RDSA us
 Quality of life:
     --> Dispatcher should create output location if directory doesn't exist.
 
+Big changes:
+    --> Change each attack's functionality to return the label assigned to the adversary. Instead, pass a return_labels boolean: if it given, return both the label for the original and perturbed data. If not, only the adversary.
+    --> Massive structural change: we can just apply constrainers after the data generation in the EVALUATION STEPS!!!!! We do not need to make multiple nigh-identical copies of an adversary dataset if the only step changed is in postprocessing.
+    --> LMAOOOOOOOOOOOOO
+
 Write evaluators:
     Create Histogram creator script
     Apply and measure different distance metrics
