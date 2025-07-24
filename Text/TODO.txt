@@ -5,7 +5,6 @@ Discuss fundamental difference in how we constrain PGD and RDSA methods! RDSA us
 
 Quality of life:
     --> Dispatcher should create output location if directory doesn't exist.
-    --> Properly document each dataset and its shape
 
 Write evaluators:
     Create Histogram creator script
