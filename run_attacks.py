@@ -57,7 +57,6 @@ TopoDNN_RDSA_clip = False
 # PGD uses the constrainers as a repeated projection function. Thus, we unfortunately need to re-attack from scratch multiple times, since we cannot just tack the constraint onto the end result.
 TopoDNN_PGD_constits_clip = False
 TopoDNN_PGD_constits_clip_globalEnergy = False
-# TopoDNN_PGD_constits_clip_particleEnergy = True
 
 
 
@@ -402,30 +401,6 @@ if __name__ == "__main__":
                 stepcount=20,
                 stepsize=stepsize,
                 feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy,
-                return_labels=False,
-                n=1,
-                force_overwrite=True,
-                workercount=8,
-                chunksize=512
-            )
-        except Exception as e:
-            print(f"Failure: {e}")
-
-    if (TopoDNN_PGD_constits_clip_particleEnergy):
-        try:
-            print("\n\n\nTopoDNN PGD constits clip particleEnergy\n")
-            AttackDispatcher(
-                attack_type="PGD",
-                datasetPath="Datasets/TopoDNN/train_data.npy",
-                targetPath="Datasets/TopoDNN/train_target.npy",
-                modelPath="Models/TopoDNN/base_model.keras",
-                adversaryPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/PGD_train_data.npy",
-                # originalLabelPath="Adversaries/TopoDNN/test/Original_train_labels.npy",
-                # adversarialLabelPath="Adversaries/TopoDNN/test/PGD_train_labels.npy",
-                lossObject=keras.losses.BinaryCrossentropy(),
-                stepcount=1,
-                stepsize=stepsize,
-                feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy,
                 return_labels=False,
                 n=1,
                 force_overwrite=True,
