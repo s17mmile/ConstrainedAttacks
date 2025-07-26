@@ -16,6 +16,7 @@ import timeit
 
 # Transform a single index (in the range [0, prod(shape)]) into the corresponding multidimensional index.
 # Ok yeah this works but I just realized it's stupidly slow. I just need to generate a list of all the combinations anyway.
+# This is a lot like numpy unravel index, but there we get multiple lists of each dimension's index values. This is a little clearer imo, if potantially minimally slower.
 def transformIndex(index, shape):
     assert index >= 0
     assert index < np.prod(shape)

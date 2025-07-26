@@ -3,27 +3,39 @@ import numpy as np
 # import keras
 # import tensorflow as tf
 
-# -------------------------------------------------------------------------------------------------
-# data = np.load("Datasets/CIFAR10/test_data.npy")
-
-# model = keras.models.load_model("Models/CIFAR10/base_model.keras")
-
-# print(model(tf.convert_to_tensor([data[0]]), training = False).numpy()[0])
 
 
-# -------------------------------------------------------------------------------------------------
-# def return_sth(x):
-#     if x:
-#         return 1,2,3
-#     else:
-#         return 1
-    
-# result0 = return_sth(0)
-# result1 = return_sth(1)
+# Transform a single index (in the range [0, prod(shape)]) into the corresponding multidimensional index.
+# Ok yeah this works but I just realized it's stupidly slow. I just need to generate a list of all the combinations anyway.
+def transformIndex(index, shape):
+    assert index >= 0
+    assert index < np.prod(shape)
 
-# print(result0[0])
-# print(result1[1])
+    transformedIndex = []
 
-# -------------------------------------------------------------------------------------------------
-# print(os.path.dirname("Adversaries/CIFAR10/scaled/test/depth/xyz.npy"))
-# os.makedirs(os.path.dirname("Adversaries/CIFAR10/scaled/test/depth/moredepth/xyz.npy"))
+    remainder = index
+
+    for dimension in shape:
+        coordinate = remainder % dimension
+        remainder = int(remainder/dimension)
+        transformedIndex.append(coordinate)
+
+    return tuple(transformedIndex)
+
+
+exampleShape = (28,28,1)
+featureCount = 784
+
+allFeatureIndices = [transformIndex(i,exampleShape) for i in range(featureCount)]
+
+print(allFeatureIndices)
+
+numpyFeatureIndices = zip(*np.unravel_index(range(featureCount), exampleShape))
+
+for idx in numpyFeatureIndices:
+    print(idx)
+
+print("paishdgaspiufbvsüouass")
+
+for idx in numpyFeatureIndices:
+    print(idx)

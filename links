@@ -1,0 +1,15 @@
+ImageNet:
+    Dataset: https://huggingface.co/datasets/vaishaal/ImageNetV2/tree/main
+    Model:
+
+CIFAR-10:
+    Dataset: https://www.cs.toronto.edu/%7Ekriz/cifar-10-python.tar.gz
+    Model:
+
+MNIST784:
+    Dataset: --> use sklearn fetch_openml functionality
+    Model: self-trained
+
+TopoDNN:
+    Model:
+    Dataset: https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=train.h5
