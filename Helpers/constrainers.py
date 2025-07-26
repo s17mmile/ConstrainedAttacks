@@ -92,6 +92,14 @@ def TopoDNN_spreadLimit(jet):
     jet[1::3] = np.clip(jet[1::3], min_eta, max_eta)
     jet[2::3] = np.clip(jet[2::3], min_phi, max_phi)
 
+    # Also, the preprocessing forces a few values to always be zero:
+    # eta_0
+    jet[1] = 0
+    # phi_0
+    jet[2] = 0
+    # eta_1
+    jet[4] = 0
+
     return jet
 
 # Scale all pT values such that (in the massless limit) the jet energy remains the same.

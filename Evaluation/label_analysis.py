@@ -2,7 +2,9 @@ import numpy as np
 import os
 import sys
 import warnings
+import scipy.spatial
 import tqdm
+import scipy
 
 sys.path.append(os.getcwd())
 
@@ -28,6 +30,10 @@ def confusion_matrix(labels1, labels2):
         matrix[class1, class2] += 1
 
     return matrix
+
+# Jensen Shannon Distance between probability Distributions
+def JSD(labels1, labels2):
+    return scipy.spatial.distance.jensenshannon(labels1, labels2)
 
 # Compare quality of predictions by creating 2x2 correctness comparison matrix.
 # the returned matrix will count the following at each index:
