@@ -18,21 +18,35 @@ import keras
 from Evaluation.evaluation_dispatch import EvaluationDispatcher 
 
 # Selector panel
+
+# CIFAR, ImageNet and MNIST will run (unless otherwise specified) using the scaled data - no further constraints.
 CIFAR_FGSM = True
-CIFAR_FGSM = True
-CIFAR_FGSM = True
+CIFAR_PGD = True
+CIFAR_RDSA = True
 
 ImageNet_FGSM = True
-ImageNet_FGSM = True
-ImageNet_FGSM = True
+ImageNet_PGD = True
+ImageNet_RDSA = True
 
-CIFAR_FGSM = True
-CIFAR_FGSM = True
-CIFAR_FGSM = True
+MNIST_FGSM = True
+MNIST_PGD = True
+MNIST_RDSA = True
 
-CIFAR_FGSM = True
-CIFAR_FGSM = True
-CIFAR_FGSM = True
+
+
+# TopoDNN has more options. These can be seen in run_attacks.py with a bit more explanation.
+TopoDNN_FGSM_clip = True
+TopoDNN_FGSM_constits_clip = True
+TopoDNN_FGSM_constits_clip_globalEnergy = True
+
+TopoDNN_PGD_clip = True
+TopoDNN_PGD_constits_clip = True
+TopoDNN_PGD_constits_clip_globalEnergy = True
+
+TopoDNN_RDSA_clip = True
+TopoDNN_RDSA_constits_clip = True
+TopoDNN_RDSA_constits_clip_globalEnergy = True
+
 
 
 if __name__ == "__main__":

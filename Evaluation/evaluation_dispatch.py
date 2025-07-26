@@ -18,21 +18,24 @@ def write_eval_to_file(args)
 
 # This function basically just runs through all the evaluation metrics with a given set of parameters. Then, we juts write separate evaluation configs for each task and attack type and we're good.
 # Ideally, this would include all the error handling like the attack dispatcher, btu I'm short on time and cannot be bothered right now.
-def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPaths, originalTargetPath, testDataPath, testTargetPath, originalModelPath, retrainedModelPaths, histogramFeatures, descriptors, resultDirectory, computeCorrelation = False)
+def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTargetPath, testDataPath, testTargetPath, originalModelPath, retrainedModelPaths, histogramFeatures, attackName, resultDirectory, computeCorrelation = False)
     '''
-        originalDatasetPath: path to original unperturbed dataset. SHould be training data.
-        perturbedDatasetPaths: path to perturbed training datasets
+        originalDatasetPath: path to original unperturbed dataset. Should be training data.
+        perturbedDatasetPath: path to perturbed training datasets
         originalTargetPath: training target labels
         testDataPath: testing dataset
         testTargetPath: targets for testing data
         originalModelPath: path to base model
-        retrainedModelPaths: list of list of paths to retrained models at different amounts of augmeneted data used for different 
+        retrainedModelPaths: list of paths to retrained models at different amounts of augmeneted data used
         histogramFeatures: list of feature indices of which histograms should be created 
-        descriptors: e.g. ["FGSM", "PGD", "RDSA"]: list of names for each attack
+        attackName: Name for the attack
 
         resultDirectory: Everything will be saved into this folder/appropriate subfolders
         computeCorrelation: allows turning on/off the quite intensive correlation matrix computation.
     '''
+
+    os.makedirs(f"{resultDirectory}/Correlations")
+    os.makedirs(f"{resultDirectory}/Histograms")
 
     # First, we want to examine how well the attacks did on the base dataset.
     # We will analyze the datasets themselves by computing a few metrics:
