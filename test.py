@@ -1,41 +1,14 @@
 import os
 import numpy as np
+import sys
 # import keras
 # import tensorflow as tf
 
+from Evaluation.dataset_analysis import *
 
+array1 = np.load("Datasets/CIFAR-10/train_data.npy", mmap_mode="r")
+array2 = np.load("Datasets/CIFAR-10/FGSM_train_data.npy", mmap_mode="r")
 
-# Transform a single index (in the range [0, prod(shape)]) into the corresponding multidimensional index.
-# Ok yeah this works but I just realized it's stupidly slow. I just need to generate a list of all the combinations anyway.
-def transformIndex(index, shape):
-    assert index >= 0
-    assert index < np.prod(shape)
+# render_feature_histograms([array1, array2], ["CIFAR_base", "CIFAR_FGSM"], [(0,0,0)], 100, "Results/CIFAR10/Histograms")
 
-    transformedIndex = []
-
-    remainder = index
-
-    for dimension in shape:
-        coordinate = remainder % dimension
-        remainder = int(remainder/dimension)
-        transformedIndex.append(coordinate)
-
-    return tuple(transformedIndex)
-
-
-exampleShape = (28,28,1)
-featureCount = 784
-
-allFeatureIndices = [transformIndex(i,exampleShape) for i in range(featureCount)]
-
-print(allFeatureIndices)
-
-numpyFeatureIndices = zip(*np.unravel_index(range(featureCount), exampleShape))
-
-for idx in numpyFeatureIndices:
-    print(idx)
-
-print("paishdgaspiufbvsüouass")
-
-for idx in numpyFeatureIndices:
-    print(idx)
+render_correlation_matrix(array1[:,:,:], "Results/CIFAR10/Correlations/unmodified.png")

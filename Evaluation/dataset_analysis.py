@@ -1,0 +1,72 @@
+import numpy as np
+import os
+import sys
+import warnings
+import tqdm
+import matplotlib.pyplot as plt
+
+sys.path.append(os.getcwd())
+
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["KERAS_BACKEND"] = "tensorflow"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1" 
+
+import tensorflow as tf
+import keras
+
+# Element-wise (<=> one for each example) cosine similarity between original and modified dataset.
+def cosine_similarity(original_data, adversarial_data):
+    return np.array([np.dot(example, adversary)/(np.linalg.norm(example) * np.linalg.norm(adversary)) for example, adversary in zip(original_data, adversarial_data)])
+
+# Element-wise L-1-Norm for a set of examples
+# L-1-norm is the same as the sum of absolutes
+def L_1_norm(data):
+    return np.sum(np.abs(data), axis = 1)
+
+# Element-wise L-2-Norm for a set of examples
+# L-2-Norm is just Euclidean Distance
+def L_2_norm(data):
+    return np.sqrt(np.sum(np.square(data), axis = 1))
+
+# Element-wise L-infinity-Norm for a set of examples
+# L-2-Norm is just the maximum magnitude of any value
+def L_inf_norm(data):
+    return np.max(np.abs(data), axis = 1)
+
+# Create and render histograms of a given subset of a dataset's features, saving to a given directory.
+# This actually takes in multiple datasets, and will create the histograms for each in the same plot with different colors.
+def render_feature_histograms(datasets, datasetNames, features, binCount, output_directory):
+
+    for featureIndex in features:
+        plt.figure(figsize = (16,9))
+
+        # Load feature data from memory maps (will also work with non-memmapped data, but might be inefficient)
+        feature_data = [dataset[:,*featureIndex] for dataset in datasets]
+
+        plt.hist(feature_data, bins = binCount, histtype = "step", label = datasetNames)
+
+        plt.legend()
+        plt.savefig(f"{output_directory}/{featureIndex}.png")
+    
+    return
+
+
+# Create and render Pearson product-moment correlation coefficients between all variables in a dataset.
+# Since this can be computationally expensive (quadratic in number of input features!), we give the option to save the correlations array for later use.
+def render_correlation_matrix(dataset, output_path, array_path = None):
+    # Each example in the dataset needs to be "flattened", meaning the dataset is squished into two dimensions
+    flat_data = np.reshape(dataset, (dataset.shape[0], int(dataset.size/dataset.shape[0])))
+
+    # We use rowvar = False because each feature is given in a column - each row is an input.
+    correlations = np.corrcoef(flat_data, rowvar = False)
+
+    plt.figure(figsize = (16,9))
+    plt.tick_params(bottom = False, top = True)
+    plt.imshow(correlations, vmin=-1, vmax=1, cmap="coolwarm", interpolation = None)
+
+    plt.savefig(output_path, dpi = 300)
+
+    if array_path is not None:
+        np.save(array_path, correlations)
+
+    return
