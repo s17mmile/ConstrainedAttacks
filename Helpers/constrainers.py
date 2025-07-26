@@ -105,33 +105,34 @@ def TopoDNN_conserveGlobalEnergy(adversary, example):
 
     return adversary
 
+# Decided against implementing this as I was running into too many numerical issues and it's not that interesting. Focus on the other stuff first.
 # Scale all pT values separately such that the jet energy remains the same (again, massless limit). Each particle is processed individually.
 # Another way to do this may involve scaling eta, but this is easier.
-def TopoDNN_conserveParticleEnergy(adversary, example):
-    print(example)
-    print(adversary)
-    # For each particle (that isn't 0-padding): Find the Energy of the adversary and example (massless limit). Scale adversary pT by the ratio.
-    for particleIndex in range(30):
-        if isParticle(adversary[3*particleIndex], adversary[3*particleIndex+1], adversary[3*particleIndex+2]):
+# def TopoDNN_conserveParticleEnergy(adversary, example):
+#     print(example)
+#     print(adversary)
+#     # For each particle (that isn't 0-padding): Find the Energy of the adversary and example (massless limit). Scale adversary pT by the ratio.
+#     for particleIndex in range(30):
+#         if isParticle(adversary[3*particleIndex], adversary[3*particleIndex+1], adversary[3*particleIndex+2]):
 
-            pT_example, eta_example, phi_example = example[3*particleIndex], example[3*particleIndex+1], example[3*particleIndex+2]
-            pT_adversary, eta_adversary, phi_adversary = adversary[3*particleIndex], adversary[3*particleIndex+1], adversary[3*particleIndex+2]
+#             pT_example, eta_example, phi_example = example[3*particleIndex], example[3*particleIndex+1], example[3*particleIndex+2]
+#             pT_adversary, eta_adversary, phi_adversary = adversary[3*particleIndex], adversary[3*particleIndex+1], adversary[3*particleIndex+2]
             
-            exampleEnergy = particleEnergy(pT_example, eta_example, phi_example)
-            adversaryEnergy = particleEnergy(pT_adversary, eta_adversary, phi_adversary)
+#             exampleEnergy = particleEnergy(pT_example, eta_example, phi_example)
+#             adversaryEnergy = particleEnergy(pT_adversary, eta_adversary, phi_adversary)
 
-            print(particleIndex)
-            print(pT_example, eta_example, phi_example)
-            print(pT_adversary, eta_adversary, phi_adversary)
-            print(exampleEnergy)
-            print(adversaryEnergy)
-            print()
+#             print(particleIndex)
+#             print(pT_example, eta_example, phi_example)
+#             print(pT_adversary, eta_adversary, phi_adversary)
+#             print(exampleEnergy)
+#             print(adversaryEnergy)
+#             print()
 
-            scalingFactor = exampleEnergy/adversaryEnergy
+#             scalingFactor = exampleEnergy/adversaryEnergy
 
-            adversary[3*particleIndex] = scalingFactor * adversary[3*particleIndex]
+#             adversary[3*particleIndex] = scalingFactor * adversary[3*particleIndex]
 
-    return adversary
+#     return adversary
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -164,9 +165,10 @@ def constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy(advers
     adversary = TopoDNN_conserveGlobalEnergy(adversary, example)
     return adversary
 
-def constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy(adversary, example):
-    adversary = TopoDNN_conserveConstits(adversary, example)
-    adversary = TopoDNN_spreadLimit(adversary)
-    adversary = TopoDNN_conserveParticleEnergy(adversary, example)
-    return adversary
+# Again, by-particle conservation is out.
+# def constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy(adversary, example):
+#     adversary = TopoDNN_conserveConstits(adversary, example)
+#     adversary = TopoDNN_spreadLimit(adversary)
+#     adversary = TopoDNN_conserveParticleEnergy(adversary, example)
+#     return adversary
 
