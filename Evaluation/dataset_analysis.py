@@ -35,7 +35,7 @@ def L_inf_norm(data):
 
 # Create and render histograms of a given subset of a dataset's features, saving to a given directory.
 # This actually takes in multiple datasets, and will create the histograms for each in the same plot with different colors.
-def render_feature_histograms(datasets, datasetNames, features, binCount, output_directory):
+def render_feature_histograms(datasets, datasetNames, features, binCount, output_directory, out_name):
 
     for featureIndex in features:
         plt.figure(figsize = (16,9))
@@ -46,7 +46,7 @@ def render_feature_histograms(datasets, datasetNames, features, binCount, output
         plt.hist(feature_data, bins = binCount, histtype = "step", label = datasetNames)
 
         plt.legend()
-        plt.savefig(f"{output_directory}/{featureIndex}.png")
+        plt.savefig(f"{output_directory}/{out_name}_{featureIndex}.png")
     
     return
 
