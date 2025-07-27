@@ -35,13 +35,37 @@ def confusion_matrix(labels1, labels2):
 def JSD(labels1, labels2):
     return scipy.spatial.distance.jensenshannon(labels1, labels2)
 
+# Accuracy
+def accuracy(labels, target):
+    return float(np.count_nonzero(get_label_correctness(labels, target)))/labels.size
+
+# Accuracy per class
+# Damn I could've probably made this easier and faster by just going line-by-line through the confusion matrix, but whatever.
+def accuracy_per_class(labels, targets):
+    num_classes = targets.shape[1]
+
+    # Count the total and correctly classified examples of each class
+    total = np.zeros(num_classes).astype("float")
+    correct = np.zeros(num_classes).astype("float")
+
+    # Loop over all examples and increment counters 
+    for label, target in zip(labels, targets):
+        target_class = np.argmax(target)
+        total[target_class] += 1
+        if np.argmax(label) == target_class:
+            correct[target_class] += 1
+
+    return correct/total
+
+
+
 # Compare quality of predictions by creating 2x2 correctness comparison matrix.
 # the returned matrix will count the following at each index:
 #   [0,0] --> Number of times where both labels are wrong
 #   [0,1] --> Number of times only the second label is correct
-#   [0,1] --> Number of times only the first label is correct
+#   [1,0] --> Number of times only the first label is correct
 #   [1,1] --> Number of times both labels are correct
-def get_correctness_matrix(labels1, labels2, target):
+def get_fooling_matrix(labels1, labels2, target):
     assert labels1.shape == labels2.shape and labels2.shape == target.shape, "Correctness Matrix: Incompatible input shapes." 
 
     correctness1 = get_label_correctness(labels1, target)

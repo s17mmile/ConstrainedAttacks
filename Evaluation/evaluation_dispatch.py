@@ -43,6 +43,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     # Load data as memmaps
     originalData = np.load(originalDatasetPath, mmap_mode="r")
     perturbedData = np.load(perturbedDatasetPath, mmap_mode="r")
+    originalTarget = np.load(originalTargetPath, mmap_mode="r")
 
     # Load all the models
     baseModel = keras.models.load_model(baseModelPath)
@@ -90,21 +91,50 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
 
 
 
+    # region fooling
 
     # Then, we want to check the performance of the original classifier on the original and perturbed data 
     # We run the classifier on both datasets to obtain original and perturbed TRAINING labels.
-    # We can then compute some metrics:
-        # Accuracy
-        # JSD between original and adversarial training labels
-    # We also obtain a "Fooling Matrix"
+
+    original_base_labels = baseModel.predict(originalData)
+    perturbed_base_labels = baseModel.predict(perturbedData)
+
+    # We can then compute some metrics
+    # Accuracy
+    original_base_accuracy = accuracy(original_base_labels, originalTarget)
+    perturbed_base_accuracy = accuracy(perturbed_base_labels, originalTarget)
+    
+    # JSD between original and adversarial training labels
+    base_JSD = JSD(original_base_labels, perturbed_base_labels)
+
+    # Obtain and save classic confusion matrices comparing the original labels, perturbed labels and the target.
+    original_base_confusion_matrix = confusion_matrix(original_base_labels, originalTarget)
+    perturbed_base_confusion_matrix = confusion_matrix(perturbed_base_labels, originalTarget)
+    original_perturbed_comparison_matrix = confusion_matrix(original_base_labels, perturbed_base_labels)
+
+    # Get per-class accuracy: which classes are easier/harder to properly classify?
+    original_base_accuracy_per_class = accuracy_per_class(original_base_labels, originalTarget)
+    perturbed_base_accuracy_per_class = accuracy_per_class(perturbed_base_labels, originalTarget)
+    
+    # We also obtain a "Fooling Matrix", essentially a confusion matrix of correctness.
         # Check for correct classification of example in first and second dataset. Gives 4 options:
-            # - Original example incorrect, corresponding adversarial example incorrect ("Robust Negative")
-            # - Original example incorrect, corresponding adversarial example correct ("Miracle", should be extremely rare)
-            # - Original example correct, corresponding adversarial example incorrect ("Adversary")
-            # - Original example correct, corresponding adversarial example correct ("Robust Positive")
+            # - Index [0,0]: Original example incorrect, corresponding adversarial example incorrect ("Robust Negative")
+            # - Index [0,1]: Original example incorrect, corresponding adversarial example correct ("Miracle", should be extremely rare)
+            # - Index [1,0]: Original example correct, corresponding adversarial example incorrect ("Adversary")
+            # - Index [1,1]: Original example correct, corresponding adversarial example correct ("Robust Positive")
+    fooling_matrix = get_fooling_matrix(original_base_labels, perturbed_base_labels, originalTarget)
+
     # This matrix gives us the fooling ratio: #Adversaries/(#Adversaries + #Robust Positives)
+    fooling_ratio = fooling_matrix[1,0]/(fooling_matrix[1,0] + fooling_matrix[1,1])
+
+    # Might as well calculate the ration of misclassified events that were fixed by the attack. Intuitively, this should be zero.
+    miracle_ratio = fooling_matrix[0,1]/(fooling_matrix[0,0] + fooling_matrix[0,1])
+
+    # endregion fooling
 
 
+
+    # region retrained
 
     # Then, we want to compare the performance of the original and retrained model(s) for each attack type on testing data.
     # We load up the original model and then the retrained models with different amounts of retraining data used.
@@ -117,6 +147,8 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
             # - Original example incorrect, corresponding adversarial example incorrect ("Consistent Deficit")
     # We can also get the accuracy of these classifiers, which will be our final "well, did it work?" metric.
     # We plot the accuracy and loss vs. the amount of data used for retraining.
+
+    # region retrained
 
 
 
