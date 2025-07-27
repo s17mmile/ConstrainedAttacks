@@ -41,7 +41,13 @@ def render_feature_histograms(datasets, datasetNames, features, binCount, output
         plt.figure(figsize = (16,9))
 
         # Load feature data from memory maps (will also work with non-memmapped data, but might be inefficient)
-        feature_data = [dataset[:,*featureIndex] for dataset in datasets]
+        # Can't unwrap an int, so we need to make a small exception for 1D inputs and not attempt an unwrap. Makes list comprehension ugl so I split it.
+        feature_data = []
+        for dataset in datasets:
+            if dataset.ndim == 2:
+                feature_data.append(dataset[:,featureIndex])
+            else:
+                feature_data.append(dataset[:,*featureIndex])
 
         plt.hist(feature_data, bins = binCount, histtype = "step", label = datasetNames)
 

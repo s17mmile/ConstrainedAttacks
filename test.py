@@ -6,9 +6,6 @@ import sys
 
 from Evaluation.dataset_analysis import *
 
-array1 = np.load("Datasets/CIFAR-10/train_data.npy", mmap_mode="r")
-array2 = np.load("Datasets/CIFAR-10/FGSM_train_data.npy", mmap_mode="r")
+array1 = np.load("Datasets/TopoDNN/train_data.npy", mmap_mode="r")
 
-# render_feature_histograms([array1, array2], ["CIFAR_base", "CIFAR_FGSM"], [(0,0,0)], 100, "Results/CIFAR10/Histograms")
-
-render_correlation_matrix(array1[:,:,:], "Results/CIFAR10/Correlations/unmodified.png")
+render_feature_histograms([array1], ["TopoDNN_base"], np.arange(90), 100, "Results/TopoDNN/Feature Distributions", "TopoDNN_base")
