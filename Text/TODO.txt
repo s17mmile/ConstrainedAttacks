@@ -4,16 +4,6 @@ Write evaluators:
     Confusion Matrix (was previous classification correct vs. is perturbed classification correct) --> Fooling Ratio
     Correlation Matrix
 
-Constrainer Architecture:
-    --> First, Make constrainers and other useful maths stuff (e.g. linearRescale) a local import --> Helpers.constrainers or sth.
-    --> Give constrainers both the original example and adversary candidate as parameters to enable more flexibility.
-
-Build a proper constrainer for TopoDNN
-    --> Read up on the physics that gets you the Energy
-    --> Energy conservation. Also apply this as feasibilityProjector.
-        --> Do I keep every single particle's energy individually constant? Or just work with the bunch?
-    --> Check out impact of nonexistent constituents --> if a constit is all 0 (doesn't exist), then the algorithm can't create a new one from thin air. Also apply this as feasibilityProjector.
-
 Retraining
     --> a) Should take a model path and dataset as parameters, also a way to chunk the data for testing at different amounts of retraining.
     --> b) Should specify architecture and then train using a combination of the OG dataset and (chuunks of various sizes of) the adversarial data.

@@ -63,7 +63,7 @@ def render_correlation_matrix(dataset, output_path, array_path = None):
     # Each example in the dataset needs to be "flattened", meaning the dataset is squished into two dimensions
     flat_data = np.reshape(dataset, (dataset.shape[0], int(dataset.size/dataset.shape[0])))
 
-    # We use rowvar = False because each feature is given in a column - each row is an input.
+    # We use rowvar = False because each feature is given in a column - each row represents a sample.
     correlations = np.corrcoef(flat_data, rowvar = False)
 
     plt.figure(figsize = (16,9))

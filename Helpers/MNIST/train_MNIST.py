@@ -66,7 +66,7 @@ model.fit(
     target,
     batch_size=batch_size,
     epochs=epochs,
-    validation_split=0.2,
+    validation_split=0.15,
     callbacks=callbacks,
 )
 
