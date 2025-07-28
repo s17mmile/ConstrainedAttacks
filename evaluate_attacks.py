@@ -55,17 +55,14 @@ if __name__ == "__main__":
     try:
         EvaluationDispatcher(
             originalDatasetPath="Datasets/CIFAR10/train_data.npy",
-            perturbedDatasetPath="Adversaries/CIFAR10_FGSM_train_data.npy",
+            perturbedDatasetPath="Adversaries/CIFAR10/FGSM_train_data.npy",
             originalTargetPath="Datasets/CIFAR10/train_target.npy",
             testDataPath="Datasets/CIFAR10/test_data.npy",
             testTargetPath="Datasets/CIFAR10/test_target.npy",
             baseModelPath="Models/CIFAR10/base_model.keras",
-            retrainedModelPaths=[
-                "Models/CIFAR10/Retrained/XYZ.keras"
-                ... TODO
-            ],
-            histogramFeatures = [(15,15,0),(15,,15,1),(15,15,2)],
-            attackName = "\"FGSM, ranged\"",
+            retrainedModelPaths=[],
+            histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+            attackName = "\"FGSM, CIFAR10, ranged\"",
             resultDirectory="Results/CIFAR10/",
             computeCorrelation=True
         )

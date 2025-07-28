@@ -11,14 +11,14 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 import tensorflow as tf
 import keras
 
-from dataset_analysis import *
-from label_analysis import *
+from Evaluation.dataset_analysis import *
+from Evaluation.label_analysis import *
 
-def write_eval_to_file(args)
+
 
 # This function basically just runs through all the evaluation metrics with a given set of parameters. Then, we juts write separate evaluation configs for each task and attack type and we're good.
 # Ideally, this would include all the error handling like the attack dispatcher, btu I'm short on time and cannot be bothered right now.
-def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTargetPath, testDataPath, testTargetPath, baseModelPath, retrainedModelPaths, histogramFeatures, attackName, resultDirectory, computeCorrelation = False)
+def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTargetPath, testDataPath, testTargetPath, baseModelPath, retrainedModelPaths, histogramFeatures, attackName, resultDirectory, computeCorrelation = False):
     '''
         originalDatasetPath: path to original unperturbed dataset. Should be training data.
         perturbedDatasetPath: path to perturbed training datasets
@@ -35,15 +35,34 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     '''
 
     # Set Up 
-    os.makedirs(f"{resultDirectory}/Dataset Metrics")
-    os.makedirs(f"{resultDirectory}/Feature Distributions")
-    os.makedirs(f"{resultDirectory}/Correlation Plots")
-    os.makedirs(f"{resultDirectory}/Retraining Performance")
+    try:
+        os.makedirs(f"{resultDirectory}/Dataset Metrics")
+    except Exception as e:
+        print(e)
+
+    try:
+        os.makedirs(f"{resultDirectory}/Feature Distributions")
+    except Exception as e:
+        print(e)
+
+    try:
+        os.makedirs(f"{resultDirectory}/Retraining Performance")
+    except Exception as e:
+        print(e)
+
+    if computeCorrelation:
+        try:
+            os.makedirs(f"{resultDirectory}/Correlation Plots")
+        except Exception as e:
+            print(e)
 
     # Load data as memmaps
     originalData = np.load(originalDatasetPath, mmap_mode="r")
     perturbedData = np.load(perturbedDatasetPath, mmap_mode="r")
     originalTarget = np.load(originalTargetPath, mmap_mode="r")
+
+    testData = np.load(testDataPath, mmap_mode="r")
+    testTarget = np.load(testTargetPath, mmap_mode="r")
 
     # Load all the models
     baseModel = keras.models.load_model(baseModelPath)
@@ -83,8 +102,13 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     plt.title(f"L-infinity (max) distance between original data and {attackName}-attacked data. Total: ({np.mean(l_inf)} ± {np.std(l_inf)}")
     plt.savefig(f"{resultDirectory}/Dataset Metrics/{attackName}_l_inf_distance.png")
 
-    # Now, render a few feature histograms
+    # Now, render a few feature histograms. Which exactly is given by the histogramFeatures list/array.
     render_feature_histograms([originalData, perturbedData], ["Original", attackName], histogramFeatures, 100, f"{resultDirectory}/Feature Distributions", attackName)
+
+    # Finally, add correlation plot if desired. Not recommended for particularly large input sizes.
+    if computeCorrelation:
+        render_correlation_matrix(originalData,f"{resultDirectory}/Correlation Plots/original_correlation.png")
+        render_correlation_matrix(perturbedData,f"{resultDirectory}/Correlation Plots/{attackName}_correlation.png")
 
     # endregion dataset analysis
 
@@ -136,19 +160,70 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     # region retrained model eval
 
     # Then, we want to compare the performance of the original and retrained model(s) for each attack type on testing data.
-    # We load up the original model and then the retrained models with different amounts of retraining data used.
-    
-    # We then compute a "Learning Matrix" with these models on the testing dataset:
+    # We use the original model and then the retrained models with different amounts of retraining data used.
+    test_base_labels = baseModel.predict(testData)
+    test_retrained_labels = [model.predict(testData) for model in retrainedModels]
+
+    # We then compute a "Learning Matrix" (principally identical to the fooling matrix) with these models on the testing dataset:
         # Check for correct classification of example in dataset using both classifiers. Gives 4 options per example:
-            # - Original classifier correct, retrained classifier correct ("Consistent Quality")
-            # - Original classifier correct, retrained classifier incorrect ("Overcorrect")
-            # - Original example incorrect, corresponding adversarial example correct ("Improvement")
-            # - Original example incorrect, corresponding adversarial example incorrect ("Consistent Deficit")
-    # We can also get the accuracy of these classifiers, which will be our final "well, did it work?" metric.
-    # We plot the accuracy and loss vs. the amount of data used for retraining.
+            # - Index [0,0]: Original classifier incorrect, retrained classifier incorrect ("Consistent Deficit")
+            # - Index [0,1]: Original classifier incorrect, retrained classifier correct ("Improvement")
+            # - Index [1,0]: Original classifier correct, retrained classifier incorrect ("Overcorrect")
+            # - Index [1,1]: Original classifier correct, retrained classifier correct ("Consistent Quality")
+    learning_matrices = [get_learning_matrix(test_base_labels, labels, testTarget) for labels in test_retrained_labels]
+
+    # Improvement ratio: what fraction of the previously misclassified examples are now correct?
+    improvement_ratios = [matrix[0,1]/(matrix[0,1] + matrix[0,0]) for matrix in learning_matrices]
+
+    # Overcorrection ratio: what fraction of the previously correctly classified examples are now incorrect?
+    overcorrect_ratios = [matrix[1,0]/(matrix[1,0] + matrix[1,1]) for matrix in learning_matrices]
+
+    # We can also plot the accuracy and loss of these classifiers.
+    # This assumes that the retrained models were trained using evenly-increasing amounts of adversarial data. This is given in this project.
+    # So, we just use the percentage of data used in retraining as the x axis.
+    x_vals = np.linspace(0, 1, len(retrainedModels)+1, endpoint=True)
+
+    # Accuracy (will be our final "well, did it work?" metric)
+    test_base_accuracy = accuracy(test_base_labels, testTarget)
+    test_retrained_accuracies = [accuracy(labels, testTarget) for labels in test_retrained_labels]
+
+    accuracy_vals = [test_base_accuracy]+test_retrained_accuracies
+
+    plt.figure(figsize=(16,9))
+    plt.xlim(0,1)
+    plt.xlabel("Fraction of adversarial training data used for training.")
+    plt.ylim(0,1)
+    plt.ylabel("Accuracy on Testing dataset.")
+    plt.title("Dependence of Accuracy on amount of adversarial retraining Data")
+    plt.scatter(x_vals, accuracy_vals, label = "Accuracy vs. Amount of retraining Data used.")
+    plt.legend()
+    plt.savefig(f"{resultDirectory}/Retraining Performance/{attackName}_Retraining_Accuracy.png")
+    plt.close()
+
+    # Loss
+    test_base_loss = baseModel.loss(testTarget, test_base_labels)
+    test_retrained_losses = [model.loss(testTarget, labels) for model, labels in zip(retrainedModels, test_retrained_labels)]
+
+    loss_vals = [test_base_loss]+test_retrained_losses
+
+    plt.figure(figsize=(16,9))
+    plt.xlim(0,1)
+    plt.xlabel("Fraction of adversarial training data used for training.")
+    plt.ylim(0,1)
+    plt.ylabel("Loss on Testing dataset.")
+    plt.title("Dependence of Training Loss on amount of adversarial retraining Data")
+    plt.scatter(x_vals, accuracy_vals, label = "Loss vs. Amount of retraining Data used.")
+    plt.legend()
+    plt.savefig(f"{resultDirectory}/Retraining Performance/{attackName}_Retraining_Loss.png")    
+    plt.close()
 
     # endregion retrained model eval
 
 
 
-    # Write all the important metrics into a file
+    # Write all the important metrics that can't be nicely visualized into a file
+    with open(f"{resultDirectory}/evaluation,txt", "w") as f:
+        f.write(f"Evaluation of {attackName} attack")
+
+        f.write("TODO write the file outputs, this is just testing.")
+    

@@ -1,32 +1,23 @@
-import os
 import numpy as np
+import os
 import sys
-# import keras
-# import tensorflow as tf
+
+sys.path.append(os.getcwd())
+
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["KERAS_BACKEND"] = "tensorflow"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1" 
+
+import tensorflow as tf
+import keras
 
 from Evaluation.dataset_analysis import *
 from Helpers.constrainers import *
-# data = np.load("Datasets/TopoDNN/train_data.npy", mmap_mode="r")
-
-# sample = data[238].copy()
-
-# print(sample)
-# print(np.count_nonzero(sample))
-
-# perturbed = sample + np.random.rand(90)
-
-# print(jetEnergy(sample))
-# print(jetEnergy(TopoDNN_spreadLimit(sample)))
-
-# print(jetEnergy(perturbed))
-# print(jetEnergy(TopoDNN_conserveConstits(perturbed, sample)))
-# print(jetEnergy(TopoDNN_conserveGlobalEnergy(perturbed, sample)))
-
-# fixed = constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy(perturbed, sample)
-
-# print(jetEnergy(fixed))
 
 
 
-data = np.load("Adversaries/TopoDNN/spreadLimit/RDSA_train_data.npy", mmap_mode="r")
 
+model = keras.models.load_model("Models/CIFAR10/base_model.keras")
+data = np.load("Datasets/CIFAR10/train_data.npy", mmap_mode="r")
+
+print(model.loss())

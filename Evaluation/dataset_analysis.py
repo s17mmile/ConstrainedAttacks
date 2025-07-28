@@ -53,6 +53,8 @@ def render_feature_histograms(datasets, datasetNames, features, binCount, output
 
         plt.legend()
         plt.savefig(f"{output_directory}/{out_name}_{featureIndex}.png")
+
+        plt.close()
     
     return
 
@@ -74,5 +76,7 @@ def render_correlation_matrix(dataset, output_path, array_path = None):
 
     if array_path is not None:
         np.save(array_path, correlations)
+
+    plt.close()
 
     return

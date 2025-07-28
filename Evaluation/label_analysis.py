@@ -57,8 +57,6 @@ def accuracy_per_class(labels, targets):
 
     return correct/total
 
-
-
 # Compare quality of predictions by creating 2x2 correctness comparison matrix.
 # the returned matrix will count the following at each index:
 #   [0,0] --> Number of times where both labels are wrong
@@ -66,9 +64,15 @@ def accuracy_per_class(labels, targets):
 #   [1,0] --> Number of times only the first label is correct
 #   [1,1] --> Number of times both labels are correct
 def get_fooling_matrix(labels1, labels2, target):
-    assert labels1.shape == labels2.shape and labels2.shape == target.shape, "Correctness Matrix: Incompatible input shapes." 
+    assert labels1.shape == labels2.shape and labels2.shape == target.shape, "Fooling/Learning Matrix: Incompatible input shapes." 
 
     correctness1 = get_label_correctness(labels1, target)
     correctness2 = get_label_correctness(labels2, target)
 
     return confusion_matrix(correctness1, correctness2)
+
+# This is the exact same function with a different name. Simply done to reduce confusion in the name choice for different matrices:
+# - A "fooling matrix" is meant to show the performance of a model on two datasets
+# - A "learning matrix" is meant to show the performance of two models on one dataset
+def get_learning_matrix(labels1, labels2, target):
+    return get_fooling_matrix(labels1, labels2, target)
