@@ -49,8 +49,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     baseModel = keras.models.load_model(baseModelPath)
     retrainedModels = [keras.models.load_model(path) for path in retrainedModelPaths]
 
-    # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    # STEP 1
+
 
     # region dataset analysis
 
@@ -134,7 +133,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
 
 
 
-    # region retrained
+    # region retrained model eval
 
     # Then, we want to compare the performance of the original and retrained model(s) for each attack type on testing data.
     # We load up the original model and then the retrained models with different amounts of retraining data used.
@@ -148,7 +147,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     # We can also get the accuracy of these classifiers, which will be our final "well, did it work?" metric.
     # We plot the accuracy and loss vs. the amount of data used for retraining.
 
-    # region retrained
+    # endregion retrained model eval
 
 
 

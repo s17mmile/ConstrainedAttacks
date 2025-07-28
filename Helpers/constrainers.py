@@ -77,15 +77,16 @@ def TopoDNN_conserveConstits(adversary, example):
     return adversary
 
 def TopoDNN_spreadLimit(jet):
-    # Hardcoded minima and maxima across the training dataset
+    # Hardcoded minima and maxima. These are motivated by observing the original feature distributions - for eta and phi, there are single outliers way outside the otherwise feasible range.
+    # The vast, VAST majority of all values lie comfortable within these ranges.
     min_pT = 0.0
     max_pT = 1.0
 
-    min_eta = -1.909346
-    max_eta = 2.119423
+    min_eta = -1.0
+    max_eta = 1.0
 
-    min_phi = -1.588196
-    max_phi = 1.443206
+    min_phi = -1
+    max_phi = 1
 
     # Constrain pT, eta and phi values by clipping - we might lose some info, but doing a linear rescale here seems like it has more potential to break things than for image classifiers.
     jet[0::3] = np.clip(jet[0::3], min_pT, max_pT)
