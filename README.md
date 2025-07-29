@@ -52,7 +52,7 @@ Alternatively, you can directly import the constrained FGSM/PGD/RDSA implementat
 
 5. Re-train a model: The Evaluation folder contains the retrain_model.py script, which allows you to retrain an existing network, incrementally taking in parts of the generated adversary data. Since model performance improvements are all but guaranteed, it's worth it to evaluate retraining efficiency and resulting performance using different proportions of the generated data for augmentation. Who knows, maybe only using half of it will result in better performance?
 
-6. Evaluate model performance: The Evaluation folder contains implementations of some performance evaluation metrics. These will allow you to determine key statistics about the attack's efficiency, the underlying dataset's charactristics and retrained model performance:
+6. Evaluate model performance: The Evaluation folder contains implementations of some performance evaluation metrics as well as - again - a dispatcher (examples in the evaluate_attacks.py script). These will allow you to determine key statistics about the attack's efficiency, the underlying dataset's charactristics and retrained model performance:
 
     - Accuracy, Recall, F1-Score: Basic Model performance evaluators.
     
