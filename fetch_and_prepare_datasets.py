@@ -180,9 +180,9 @@ if (get_topodnn):
     # Data Fetching
 
     urls =      [
-                "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=test.h5",
-                "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=train.h5",
-                "https://syncandshare.desy.de/index.php/s/llbX3zpLhazgPJ6/download?path=%2F&files=val.h5"
+                "https://syncandshare.desy.de/public.php/dav/files/llbX3zpLhazgPJ6/test.h5",
+                "https://syncandshare.desy.de/public.php/dav/files/llbX3zpLhazgPJ6/train.h5",
+                "https://syncandshare.desy.de/public.php/dav/files/llbX3zpLhazgPJ6/val.h5"
                 ]
 
     names =     ["test", "train", "val"]
