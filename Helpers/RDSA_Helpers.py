@@ -4,9 +4,6 @@ import keras
 
 import tqdm
 
-from keras.losses import mean_squared_error as MSE
-from keras.losses import binary_crossentropy as BCE
-from keras.losses import categorical_crossentropy as CCE
 from scipy import stats
 
 import tensorflow as tf
@@ -67,15 +64,18 @@ def featureContinuity(data, categoricalLimit):
 
 
 
-def featureDistributions(data, features, binCount):
+def featureDistributions(data, features = None, binCount = 100):
     """
-        Creates normalized Histograms (= Probability Density Functions) of a (subset of a) dataset's features.
+        Creates normalized Histograms (= Probability Density Functions) of (a subset of) a dataset's features.
         Practically, these will be the continuous features, as RDSA specifically targets them when shuffling.
         
         Returns Histograms as pairs of two arrays:
             - (binCount+1) bin edges
             - (binCount) bin values
     """
+
+    if features is None:
+        features = [transformIndex(i, data[0].shape) for i in range(data[0].size)]
 
     exampleShape = data.shape[1:]
     featureCount = np.prod(exampleShape)

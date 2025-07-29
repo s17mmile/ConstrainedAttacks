@@ -17,7 +17,7 @@ import keras
 
 # Compare the predicted labels with the respective target labels. Return an array where 0 indicates the label was wrong, and 1 indicates the label was right.
 def get_label_correctness(labels, targets):
-    return (np.argmax(labels, axis = 1) == np.argmax(targets, axis = 1))
+    return np.argmax(labels, axis = 1) == np.argmax(targets, axis = 1)
 
 # Creates 2d histogram-like array to compare predicted labels with each other and with targets.
 def confusion_matrix(labels1, labels2):
@@ -31,13 +31,13 @@ def confusion_matrix(labels1, labels2):
 
     return matrix
 
-# Jensen Shannon Distance between probability Distributions
+# Compute average Jensen Shannon Distance between prediction probability Distributions
 def JSD(labels1, labels2):
     return scipy.spatial.distance.jensenshannon(labels1, labels2)
 
 # Accuracy
 def accuracy(labels, target):
-    return float(np.count_nonzero(get_label_correctness(labels, target)))/labels.size
+    return float(np.count_nonzero(get_label_correctness(labels, target).astype(int)))/labels.size
 
 # Accuracy per class
 # Damn I could've probably made this easier and faster by just going line-by-line through the confusion matrix, but whatever.
@@ -66,8 +66,8 @@ def accuracy_per_class(labels, targets):
 def get_fooling_matrix(labels1, labels2, target):
     assert labels1.shape == labels2.shape and labels2.shape == target.shape, "Fooling/Learning Matrix: Incompatible input shapes." 
 
-    correctness1 = get_label_correctness(labels1, target)
-    correctness2 = get_label_correctness(labels2, target)
+    correctness1 = get_label_correctness(labels1, target).astype(int)
+    correctness2 = get_label_correctness(labels2, target).astype(int)
 
     return confusion_matrix(correctness1, correctness2)
 

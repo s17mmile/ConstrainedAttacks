@@ -2,8 +2,10 @@ import numpy as np
 import os
 import sys
 import warnings
+import scipy.spatial
 import tqdm
 import matplotlib.pyplot as plt
+import scipy
 
 sys.path.append(os.getcwd())
 
@@ -13,6 +15,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 
 import tensorflow as tf
 import keras
+
+from Helpers.RDSA_Helpers import featureDistributions
 
 # Element-wise (<=> one for each example) cosine similarity between original and modified dataset.
 def cosine_similarity(original_data, adversarial_data):
@@ -33,6 +37,24 @@ def L_2_norm(data):
 def L_inf_norm(data):
     return np.max(np.abs(data), axis = 1)
 
+# Jensen Shannon Distance between the feature Distributions
+def dataset_JSD(dataset1, dataset2):
+
+    # Get single feature distributions for both datasets. Will sort into 100 bins, since this is the default value in featureDistributions().
+    # We could also just get the frequencies (without the normalization applied in featureDistributions()), but this is easier.
+    # The shape of these arrays will then be {INPUT SHAPE}x100
+    _, probabilities1 = featureDistributions(dataset1)
+    _, probabilities2 = featureDistributions(dataset1)
+
+    print(probabilities1.shape)
+    print(probabilities2.shape)
+
+    # When computing JSD, flatten the frequency arrays, putting all the histograms in one long line.
+    probabilities1 = probabilities1.flatten()
+    probabilities2 = probabilities2.flatten()
+
+    return scipy.spatial.distance.jensenshannon(probabilities1, probabilities2)
+
 # Create and render histograms of a given subset of a dataset's features, saving to a given directory.
 # This actually takes in multiple datasets, and will create the histograms for each in the same plot with different colors.
 def render_feature_histograms(datasets, datasetNames, features, binCount, output_directory, out_name):
@@ -41,7 +63,7 @@ def render_feature_histograms(datasets, datasetNames, features, binCount, output
         plt.figure(figsize = (16,9))
 
         # Load feature data from memory maps (will also work with non-memmapped data, but might be inefficient)
-        # Can't unwrap an int, so we need to make a small exception for 1D inputs and not attempt an unwrap. Makes list comprehension ugl so I split it.
+        # Can't unwrap an int, so we need to make a small exception for 1D inputs and not attempt an unwrap. Makes list comprehension ugly so I split it.
         feature_data = []
         for dataset in datasets:
             if dataset.ndim == 2:
