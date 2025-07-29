@@ -3,3 +3,5 @@ Ignoring datasets as they are too large
 Datasets/
 Adversaries/
 Testing/
+
+test.py
