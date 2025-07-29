@@ -74,5 +74,3 @@ if __name__ == "__main__":
 
 
     del original_data
-
-    # RDSA_base_data = np.load("Adversaries/TopoDNN/spreadLimit/RDSA_train_data.npy", mmap_mode="r")
