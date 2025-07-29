@@ -50,6 +50,40 @@ def constrainer_scale_m1_1(adversary, example):
 
 # Reminder: overall, all the energies are scaled down by a factor of about 1700 due to pT being scaled by that amount in preprocessing. This does NOT matter for conservation constraints.
 
+
+
+# Little indexing helpers to make things readable
+def pT(particleIndex):
+    return 3*particleIndex
+
+def eta(particleIndex):
+    return 3*particleIndex+1
+
+def phi(particleIndex):
+    return 3*particleIndex+2
+
+# For readability of other code, use this to apply a single-example constrainer to all examples.
+# Works in-place as arrays are passed by reference!
+def TopoDNN_applyToAll(adversarialData, constrainer, originalData = None):
+    assert adversarialData.shape == originalData.shape, "Shape Mismatch"
+    num_samples = adversarialData.shape[0]
+
+    # constrainedData = np.empty(adversarialData.shape)
+
+    # Some constraints require the original data. If given, we pass it to the constrainer.
+    if originalData is not None:
+        for i in range(num_samples):
+            # constrainedData[i] = constrainer(adversarialData[i], originalData[i])
+            constrainer(adversarialData[i], originalData[i])
+    else:
+        for i in range(num_samples):
+            # constrainedData[i] = constrainer(adversarialData[i])
+            constrainer(adversarialData[i])
+
+    return
+
+
+
 # Since we do not know the particle masses, we must use the massless limit approximation, justified by high accelerator energy.
 
 # Particle Energy in the massless limit
@@ -63,16 +97,6 @@ def particleEnergyInJet(jet, particleIndex):
 def jetEnergy(jet):
     energy = np.sum(np.array([particleEnergy(pT, eta, phi) for pT, eta, phi in zip(jet[0::3], jet[1::3], jet[2::3])]))
     return energy
-
-# Little indexing helpers to make things readable
-def pT(particleIndex):
-    return 3*particleIndex
-
-def eta(particleIndex):
-    return 3*particleIndex+1
-
-def phi(particleIndex):
-    return 3*particleIndex+2
 
 # We define a pT-eta-phi triplet as a particle as long as any one of the three is nonzero.
 # (Practically, just checking pT should be enough, as no particle with 0 pT could ever be detected, but whatever. The overhead is tiny and that feels a bit hacky.)
