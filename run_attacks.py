@@ -26,7 +26,7 @@ def stepsize(step):
 
 # Exponential decrease to zero in on target. Inspired by binary search. Smaller overall because TopoDNN values are less spread out.
 def stepsize_topodnn(step):
-    return 0.01*(1/2**step)
+    return 0.02*(1/2**step)
 
 
 # Selector Panel: Choose which attacks to perform
@@ -53,14 +53,14 @@ MNIST_RDSA = False
 # The "Base Constraint" is just clipping the variables' values back into original ranges.
 # As of writing this, we already have adversarial topoDNN data that was constrained this way (no feasibilityProjector for PGD, only clip at end).
 # Thus, we do not need to re-run RDSA or FGSM at all! We can simply take the clipped data and apply the constituent conservation and both energy conservation strategies after the fact, saving loads of computation time and disk space.
-TopoDNN_FGSM_clip = True
-TopoDNN_PGD_clip = True
+TopoDNN_FGSM_clip = False
+TopoDNN_PGD_clip = False
 TopoDNN_RDSA_clip = False
 
 # PGD uses the constrainers as a repeated projection function. Thus, we unfortunately need to re-attack from scratch multiple times, since we cannot just tack the constraint onto the end result.
 TopoDNN_PGD_constits_clip = True
 TopoDNN_PGD_constits_clip_globalEnergy = True
-
+TopoDNN_PGD_constits_clip_particleEnergy = True
 
 
 
@@ -304,8 +304,8 @@ if __name__ == "__main__":
                 epsilon=0.02,
                 constrainer=constrainers.constrainer_TopoDNN_spreadLimit,
                 return_labels=False,
-                # n=1,
-                force_overwrite=True,
+                n=1024,
+                force_overwrite=False,
                 workercount=8,
                 chunksize=512
             )
@@ -326,8 +326,8 @@ if __name__ == "__main__":
                 stepsize=stepsize,
                 feasibilityProjector=constrainers.constrainer_TopoDNN_spreadLimit,
                 return_labels=False,
-                # n=1,
-                force_overwrite=True,
+                n=1024,
+                force_overwrite=False,
                 workercount=8,
                 chunksize=512
             )
@@ -370,10 +370,10 @@ if __name__ == "__main__":
                 adversaryPath="Adversaries/TopoDNN/conserveConstits_spreadLimit/PGD_train_data.npy",
                 lossObject=keras.losses.BinaryCrossentropy(),
                 stepcount=20,
-                stepsize=stepsize,
+                stepsize=stepsize_topodnn,
                 feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit,
                 return_labels=False,
-                # n=1,
+                # n=1024,
                 force_overwrite=True,
                 workercount=8,
                 chunksize=512
@@ -392,10 +392,32 @@ if __name__ == "__main__":
                 adversaryPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/PGD_train_data.npy",
                 lossObject=keras.losses.BinaryCrossentropy(),
                 stepcount=20,
-                stepsize=stepsize,
+                stepsize=stepsize_topodnn,
                 feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy,
                 return_labels=False,
-                # n=1,
+                # n=1024,
+                force_overwrite=True,
+                workercount=8,
+                chunksize=512
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+            
+    if (TopoDNN_PGD_constits_clip_particleEnergy):
+        try:
+            print("\n\n\nTopoDNN PGD constits clip particleEnergy\n")
+            AttackDispatcher(
+                attack_type="PGD",
+                datasetPath="Datasets/TopoDNN/train_data.npy",
+                targetPath="Datasets/TopoDNN/train_target.npy",
+                modelPath="Models/TopoDNN/base_model.keras",
+                adversaryPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/PGD_train_data.npy",
+                lossObject=keras.losses.BinaryCrossentropy(),
+                stepcount=20,
+                stepsize=stepsize_topodnn,
+                feasibilityProjector=constrainers.constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy,
+                return_labels=False,
+                # n=1024,
                 force_overwrite=True,
                 workercount=8,
                 chunksize=512

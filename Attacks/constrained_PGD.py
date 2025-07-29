@@ -39,17 +39,23 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
 
     # Data formatting for use with GradientTape and as a model input
     # --> Within this function, manipulate everything as tensors. Only transform back to numpy at the end.
-    # print("convert 1")
     adversary = tf.convert_to_tensor(np.array([example]))
 
-    print(adversary)
+    # If given: apply the feasibility projector. We do this once BEFORE the PGD attack to avoid outlier values from slipping through by trigegring the early stop condition.
+    if feasibilityProjector is not None:
+        adversary = adversary.numpy()[0]
+        adversary = feasibilityProjector(adversary, example)
+        adversary = tf.convert_to_tensor([adversary])
 
-    # We re-instantiate the GradientTape each time. I'm not sure if this is a preformance loss, but it feels like it.
+
+
+    # We re-instantiate the GradientTape each time. I'm not sure if this is a performance loss, but it very well might be.
     # I tried the persistent tape, but could not get it to work.
+
     for step in range(stepcount):
-        # print("step",step)
         with tf.GradientTape(persistent = True) as tape:
             tape.watch(adversary)
+
             # Run model on current adversary
             prediction = model(adversary, training = False)[0]
 
@@ -62,12 +68,11 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
         
         # Get the gradients of the loss w.r.t to the current adversary.
         gradient = tape.gradient(loss, adversary)
+
         # Get the sign of the gradients to create the perturbation
         gradient_sign = tf.sign(gradient)
         # Apply Gradient perturbation
         adversary = adversary + stepsize(step) * gradient_sign
-
-        print(gradient)
 
         # If given: apply the feasibility projector.
         if feasibilityProjector is not None:
@@ -84,7 +89,7 @@ def constrained_PGD(model, example, target, lossObject, stepcount = 10, stepsize
     if constrainer is not None:
         adversary = constrainer(adversary, example)
 
-    # Compte and return the labels if wanted
+    # Compute and return the labels if wanted
     if (return_labels):
         originalLabel = model(tf.convert_to_tensor([example]), training = False).numpy()[0]
         newLabel = model(tf.convert_to_tensor([adversary]), training = False).numpy()[0]

@@ -56,25 +56,34 @@ def constrainer_scale_m1_1(adversary, example):
 def particleEnergy(pT, eta, phi):
     return pT * cosh(eta)
 
+def particleEnergyInJet(jet, particleIndex):
+    return particleEnergy(jet[pT(particleIndex)], jet[eta(particleIndex)], jet[phi(particleIndex)])
+
 # Jet energy in the massless limit
 def jetEnergy(jet):
-    return np.sum(np.array([particleEnergy(pT, eta, phi) for pT, eta, phi in zip(jet[0::3], jet[1::3], jet[2::3])]))
+    energy = np.sum(np.array([particleEnergy(pT, eta, phi) for pT, eta, phi in zip(jet[0::3], jet[1::3], jet[2::3])]))
+    return energy
+
+# Little indexing helpers to make things readable
+def pT(particleIndex):
+    return 3*particleIndex
+
+def eta(particleIndex):
+    return 3*particleIndex+1
+
+def phi(particleIndex):
+    return 3*particleIndex+2
 
 # We define a pT-eta-phi triplet as a particle as long as any one of the three is nonzero.
 # (Practically, just checking pT should be enough, as no particle with 0 pT could ever be detected, but whatever. The overhead is tiny and that feels a bit hacky.)
-# Actually this ^^ may well be wrong because of the preprocessing we apply. I'm not fully sure if the change in pseudorapidity makes a difference here. 
+# Actually this ^^ may be wrong because of the preprocessing we apply...? I'm not fully sure if the change in pseudorapidity makes a difference here.
+# We introduce a tiny numerical tolerance.
 def isParticle(pT,eta,phi):
-    return not ((pT == 0) and (eta == 0) and (phi == 0))
+    tolerance = 1e-8
+    return not ((abs(pT) < tolerance) and (abs(eta) < tolerance) and (abs(phi) < tolerance))
 
-# Conserve particle count: Set adversary to 0 wherever the example was 0-padded. 
-def TopoDNN_conserveConstits(adversary, example):
-    # Each particle is encoded by three variables. We look for zero triplets in the example and set the same zero triplets in the adversary.
-    for particleIndex in range(30):
-        # Can be made more compact with np.any(), np.all() or similar, but this is easier to read.
-        if not isParticle(example[3*particleIndex], example[3*particleIndex+1], example[3*particleIndex+2]):
-            adversary[3*particleIndex:3*particleIndex+2] = 0
-
-    return adversary
+def isParticleInJet(jet, particleIndex):
+    return isParticle(jet[pT(particleIndex)], jet[eta(particleIndex)], jet[phi(particleIndex)])
 
 def TopoDNN_spreadLimit(jet):
     # Hardcoded minima and maxima. These are motivated by observing the original feature distributions - for eta and phi, there are single outliers way outside the otherwise feasible range.
@@ -85,8 +94,8 @@ def TopoDNN_spreadLimit(jet):
     min_eta = -1.0
     max_eta = 1.0
 
-    min_phi = -1
-    max_phi = 1
+    min_phi = -1.0
+    max_phi = 1.0
 
     # Constrain pT, eta and phi values by clipping - we might lose some info, but doing a linear rescale here seems like it has more potential to break things than for image classifiers.
     jet[0::3] = np.clip(jet[0::3], min_pT, max_pT)
@@ -95,18 +104,47 @@ def TopoDNN_spreadLimit(jet):
 
     # Also, the preprocessing forces a few values to always be zero:
     # eta_0
-    jet[1] = 0
+    jet[1] = 0.0
     # phi_0
-    jet[2] = 0
+    jet[2] = 0.0
     # eta_1
-    jet[4] = 0
+    jet[4] = 0.0
 
     return jet
+
+# Conserve particle count: Set adversary to 0 wherever the example was 0-padded.
+# Also, any particle with pT <= 0 is effectively "gone" as pT will be clipped
+# This will break the energy conservation if all are gone, which can actually happen if not prevented here.
+# So, if an example particle exists but the corresponsing adversary has pT = 0, restore a usable pT value. There are 2 ways to do this implemented here.
+# (I feel like it would be cleanest to only reset the last gradient addition for PGD, but that would require an annoyig rewrite to pass the previous step's adversary to the feasibility functions.)
+def TopoDNN_conserveConstits(adversary, example):
+    # Each particle is encoded by three variables - we have 30 particles total. This is all a little unclean due to the interleaved pT/eta/phi data in a 1D array. This is kept for consistency with the original data format. 
+    for particleIndex in range(30):
+        # Remove any "hallucinated" particles
+        # We look for zero triplets in the example and set the same zero triplets in the adversary.
+        # Can be made more compact with np.any(), np.all() or similar, but this is easier to read.
+        if not isParticleInJet(example, particleIndex):
+            adversary[pT(particleIndex):pT(particleIndex+1)] = 0.0
+
+        # Restore Particles with negative pT, as they would be clipped.
+        # If pT is exactly 0, VERSION B breaks, so we still use the method used in A to get a value that is at least reasonable
+        else:
+            # VERSION A: Reset pT of any particles that the perturbation set to 0 to equal the pT of the original sample.
+            # if (adversary[pT(particleIndex)] <= 0):
+            #     adversary[pT(particleIndex)] = example[pT(particleIndex)]
+
+            # VERSION B: 
+            if (adversary[pT(particleIndex)] < 0):
+                adversary[pT(particleIndex)] = -1.0 * adversary[pT(particleIndex)]
+            elif (adversary[pT(particleIndex)] == 0): # rare
+                adversary[pT(particleIndex)] = example[pT(particleIndex)]
+
+    return adversary
 
 # Scale all pT values such that (in the massless limit) the jet energy remains the same.
 # Another way to do this may involve scaling eta, but this is easier.
 def TopoDNN_conserveGlobalEnergy(adversary, example):
-    # Compute the energy ratio between the original and modified jet. Should generally be close to 1.
+    # Compute the energy ratio between the original and modified jet.
     scalingFactor = jetEnergy(example)/jetEnergy(adversary)
 
     # Scale all pT values by this factor. The energy is linear in pT, so this will match the total energies.
@@ -114,6 +152,20 @@ def TopoDNN_conserveGlobalEnergy(adversary, example):
 
     return adversary
 
+# Scale all pT values such that (in the massless limit) each particle's energy remains the same.
+# Another way to do this may involve scaling eta, but this is easier.
+def TopoDNN_conserveParticleEnergy(adversary, example):
+    
+    # Loop over each particle and restore the energy
+    for particleIndex in range(30):
+        if isParticleInJet(example, particleIndex):
+            # Compute the particle energy ratio between the original and modified jet.
+            scalingFactor = particleEnergyInJet(example, particleIndex)/particleEnergyInJet(adversary, particleIndex)
+
+            # Scale pT values by this factor. The energy is linear in pT, so this will match the total energies.
+            adversary[pT(particleIndex)] = adversary[pT(particleIndex)] * scalingFactor
+
+    return adversary
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # TopoDNN constrainer/feasibility functions. Pass these to the dispatcher.
@@ -132,8 +184,8 @@ def constrainer_TopoDNN_conserveConstits_spreadLimit(adversary, example):
 
 
 # This constrainer works with a TopoDNN adversary candidate and the example it originated from to apply three constraints in order:
-# - Constituent Particle Count conservation. Jets with less than 30 Constituents are represented by padding with zeros.
-# - Spread Limiting: No constituent's observables shoud leave the range that they had in the oiginal data. We could also use Delta_R here.
+# - Constituent Particle Count conservation. Jets with less than 30 Constituents are represented by padding the jet data with zeros.
+# - Spread Limiting: No constituent's observables shoud leave the range that they had in the original data.
 # - Energy conservation: We want the total jet energy to remain the same, as it is suposed to be feasible that it came from the same reaction.
     # - Two subtly different versions:
         # - We calculate the energy of the example and adversary candidate. Then, scale all pTs in the candidate by their ratio.
@@ -143,4 +195,10 @@ def constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy(advers
     adversary = TopoDNN_conserveConstits(adversary, example)
     adversary = TopoDNN_spreadLimit(adversary)
     adversary = TopoDNN_conserveGlobalEnergy(adversary, example)
+    return adversary
+
+def constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy(adversary, example):
+    adversary = TopoDNN_conserveConstits(adversary, example)
+    adversary = TopoDNN_spreadLimit(adversary)
+    adversary = TopoDNN_conserveParticleEnergy(adversary, example)
     return adversary
