@@ -48,7 +48,7 @@ def renderROCandGetAUROC(testLabels, testTarget, outputPath, attackName):
     integerTestLabels = np.argmax(testLabels, axis = 1)
     integerTestTarget = np.argmax(testTarget, axis = 1)
 
-    testLabelScore = np.array([testLabels[i,np.argmax(testTarget[i])] for i in ])
+    testLabelScore = np.array([testLabels[i,np.argmax(testTarget[i])] for i in range(num_samples)])
 
     auroc = roc_auc_score(testTarget.ravel(), testLabels.ravel())
 

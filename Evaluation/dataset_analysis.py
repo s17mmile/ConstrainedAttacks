@@ -20,7 +20,7 @@ from Helpers.RDSA_Helpers import featureDistributions
 
 # Element-wise (<=> one for each example) cosine similarity between original and modified dataset.
 def cosine_similarity(original_data, adversarial_data):
-    return np.array([np.dot(example, adversary)/(np.linalg.norm(example) * np.linalg.norm(adversary)) for example, adversary in zip(original_data, adversarial_data)])
+    return np.array([np.dot(example.flatten(), adversary.flatten())/(np.linalg.norm(example.flatten()) * np.linalg.norm(adversary.flatten())) for example, adversary in zip(original_data, adversarial_data)])
 
 # Element-wise L-1-Norm for a set of examples
 # L-1-norm is the same as the sum of absolutes

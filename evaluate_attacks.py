@@ -52,19 +52,17 @@ TopoDNN_RDSA_constits_clip_globalEnergy = True
 if __name__ == "__main__":
 
     # Run eval with all the different configs
-    try:
+    if (CIFAR_FGSM):
         EvaluationDispatcher(
             originalDatasetPath="Datasets/CIFAR10/train_data.npy",
-            perturbedDatasetPath="Adversaries/CIFAR10/FGSM_train_data.npy",
+            perturbedDatasetPath="Adversaries/CIFAR10/scaled/FGSM_train_data.npy",
             originalTargetPath="Datasets/CIFAR10/train_target.npy",
             testDataPath="Datasets/CIFAR10/test_data.npy",
             testTargetPath="Datasets/CIFAR10/test_target.npy",
             baseModelPath="Models/CIFAR10/base_model.keras",
             retrainedModelPaths=[],
             histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
-            attackName = "\"FGSM, CIFAR10, ranged\"",
+            attackName = "FGSM_CIFAR10_scaled",
             resultDirectory="Results/CIFAR10/",
             computeCorrelation=True
         )
-    except Exception as e:
-        print(f"Failure: {e}")
