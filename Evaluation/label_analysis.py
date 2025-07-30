@@ -37,7 +37,7 @@ def JSD(labels1, labels2):
 
 # Accuracy
 def accuracy(labels, target):
-    return float(np.count_nonzero(get_label_correctness(labels, target).astype(int)))/labels.size
+    return float(np.count_nonzero(get_label_correctness(labels, target).astype(int)))/labels.shape[0]
 
 # Accuracy per class
 # Damn I could've probably made this easier and faster by just going line-by-line through the confusion matrix, but whatever.

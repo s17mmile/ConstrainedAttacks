@@ -70,4 +70,4 @@ model.fit(
 
 model.evaluate(test_data, test_target, verbose=1)
 
-model.save("Models/TopoDNN/base_model.keras")
+model.save("Models/TopoDNN/test_model.keras")

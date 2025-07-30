@@ -1,5 +1,22 @@
 import numpy as np
 from math import cosh
+import tqdm
+
+# For readability of other code, use this to apply a single-example constrainer to all examples.
+# Works in-place as arrays are passed by reference!
+def applyToAll(adversarialData, constrainer, originalData = None):
+    num_samples = adversarialData.shape[0]
+
+    # Some constraints require the original data. If given, we pass it to the constrainer.
+    if originalData is not None:
+        assert adversarialData.shape == originalData.shape, "Shape Mismatch"
+        for i in tqdm.tqdm(range(num_samples)):
+            constrainer(adversarialData[i], originalData[i])
+    else:
+        for i in tqdm.tqdm(range(num_samples)):
+            constrainer(adversarialData[i])
+
+    return
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Image constrainer function helpers
@@ -8,8 +25,9 @@ from math import cosh
 # Add a one-pixel-wide white box (all color channels get value 1) around any given image.
 # array should be 3d numpy array.
 def addBox(array):
-    # Failsafe in case I fucked up the shape
+    # Failsafe in case I screwed up the shape
     if array.ndim != 3:
+        print("Warning: addBox failed due to incorrect input simension.")
         return array
 
     array[0,:,:] = 1.
@@ -61,26 +79,6 @@ def eta(particleIndex):
 
 def phi(particleIndex):
     return 3*particleIndex+2
-
-# For readability of other code, use this to apply a single-example constrainer to all examples.
-# Works in-place as arrays are passed by reference!
-def TopoDNN_applyToAll(adversarialData, constrainer, originalData = None):
-    assert adversarialData.shape == originalData.shape, "Shape Mismatch"
-    num_samples = adversarialData.shape[0]
-
-    # constrainedData = np.empty(adversarialData.shape)
-
-    # Some constraints require the original data. If given, we pass it to the constrainer.
-    if originalData is not None:
-        for i in range(num_samples):
-            # constrainedData[i] = constrainer(adversarialData[i], originalData[i])
-            constrainer(adversarialData[i], originalData[i])
-    else:
-        for i in range(num_samples):
-            # constrainedData[i] = constrainer(adversarialData[i])
-            constrainer(adversarialData[i])
-
-    return
 
 
 

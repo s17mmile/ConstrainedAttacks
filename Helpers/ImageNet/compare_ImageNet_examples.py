@@ -19,7 +19,7 @@ method = input("Attack method (RDSA/FGSM/PGD): ")
 model = keras.models.load_model("Models/ImageNet/base_model.keras")
 
 originalDatasetPath = "Datasets/ImageNet/threshold_data.npy"
-perturbedDatasetPath = "Adversaries/ImageNet/scaled/" + method + "_threshold_data.npy"
+perturbedDatasetPath = "Adversaries/ImageNet/scaled_boxed/" + method + "_threshold_data.npy"
 targetPath = "Datasets/ImageNet/threshold_target.npy"
 
 
