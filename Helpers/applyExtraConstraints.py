@@ -69,11 +69,26 @@ if __name__ == "__main__":
         np.save("Adversaries/MNIST/scaled_boxed/PGD_train_data.npy", PGD_data)
         del PGD_data
 
+<<<<<<< HEAD
         # Load, constrain (box), store and delete.
         RDSA_data = np.load("Adversaries/MNIST/scaled/RDSA_train_data.npy", mmap_mode=None)
         applyToAll(RDSA_data, addBox)
         np.save("Adversaries/MNIST/scaled_boxed/RDSA_train_data.npy", RDSA_data)
         del RDSA_data
+=======
+
+    # Load, constrain (conserveConstits, globalEnergy), store and delete.
+    FGSM_data = np.load("Adversaries/TopoDNN/spreadLimit/FGSM_train_data.npy", mmap_mode=None)
+    TopoDNN_applyToAll(FGSM_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy, original_data)
+    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/FGSM_train_data.npy", FGSM_data)
+    del FGSM_data
+
+    # Load, constrain (conserveConstits, particleEnergy), store and delete.
+    FGSM_data = np.load("Adversaries/TopoDNN/spreadLimit/FGSM_train_data.npy", mmap_mode=None)
+    TopoDNN_applyToAll(FGSM_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy, original_data)
+    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/FGSM_train_data.npy", FGSM_data)
+    del FGSM_data
+>>>>>>> 9a6c84c6fc558b57caee07fd1a0f2565da3424ef
 
 
 
@@ -81,6 +96,7 @@ if __name__ == "__main__":
         # Load original data. The read-only mmap might actually cost us a tiny bit of performance (not important here) but is a nice way to make sure we don't break the original dataset. 
         original_data = np.load("Datasets/ImageNet/threshold_data.npy", allow_pickle=True, mmap_mode="r")
 
+<<<<<<< HEAD
         # Load, constrain (box), store and delete.
         # (We will need to load several times as the ApplyToAll function works in-place (consequence of numpy passing arrays by ref).)
         FGSM_data = np.load("Adversaries/ImageNet/scaled/FGSM_threshold_data.npy", mmap_mode=None)
@@ -148,6 +164,19 @@ if __name__ == "__main__":
         applyToAll(RDSA_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy, original_data)
         np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_gconserveParticleEnergy/RDSA_train_data.npy", RDSA_data)
         del RDSA_data
+=======
+    # Load, constrain (conserveConstits, globalEnergy), store and delete.
+    RDSA_data = np.load("Adversaries/TopoDNN/spreadLimit/RDSA_train_data.npy", mmap_mode=None)
+    TopoDNN_applyToAll(RDSA_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy, original_data)
+    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/RDSA_train_data.npy", RDSA_data)
+    del RDSA_data
+
+    # Load, constrain (conserveConstits, particleEnergy), store and delete.
+    RDSA_data = np.load("Adversaries/TopoDNN/spreadLimit/RDSA_train_data.npy", mmap_mode=None)
+    TopoDNN_applyToAll(RDSA_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy, original_data)
+    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/RDSA_train_data.npy", RDSA_data)
+    del RDSA_data
+>>>>>>> 9a6c84c6fc558b57caee07fd1a0f2565da3424ef
 
 
 

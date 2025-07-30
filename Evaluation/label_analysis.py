@@ -5,6 +5,10 @@ import warnings
 import scipy.spatial
 import tqdm
 import scipy
+import matplotlib.pyplot as plt
+
+from sklearn.preprocessing import LabelBinarizer
+from sklearn.metrics import RocCurveDisplay, roc_auc_score
 
 sys.path.append(os.getcwd())
 
@@ -34,6 +38,39 @@ def confusion_matrix(labels1, labels2):
 # Compute average Jensen Shannon Distance between prediction probability Distributions
 def JSD(labels1, labels2):
     return scipy.spatial.distance.jensenshannon(labels1, labels2)
+
+
+
+# Render ROC curve (almost the same as in Timo Saala's evluation example). We mostly need to be careful with one-got and integer labels.
+def renderROCandGetAUROC(testLabels, testTarget, outputPath, attackName):
+    num_samples = testLabels.shape[0]
+
+    integerTestLabels = np.argmax(testLabels, axis = 1)
+    integerTestTarget = np.argmax(testTarget, axis = 1)
+
+    testLabelScore = np.array([testLabels[i,np.argmax(testTarget[i])] for i in range(num_samples)])
+
+    auroc = roc_auc_score(testTarget.ravel(), testLabels.ravel())
+
+    RocCurveDisplay.from_predictions(
+        integerTestTarget.ravel(),
+        testLabelScore.ravel(),
+        name="Micro-average OvR",
+        color="darkorange",
+    )
+
+    plt.plot([0, 1], [0, 1], "k--", label="chance level (AUC = 0.5)")
+    plt.axis("square")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(f"{attackName}: Micro-averaged One-vs-Rest\nReceiver Operating Characteristic. AUROC: {auroc}.")
+    plt.legend()
+    plt.savefig(outputPath)
+    plt.close()
+
+    return auroc
+
+
 
 # Accuracy
 def accuracy(labels, target):

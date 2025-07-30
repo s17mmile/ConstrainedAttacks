@@ -1,6 +1,7 @@
 import numpy as np
 from math import cosh
 import tqdm
+<<<<<<< HEAD
 
 # For readability of other code, use this to apply a single-example constrainer to all examples.
 # Works in-place as arrays are passed by reference!
@@ -17,6 +18,8 @@ def applyToAll(adversarialData, constrainer, originalData = None):
             constrainer(adversarialData[i])
 
     return
+=======
+>>>>>>> 9a6c84c6fc558b57caee07fd1a0f2565da3424ef
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Image constrainer function helpers
@@ -80,6 +83,29 @@ def eta(particleIndex):
 def phi(particleIndex):
     return 3*particleIndex+2
 
+<<<<<<< HEAD
+=======
+# For readability of other code, use this to apply a single-example constrainer to all examples.
+# Works in-place as arrays are passed by reference!
+def TopoDNN_applyToAll(adversarialData, constrainer, originalData = None):
+    assert adversarialData.shape == originalData.shape, "Shape Mismatch"
+    num_samples = adversarialData.shape[0]
+
+    # constrainedData = np.empty(adversarialData.shape)
+
+    # Some constraints require the original data. If given, we pass it to the constrainer.
+    if originalData is not None:
+        for i in tqdm.tqdm(range(num_samples)):
+            # constrainedData[i] = constrainer(adversarialData[i], originalData[i])
+            constrainer(adversarialData[i], originalData[i])
+    else:
+        for i in tqdm.tqdm(range(num_samples)):
+            # constrainedData[i] = constrainer(adversarialData[i])
+            constrainer(adversarialData[i])
+
+    return
+
+>>>>>>> 9a6c84c6fc558b57caee07fd1a0f2565da3424ef
 
 
 # Since we do not know the particle masses, we must use the massless limit approximation, justified by high accelerator energy.
