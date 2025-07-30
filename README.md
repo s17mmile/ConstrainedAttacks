@@ -72,12 +72,20 @@ Dependencies:
 In creating this project, I used the following set of dependencies. All of these can be easily installed using pip. Other versions may work, but compatibility can be an issure if you're not careful.
 
 Python:         3.11.9
+
 Tensorflow:     2.16.1
+
 Keras:          3.9.2
+
 Tqdm:           4.67.1
+
 Pytables:       3.10.2
-(Numpy:         1.26.4)
-(Scipy:         1.10.1)
+
+Numpy:         1.26.4
+
+Scipy:         1.10.1
+
+Matplotlib:     3.10.3
 
 In my experience, installing the correct python version with the given versions of keras, tensorflow, tqdm and pytables is enough to make the whole project work, as other dependencies are included with tensorflow/keras. Other important dependency versions are provided for completeness. Everything else should be given in the standard library.
 

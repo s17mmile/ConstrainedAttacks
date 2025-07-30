@@ -245,17 +245,17 @@ if __name__ == "__main__":
     # region ImageNet
 
     if(ImageNet_FGSM_scaled):
-        try:
-            RetrainingDispatcher(
-                baseModelPath="Models/ImageNet/base_model.keras",
-                retrainingDataPath="Adversaries/ImageNet/scaled/FGSM_threshold_data.npy",
-                trainingTargetPath="Datasets/ImageNet/threshold_target.npy",
-                subdivisionCount=retraining_subdivisions,
-                epochs=epochs,
-                attackName="FGSM_scaled"
-            )
-        except Exception as e:
-            print(f"Failure: {e}")
+        # try:
+        RetrainingDispatcher(
+            baseModelPath="Models/ImageNet/base_model.keras",
+            retrainingDataPath="Adversaries/ImageNet/scaled/FGSM_threshold_data.npy",
+            trainingTargetPath="Datasets/ImageNet/threshold_target.npy",
+            subdivisionCount=retraining_subdivisions,
+            epochs=epochs,
+            attackName="FGSM_scaled"
+        )
+        # except Exception as e:
+        #     print(f"Failure: {e}")
 
     if(ImageNet_PGD_scaled):
         try:

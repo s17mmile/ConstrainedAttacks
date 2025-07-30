@@ -15,7 +15,6 @@ import tensorflow as tf
 import keras
 
 
-
 def RetrainingDispatcher(baseModelPath, retrainingDataPath, trainingTargetPath, subdivisionCount, epochs, attackName):
     '''
         baseModelPath: Path to keras model.
@@ -28,7 +27,7 @@ def RetrainingDispatcher(baseModelPath, retrainingDataPath, trainingTargetPath, 
 
     print(f"\n\n\nRetraining\n{baseModelPath}\nusing data from\n{retrainingDataPath}.\n")
 
-    model = keras.models.load_model(baseModelPath)
+    model = keras.models.load_model(baseModelPath, compile = True)
 
     retrainingData = np.load(retrainingDataPath, mmap_mode="r")
     trainingTarget = np.load(trainingTargetPath, mmap_mode="r")
@@ -67,13 +66,22 @@ def RetrainingDispatcher(baseModelPath, retrainingDataPath, trainingTargetPath, 
         data = retrainingData[lowIndex:highIndex]
         target = trainingTarget[lowIndex:highIndex]
 
+        # To ensure the validation data doesn't just contain one class (as our datasets are typically grouped by class), we shuffle.
+        # Data and target must of course be shuffled the same way, so we use a permutation.
+            # In the case of TopoDNN, using the extra validation dataset might work, but since it's not been attacked it would be incosistent with other training.
+            # However, it may arguably be a more useful validation tool *because* it's not been attacked, thus better representing the rules we want.
+            # Dunno, that's something to discuss.
+        permutation = np.random.permutation(data.shape[0])
+        data = data[permutation]
+        target = target[permutation]
+
         # Continue training
         print(f"Retraining with data subdivision #{i}:")
 
         model.fit(
             data,
             target,
-            batch_size=128,
+            batch_size=100,
             epochs=epochs,
             validation_split=0.15,
             callbacks=callbacks,
