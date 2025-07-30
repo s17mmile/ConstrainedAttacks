@@ -1,5 +1,6 @@
 import numpy as np
 from math import cosh
+import tqdm
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Image constrainer function helpers
@@ -72,11 +73,11 @@ def TopoDNN_applyToAll(adversarialData, constrainer, originalData = None):
 
     # Some constraints require the original data. If given, we pass it to the constrainer.
     if originalData is not None:
-        for i in range(num_samples):
+        for i in tqdm.tqdm(range(num_samples)):
             # constrainedData[i] = constrainer(adversarialData[i], originalData[i])
             constrainer(adversarialData[i], originalData[i])
     else:
-        for i in range(num_samples):
+        for i in tqdm.tqdm(range(num_samples)):
             # constrainedData[i] = constrainer(adversarialData[i])
             constrainer(adversarialData[i])
 

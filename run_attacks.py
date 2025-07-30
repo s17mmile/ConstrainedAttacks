@@ -58,9 +58,9 @@ TopoDNN_PGD_clip = False
 TopoDNN_RDSA_clip = False
 
 # PGD uses the constrainers as a repeated projection function. Thus, we unfortunately need to re-attack from scratch multiple times, since we cannot just tack the constraint onto the end result.
-TopoDNN_PGD_constits_clip = True
-TopoDNN_PGD_constits_clip_globalEnergy = True
-TopoDNN_PGD_constits_clip_particleEnergy = True
+TopoDNN_PGD_constits_clip = False
+TopoDNN_PGD_constits_clip_globalEnergy = False
+TopoDNN_PGD_constits_clip_particleEnergy = False
 
 
 

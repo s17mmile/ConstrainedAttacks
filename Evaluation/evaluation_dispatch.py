@@ -276,6 +276,12 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     plt.savefig(f"{resultDirectory}/Model Performance/{attackName}_Retraining_Loss.png")    
     plt.close()
 
+    # Compute and save AUROC diagrams and values
+    base_auroc_score = renderROCandGetAUROC(test_base_labels, testTarget, f"{resultDirectory}/Model Performance/{attackName}_ROC_curve_base.png")
+
+    for i, labels in enumerate(test_retrained_labels):
+        retrained_auroc_scores = [renderROCandGetAUROC(labels, testTarget, f"{resultDirectory}/Model Performance/{attackName}_ROC_curve_{i}.png")]
+
     # endregion retrained model eval
 
 
@@ -314,6 +320,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
         f.write(f"")
         f.write(f"Base Test Accuracy: {test_base_accuracy}")
         f.write(f"Base Test Loss: {test_base_loss}")
+        f.write(f"Base AUROC: {base_auroc_score}")
         for i in range(len(retrainedModels)):
             matrix = learning_matrices[i]
             f.write(f"")
@@ -331,5 +338,6 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
             f.write(f"")
             f.write(f"Accuracy: {test_retrained_accuracies[i]}")
             f.write(f"Loss: {test_retrained_losses[i]}")
+            f.write(f"AUROC Score: {retrained_auroc_scores[i]}")
 
     

@@ -37,16 +37,17 @@ if __name__ == "__main__":
     np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit/FGSM_train_data.npy", FGSM_data)
     del FGSM_data
 
+
     # Load, constrain (conserveConstits, globalEnergy), store and delete.
     FGSM_data = np.load("Adversaries/TopoDNN/spreadLimit/FGSM_train_data.npy", mmap_mode=None)
     TopoDNN_applyToAll(FGSM_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy, original_data)
-    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_gconserveGlobalEnergy/FGSM_train_data.npy", FGSM_data)
+    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/FGSM_train_data.npy", FGSM_data)
     del FGSM_data
 
     # Load, constrain (conserveConstits, particleEnergy), store and delete.
     FGSM_data = np.load("Adversaries/TopoDNN/spreadLimit/FGSM_train_data.npy", mmap_mode=None)
     TopoDNN_applyToAll(FGSM_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy, original_data)
-    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_gconserveParticleEnergy/FGSM_train_data.npy", FGSM_data)
+    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/FGSM_train_data.npy", FGSM_data)
     del FGSM_data
 
 
@@ -62,13 +63,13 @@ if __name__ == "__main__":
     # Load, constrain (conserveConstits, globalEnergy), store and delete.
     RDSA_data = np.load("Adversaries/TopoDNN/spreadLimit/RDSA_train_data.npy", mmap_mode=None)
     TopoDNN_applyToAll(RDSA_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveGlobalEnergy, original_data)
-    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_gconserveGlobalEnergy/RDSA_train_data.npy", RDSA_data)
+    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/RDSA_train_data.npy", RDSA_data)
     del RDSA_data
 
     # Load, constrain (conserveConstits, particleEnergy), store and delete.
     RDSA_data = np.load("Adversaries/TopoDNN/spreadLimit/RDSA_train_data.npy", mmap_mode=None)
     TopoDNN_applyToAll(RDSA_data, constrainer_TopoDNN_conserveConstits_spreadLimit_conserveParticleEnergy, original_data)
-    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_gconserveParticleEnergy/RDSA_train_data.npy", RDSA_data)
+    np.save("Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/RDSA_train_data.npy", RDSA_data)
     del RDSA_data
 
 
