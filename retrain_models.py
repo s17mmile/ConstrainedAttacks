@@ -34,31 +34,31 @@ MNIST_RDSA_scaled_boxed = False
 
 
 
-ImageNet_FGSM_scaled = False
-ImageNet_PGD_scaled = False
-ImageNet_RDSA_scaled = False
+ImageNet_FGSM_scaled = True
+ImageNet_PGD_scaled = True
+ImageNet_RDSA_scaled = True
 
-ImageNet_FGSM_scaled_boxed = False
-ImageNet_PGD_scaled_boxed = False
-ImageNet_RDSA_scaled_boxed = False
+ImageNet_FGSM_scaled_boxed = True
+ImageNet_PGD_scaled_boxed = True
+ImageNet_RDSA_scaled_boxed = True
 
 
 
-TopoDNN_FGSM_clip = True
-TopoDNN_PGD_clip = True
-TopoDNN_RDSA_clip = True
+TopoDNN_FGSM_clip = False
+TopoDNN_PGD_clip = False
+TopoDNN_RDSA_clip = False
 
-TopoDNN_FGSM_constits_clip = True
-TopoDNN_PGD_constits_clip = True
-TopoDNN_RDSA_constits_clip = True
+TopoDNN_FGSM_constits_clip = False
+TopoDNN_PGD_constits_clip = False
+TopoDNN_RDSA_constits_clip = False
 
-TopoDNN_FGSM_constits_clip_globalEnergy = True
-TopoDNN_PGD_constits_clip_globalEnergy = True
-TopoDNN_RDSA_constits_clip_globalEnergy = True
+TopoDNN_FGSM_constits_clip_globalEnergy = False
+TopoDNN_PGD_constits_clip_globalEnergy = False
+TopoDNN_RDSA_constits_clip_globalEnergy = False
 
-TopoDNN_FGSM_constits_clip_particleEnergy = True
-TopoDNN_PGD_constits_clip_particleEnergy = True
-TopoDNN_RDSA_constits_clip_particleEnergy = True
+TopoDNN_FGSM_constits_clip_particleEnergy = False
+TopoDNN_PGD_constits_clip_particleEnergy = False
+TopoDNN_RDSA_constits_clip_particleEnergy = False
 
 
 
