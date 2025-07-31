@@ -15,7 +15,7 @@ import tensorflow as tf
 import keras
 
 
-def RetrainingDispatcher(baseModelPath, retrainingDataPath, trainingTargetPath, subdivisionCount, epochs, attackName):
+def RetrainingDispatcher(baseModelPath, initWeightsPath, retrainingDataPath, trainingDataPath, trainingTargetPath, subdivisionCount, epochs, attackName):
     '''
         baseModelPath: Path to keras model.
         retrainingDataPath: Path to retraining data (numpy array). Must be compatible with the model's input dimensions.
@@ -30,7 +30,9 @@ def RetrainingDispatcher(baseModelPath, retrainingDataPath, trainingTargetPath, 
     model = keras.models.load_model(baseModelPath, compile = True)
 
     retrainingData = np.load(retrainingDataPath, mmap_mode="r")
+    trainingData = np.load(trainingDataPath, mmap_mode=None)
     trainingTarget = np.load(trainingTargetPath, mmap_mode="r")
+
     num_samples = retrainingData.shape[0]
 
     # Create lists of indices at which retraining data should be split. Includes 0 and num_samples at either end for later indexing.
@@ -59,12 +61,11 @@ def RetrainingDispatcher(baseModelPath, retrainingDataPath, trainingTargetPath, 
             )
         ]
 
-        # Extract the correct data slice
-        lowIndex = subdivisionIndices[i]
-        highIndex = subdivisionIndices[i+1]
+        # Extract the correct data slice and add it to the original training data/labels
+        index = subdivisionIndices[i+1]
 
-        data = retrainingData[lowIndex:highIndex]
-        target = trainingTarget[lowIndex:highIndex]
+        data = np.vstack((trainingData, retrainingData[:index]))
+        target = np.vstack((trainingTarget, trainingTarget[:index]))
 
         # To ensure the validation data doesn't just contain one class (as our datasets are typically grouped by class), we shuffle.
         # Data and target must of course be shuffled the same way, so we use a permutation.
@@ -75,8 +76,10 @@ def RetrainingDispatcher(baseModelPath, retrainingDataPath, trainingTargetPath, 
         data = data[permutation]
         target = target[permutation]
 
-        # Continue training
-        print(f"Retraining with data subdivision #{i}:")
+        # Reset weights and re-train model from zero
+        print(f"Resetting and retraining with data subdivision #{i}:")
+
+        model.load_weights(initWeightsPath)
 
         model.fit(
             data,

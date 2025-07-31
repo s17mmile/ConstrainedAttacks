@@ -24,7 +24,7 @@ def get_label_correctness(labels, targets):
     return np.argmax(labels, axis = 1) == np.argmax(targets, axis = 1)
 
 # Creates 2d histogram-like array to compare predicted labels with each other and with targets.
-def confusion_matrix(labels1, labels2):
+def label_confusion_matrix(labels1, labels2):
     assert labels1.ndim == 2, f"Confusion Matrix: labels1 must be 2D array. Received labels1 of shape {labels1.shape}."
     assert labels2.ndim == 2, f"Confusion Matrix: labels2 must be 2D array. Received labels2 of shape {labels2.shape}."
     
@@ -33,6 +33,15 @@ def confusion_matrix(labels1, labels2):
     for class1, class2 in zip(np.argmax(labels1, axis = 1), np.argmax(labels2, axis = 1) ):
         matrix[class1, class2] += 1
 
+    return matrix
+
+# Normal confusion matrix. Assumes classes are 1D arrays filled with nonnegative integers.
+def confusion_matrix(classes1, classes2):
+    matrix = np.zeros((np.max(classes1)+1, np.max(classes2)+1))
+
+    for class1, class2 in zip(classes1, classes2):
+        matrix[class1, class2] += 1
+    
     return matrix
 
 # Compute average Jensen Shannon Distance between prediction probability Distributions
@@ -45,16 +54,16 @@ def JSD(labels1, labels2):
 def renderROCandGetAUROC(testLabels, testTarget, outputPath, attackName):
     num_samples = testLabels.shape[0]
 
-    integerTestLabels = np.argmax(testLabels, axis = 1)
-    integerTestTarget = np.argmax(testTarget, axis = 1)
+    integerTestLabels = np.argmax(testLabels, axis = 1).flatten()
+    integerTestTarget = np.argmax(testTarget, axis = 1).flatten()
 
     testLabelScore = np.array([testLabels[i,np.argmax(testTarget[i])] for i in range(num_samples)])
 
     auroc = roc_auc_score(testTarget.ravel(), testLabels.ravel())
 
     RocCurveDisplay.from_predictions(
-        integerTestTarget.ravel(),
-        testLabelScore.ravel(),
+        testTarget.ravel(),
+        testLabels.ravel(),
         name="Micro-average OvR",
         color="darkorange",
     )

@@ -11,37 +11,33 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import keras
-
+import tensorflow as tf
 
 # Load pretrained model
 model = keras.applications.MobileNetV2(include_top=True, weights='imagenet')
 
-print(model.optimizer)
-
 # Add necessary compilation parameters. Chosen to be the same as for the other networks used.
 model.compile(
     loss=keras.losses.CategoricalCrossentropy(),
-    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    optimizer=keras.optimizers.Adam(learning_rate=1e-3),
     metrics=[
-        keras.metrics.CategoricalAccuracy(name="acc", dtype = np.float64),
-    ]
+        keras.metrics.CategoricalAccuracy(),
+    ],
 )
 
-print(model.optimizer)
+# Need to get Adam to set up its internal variables. So, we need to call fit once and then reset the weights.
+original_weights = model.get_weights()
+
+dummydata = np.zeros((1,224,224,3))
+dummytarget = np.zeros((1,1000))
+dummytarget[0,0] = 1
+
+model.fit(dummydata, dummytarget)
+
+model.set_weights(original_weights)
+
+
 
 model.save("Models/ImageNet/base_model.keras")
 
-
-
-model1 = keras.models.load_model("Models/ImageNet/base_model.keras", compile = False)
-
-# Add necessary compilation parameters. Chosen to be the same as for the other networks used.
-model1.compile(
-    loss=keras.losses.CategoricalCrossentropy(),
-    optimizer=keras.optimizers.Adam(learning_rate=0.001),
-    metrics=[
-        keras.metrics.CategoricalAccuracy(name="acc", dtype = np.float64),
-    ]
-)
-
-print(model1.optimizer)
+model1 = keras.models.load_model("Models/ImageNet/base_model.keras")

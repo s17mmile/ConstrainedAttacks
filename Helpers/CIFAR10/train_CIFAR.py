@@ -60,6 +60,9 @@ model.compile(
     ],
 )
 
+# Save init weights for resetting during retraining
+model.save_weights("Models/CIFAR10/base_init.weights.h5")
+
 # Training and Evaluation given Training and Testing Datasets.
 # A small part of the training data is set aside for validation purposes.
 # Callbacks are taken as they were when training MNIST, we will later only keep the best model as a base model. Just good to have epochs for now. 

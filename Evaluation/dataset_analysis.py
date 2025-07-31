@@ -20,22 +20,22 @@ from Helpers.RDSA_Helpers import featureDistributions
 
 # Element-wise (<=> one for each example) cosine similarity between original and modified dataset.
 def cosine_similarity(original_data, adversarial_data):
-    return np.array([np.dot(example.flatten(), adversary.flatten())/(np.linalg.norm(example.flatten()) * np.linalg.norm(adversary.flatten())) for example, adversary in zip(original_data, adversarial_data)])
+    return np.array([np.dot(example.flatten(), adversary.flatten())/(np.linalg.norm(example.flatten()) * np.linalg.norm(adversary.flatten())) for example, adversary in zip(original_data, adversarial_data)]).flatten()
 
 # Element-wise L-1-Norm for a set of examples
 # L-1-norm is the same as the sum of absolutes
 def L_1_norm(data):
-    return np.sum(np.abs(data), axis = 1)
+    return np.sum(np.abs(data), axis = 1).flatten()
 
 # Element-wise L-2-Norm for a set of examples
 # L-2-Norm is just Euclidean Distance
 def L_2_norm(data):
-    return np.sqrt(np.sum(np.square(data), axis = 1))
+    return np.sqrt(np.sum(np.square(data), axis = 1)).flatten()
 
 # Element-wise L-infinity-Norm for a set of examples
 # L-2-Norm is just the maximum magnitude of any value
 def L_inf_norm(data):
-    return np.max(np.abs(data), axis = 1)
+    return np.max(np.abs(data), axis = 1).flatten()
 
 # Jensen Shannon Distance between the feature Distributions
 def dataset_JSD(dataset1, dataset2):
@@ -45,9 +45,6 @@ def dataset_JSD(dataset1, dataset2):
     # The shape of these arrays will then be {INPUT SHAPE}x100
     _, probabilities1 = featureDistributions(dataset1)
     _, probabilities2 = featureDistributions(dataset1)
-
-    print(probabilities1.shape)
-    print(probabilities2.shape)
 
     # When computing JSD, flatten the frequency arrays, putting all the histograms in one long line.
     probabilities1 = probabilities1.flatten()
@@ -83,7 +80,7 @@ def render_feature_histograms(datasets, datasetNames, features, binCount, output
 
 # Create and render Pearson product-moment correlation coefficients between all variables in a dataset.
 # Since this can be computationally expensive (quadratic in number of input features!), we give the option to save the correlations array for later use.
-def render_correlation_matrix(dataset, output_path, array_path = None):
+def render_correlation_matrix(dataset, output_path, attackName, array_path = None):
     # Each example in the dataset needs to be "flattened", meaning the dataset is squished into two dimensions
     flat_data = np.reshape(dataset, (dataset.shape[0], int(dataset.size/dataset.shape[0])))
 
@@ -93,7 +90,8 @@ def render_correlation_matrix(dataset, output_path, array_path = None):
     plt.figure(figsize = (16,9))
     plt.tick_params(bottom = False, top = True)
     plt.imshow(correlations, vmin=-1, vmax=1, cmap="coolwarm", interpolation = None)
-
+    plt.colorbar()
+    plt.title(f"Correlation matrix (Pearson Product-Moment) for {attackName} data.")
     plt.savefig(output_path, dpi = 300)
 
     if array_path is not None:

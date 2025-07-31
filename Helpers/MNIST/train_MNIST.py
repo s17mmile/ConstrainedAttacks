@@ -25,8 +25,7 @@ print(target.shape[0], "test samples")
 num_classes = 10
 input_shape = (28, 28, 1)
 
-# This is the Keras example architecture for MNIST. It produces strange loss gradients, which are quite often zero.
-# 
+# This is the Keras example architecture for MNIST. It occasionally produces strange loss gradients, which are quite often zero.
 model = keras.Sequential(
     [
         keras.layers.Input(shape=input_shape),
@@ -51,6 +50,9 @@ model.compile(
     #     keras.metrics.CategoricalAccuracy(name="acc", dtype = np.float64),
     # ]
 )
+
+# Save initial weights for easy resetting in retraining
+model.save_weights("Models/MNIST/base_init.weights.h5")
 
 # Training and Evaluation given Training and Testing Datasets. A small part of the data is set aside for validation purposes.
 batch_size = 128

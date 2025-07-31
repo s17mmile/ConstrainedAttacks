@@ -50,6 +50,9 @@ model.compile(
     ]
 )
 
+# Save init weights for resetting during retraining
+model.save_weights("models/TopoDNN/base_init.weights.h5")
+
 # Training and Evaluation given Training and Testing Datasets. A small part of the data is set aside for validation purposes.
 batch_size = 128
 epochs = 50
