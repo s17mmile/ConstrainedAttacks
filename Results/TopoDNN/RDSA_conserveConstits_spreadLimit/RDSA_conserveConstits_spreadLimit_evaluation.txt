@@ -1,0 +1,89 @@
+Evaluation of RDSA_conserveConstits_spreadLimit attack
+
+
+
+Adversarial Dataset Evaluation:
+Average Cosine Similarity between original and perturbed Data Samples: (0.8108782334668903 ± 0.11968394008642556).
+Average L1 Distance between original and perturbed Data Samples: (2.862106185991925 ± 1.0292748580926598).
+Average L2 Distance between original and perturbed Data Samples: (1.1547405461927016 ± 0.34604814630987724).
+Average L-infinity Distance between original and perturbed Data Samples: (0.7334140100444979 ± 0.2300263245343855).
+Overall Jensen-Shannon Distance between original and perturbed Datasets: 0.2545673976633546.
+
+
+
+Model Fooling Metrics:
+Accuracy of Original Model on unmodified training data: 0.9220008257638316.
+Accuracy of Original Model on perturbed training data: 0.6100784475639967.
+
+Jensen Shannon Distances
+ - between original dataset labels and target labels:            0.22754202533160725
+ - between perturbed dataset labels and target labels:           0.4039794589866032
+ - between original dataset labels and perturbed dataset labels: 0.30807811778889294
+
+Fooling Matrix:
+                              | Perturbed Label is incorrect |  Perturbed Label is correct  
+------------------------------|------------------------------|------------------------------
+ Original Label is incorrect  |           92829.0            |            1628.0            
+------------------------------|------------------------------|------------------------------
+ Original Label is correct    |           379366.0           |           737177.0           
+
+Fooling Ratio: 0.33976837434832335.
+Miracle Ratio: 0.01723535577035053.
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+Retraining Metrics:
+
+Base Test Accuracy: 0.9136311881188118
+Base Test Loss: 0.21348488330841064
+Base AUROC: 0.9725257841357464
+
+
+
+Learning Matrix of Retrained Model with 33.333333333333336% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           24996.0            |            9897.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           11178.0            |           357929.0           
+
+Improvement Ratio: 0.2836385521451294
+Overcorrect Ratio: 0.03028390141612053
+
+Accuracy: 0.9104603960396039
+Loss: 0.2181941121816635
+AUROC Score: 0.9706824164266984
+
+
+
+Learning Matrix of Retrained Model with 66.66666666666667% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           24780.0            |           10113.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           12401.0            |           356706.0           
+
+Improvement Ratio: 0.28982890551113405
+Overcorrect Ratio: 0.03359730376286551
+
+Accuracy: 0.9079678217821782
+Loss: 0.21995191276073456
+AUROC Score: 0.9706824164266984
+
+
+
+Learning Matrix of Retrained Model with 100.0% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           24109.0            |           10784.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           13002.0            |           356105.0           
+
+Improvement Ratio: 0.309059123606454
+Overcorrect Ratio: 0.03522555790055458
+
+Accuracy: 0.9081410891089109
+Loss: 0.2195819914340973
+AUROC Score: 0.9706824164266984

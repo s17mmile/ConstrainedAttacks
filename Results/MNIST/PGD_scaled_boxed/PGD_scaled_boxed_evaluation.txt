@@ -1,0 +1,34 @@
+Evaluation of PGD_scaled_boxed attack
+
+
+
+Adversarial Dataset Evaluation:
+Average Cosine Similarity between original and perturbed Data Samples: (0.5956107198963458 ± 0.08531723429032687).
+Average L1 Distance between original and perturbed Data Samples: (6.2679397570110496 ± 6.161978706347035).
+Average L2 Distance between original and perturbed Data Samples: (1.838184451633542 ± 0.9619661225705526).
+Average L-infinity Distance between original and perturbed Data Samples: (1.0 ± 0.0).
+Overall Jensen-Shannon Distance between original and perturbed Datasets: 0.5016137041069623.
+
+
+
+Model Fooling Metrics:
+Accuracy of Original Model on unmodified training data: 0.9951333333333333.
+Accuracy of Original Model on perturbed training data: 0.21768333333333334.
+
+Jensen Shannon Distances
+ - between original dataset labels and target labels:            0.06127805289358547
+ - between perturbed dataset labels and target labels:           0.6641075670985995
+ - between original dataset labels and perturbed dataset labels: 0.657448310343226
+
+Fooling Matrix:
+                              | Perturbed Label is incorrect |  Perturbed Label is correct  
+------------------------------|------------------------------|------------------------------
+ Original Label is incorrect  |            240.0             |             52.0             
+------------------------------|------------------------------|------------------------------
+ Original Label is correct    |           46699.0            |           13009.0            
+
+Fooling Ratio: 0.7821229985931534.
+Miracle Ratio: 0.1780821917808219.
+
+
+

@@ -1,0 +1,89 @@
+Evaluation of FGSM_conserveConstits_spreadLimit_conserveParticleEnergy attack
+
+
+
+Adversarial Dataset Evaluation:
+Average Cosine Similarity between original and perturbed Data Samples: (0.9969611669040993 ± 0.002444201571506435).
+Average L1 Distance between original and perturbed Data Samples: (1.0935937409810983 ± 0.16029670702296628).
+Average L2 Distance between original and perturbed Data Samples: (0.1472778723456767 ± 0.019054409468691233).
+Average L-infinity Distance between original and perturbed Data Samples: (0.020452860169951008 ± 0.010420049784510206).
+Overall Jensen-Shannon Distance between original and perturbed Datasets: 0.24740331596581186.
+
+
+
+Model Fooling Metrics:
+Accuracy of Original Model on unmodified training data: 0.9220008257638316.
+Accuracy of Original Model on perturbed training data: 0.8466416184971098.
+
+Jensen Shannon Distances
+ - between original dataset labels and target labels:            0.22754202533160725
+ - between perturbed dataset labels and target labels:           0.3015431558271939
+ - between original dataset labels and perturbed dataset labels: 0.10926465019566947
+
+Fooling Matrix:
+                              | Perturbed Label is incorrect |  Perturbed Label is correct  
+------------------------------|------------------------------|------------------------------
+ Original Label is incorrect  |           94433.0            |             24.0             
+------------------------------|------------------------------|------------------------------
+ Original Label is correct    |           91284.0            |          1025259.0           
+
+Fooling Ratio: 0.08175591983470408.
+Miracle Ratio: 0.00025408386885037636.
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+Retraining Metrics:
+
+Base Test Accuracy: 0.9136311881188118
+Base Test Loss: 0.21348488330841064
+Base AUROC: 0.9725257841357464
+
+
+
+Learning Matrix of Retrained Model with 33.333333333333336% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           25746.0            |            9147.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |            9439.0            |           359668.0           
+
+Improvement Ratio: 0.26214426962427995
+Overcorrect Ratio: 0.02557253045864749
+
+Accuracy: 0.9129084158415841
+Loss: 0.21388617157936096
+AUROC Score: 0.9711785267345113
+
+
+
+Learning Matrix of Retrained Model with 66.66666666666667% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           24561.0            |           10332.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           11573.0            |           357534.0           
+
+Improvement Ratio: 0.2961052360072221
+Overcorrect Ratio: 0.03135405180611584
+
+Accuracy: 0.910559405940594
+Loss: 0.2200910747051239
+AUROC Score: 0.9711785267345113
+
+
+
+Learning Matrix of Retrained Model with 100.0% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           24392.0            |           10501.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           11456.0            |           357651.0           
+
+Improvement Ratio: 0.3009486143352535
+Overcorrect Ratio: 0.031037070551357737
+
+Accuracy: 0.9112673267326733
+Loss: 0.21902377903461456
+AUROC Score: 0.9711785267345113

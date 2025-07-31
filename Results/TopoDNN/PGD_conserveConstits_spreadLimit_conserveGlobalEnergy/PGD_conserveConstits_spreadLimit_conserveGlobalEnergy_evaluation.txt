@@ -1,0 +1,89 @@
+Evaluation of PGD_conserveConstits_spreadLimit_conserveGlobalEnergy attack
+
+
+
+Adversarial Dataset Evaluation:
+Average Cosine Similarity between original and perturbed Data Samples: (0.9942495439579848 ± 0.006501026572159267).
+Average L1 Distance between original and perturbed Data Samples: (1.394174387077707 ± 0.4768692205759481).
+Average L2 Distance between original and perturbed Data Samples: (0.1831567232266949 ± 0.06388850353712416).
+Average L-infinity Distance between original and perturbed Data Samples: (0.05230480854184584 ± 0.031763195948235984).
+Overall Jensen-Shannon Distance between original and perturbed Datasets: 0.390335710652293.
+
+
+
+Model Fooling Metrics:
+Accuracy of Original Model on unmodified training data: 0.9220008257638316.
+Accuracy of Original Model on perturbed training data: 0.1789364161849711.
+
+Jensen Shannon Distances
+ - between original dataset labels and target labels:            0.22754202533160725
+ - between perturbed dataset labels and target labels:           0.5257561670218517
+ - between original dataset labels and perturbed dataset labels: 0.4347706193799886
+
+Fooling Matrix:
+                              | Perturbed Label is incorrect |  Perturbed Label is correct  
+------------------------------|------------------------------|------------------------------
+ Original Label is incorrect  |           94457.0            |             0.0              
+------------------------------|------------------------------|------------------------------
+ Original Label is correct    |           899851.0           |           216692.0           
+
+Fooling Ratio: 0.8059259697118696.
+Miracle Ratio: 0.0.
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+Retraining Metrics:
+
+Base Test Accuracy: 0.9136311881188118
+Base Test Loss: 0.21348488330841064
+Base AUROC: 0.9725257841357464
+
+
+
+Learning Matrix of Retrained Model with 33.333333333333336% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           24553.0            |           10340.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           11607.0            |           357500.0           
+
+Improvement Ratio: 0.2963345083541111
+Overcorrect Ratio: 0.03144616601690025
+
+Accuracy: 0.9104950495049505
+Loss: 0.21759435534477234
+AUROC Score: 0.9693276756659885
+
+
+
+Learning Matrix of Retrained Model with 66.66666666666667% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           23944.0            |           10949.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           13027.0            |           356080.0           
+
+Improvement Ratio: 0.3137878657610409
+Overcorrect Ratio: 0.03529328893789606
+
+Accuracy: 0.9084876237623762
+Loss: 0.21974892914295197
+AUROC Score: 0.9693276756659885
+
+
+
+Learning Matrix of Retrained Model with 100.0% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           22777.0            |           12116.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           15585.0            |           353522.0           
+
+Improvement Ratio: 0.34723296936348264
+Overcorrect Ratio: 0.042223528678675834
+
+Accuracy: 0.9050445544554455
+Loss: 0.2252943217754364
+AUROC Score: 0.9693276756659885

@@ -1,0 +1,34 @@
+Evaluation of FGSM_scaled_boxed attack
+
+
+
+Adversarial Dataset Evaluation:
+Average Cosine Similarity between original and perturbed Data Samples: (0.9274229158112676 ± 0.04943369332977248).
+Average L1 Distance between original and perturbed Data Samples: (4.601218145223083 ± 3.571945435648919).
+Average L2 Distance between original and perturbed Data Samples: (1.1008567610739985 ± 0.6260172875844715).
+Average L-infinity Distance between original and perturbed Data Samples: (0.6326499176487481 ± 0.22460576230012977).
+Overall Jensen-Shannon Distance between original and perturbed Datasets: 0.2938097509052227.
+
+
+
+Model Fooling Metrics:
+Accuracy of Original Model on unmodified training data: 0.84426.
+Accuracy of Original Model on perturbed training data: 0.0748.
+
+Jensen Shannon Distances
+ - between original dataset labels and target labels:            0.329767505691812
+ - between perturbed dataset labels and target labels:           0.7843470970227332
+ - between original dataset labels and perturbed dataset labels: 0.7174121180820829
+
+Fooling Matrix:
+                              | Perturbed Label is incorrect |  Perturbed Label is correct  
+------------------------------|------------------------------|------------------------------
+ Original Label is incorrect  |            7619.0            |            168.0             
+------------------------------|------------------------------|------------------------------
+ Original Label is correct    |           38641.0            |            3572.0            
+
+Fooling Ratio: 0.9153815175419895.
+Miracle Ratio: 0.021574418903300373.
+
+
+

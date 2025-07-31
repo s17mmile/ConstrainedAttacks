@@ -1,0 +1,89 @@
+Evaluation of FGSM_conserveConstits_spreadLimit attack
+
+
+
+Adversarial Dataset Evaluation:
+Average Cosine Similarity between original and perturbed Data Samples: (0.995703500905849 ± 0.00371437069552682).
+Average L1 Distance between original and perturbed Data Samples: (1.453622923990045 ± 0.25909136603477806).
+Average L2 Distance between original and perturbed Data Samples: (0.1695925997784921 ± 0.022418741601936958).
+Average L-infinity Distance between original and perturbed Data Samples: (0.020452860169951008 ± 0.010420049784510206).
+Overall Jensen-Shannon Distance between original and perturbed Datasets: 0.4064033209934771.
+
+
+
+Model Fooling Metrics:
+Accuracy of Original Model on unmodified training data: 0.9220008257638316.
+Accuracy of Original Model on perturbed training data: 0.34330057803468206.
+
+Jensen Shannon Distances
+ - between original dataset labels and target labels:            0.22754202533160725
+ - between perturbed dataset labels and target labels:           0.6319906594876958
+ - between original dataset labels and perturbed dataset labels: 0.5478510729129664
+
+Fooling Matrix:
+                              | Perturbed Label is incorrect |  Perturbed Label is correct  
+------------------------------|------------------------------|------------------------------
+ Original Label is incorrect  |           91246.0            |            3211.0            
+------------------------------|------------------------------|------------------------------
+ Original Label is correct    |           704017.0           |           412526.0           
+
+Fooling Ratio: 0.6305328142310686.
+Miracle Ratio: 0.0339943042866066.
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+Retraining Metrics:
+
+Base Test Accuracy: 0.9136311881188118
+Base Test Loss: 0.21348488330841064
+Base AUROC: 0.9725257841357464
+
+
+
+Learning Matrix of Retrained Model with 33.333333333333336% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           25574.0            |            9319.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |            9963.0            |           359144.0           
+
+Improvement Ratio: 0.26707362508239474
+Overcorrect Ratio: 0.02699217300132482
+
+Accuracy: 0.9120371287128712
+Loss: 0.21378646790981293
+AUROC Score: 0.9719554190214195
+
+
+
+Learning Matrix of Retrained Model with 66.66666666666667% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           24883.0            |           10010.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           10541.0            |           358566.0           
+
+Improvement Ratio: 0.28687702404493737
+Overcorrect Ratio: 0.028558114584659733
+
+Accuracy: 0.9123168316831683
+Loss: 0.2136213630437851
+AUROC Score: 0.9719554190214195
+
+
+
+Learning Matrix of Retrained Model with 100.0% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           25838.0            |            9055.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |            9723.0            |           359384.0           
+
+Improvement Ratio: 0.25950763763505574
+Overcorrect Ratio: 0.026341955042846654
+
+Accuracy: 0.9119777227722772
+Loss: 0.21507501602172852
+AUROC Score: 0.9719554190214195

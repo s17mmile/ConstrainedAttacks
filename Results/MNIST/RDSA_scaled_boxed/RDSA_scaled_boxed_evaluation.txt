@@ -1,0 +1,34 @@
+Evaluation of RDSA_scaled_boxed attack
+
+
+
+Adversarial Dataset Evaluation:
+Average Cosine Similarity between original and perturbed Data Samples: (0.5125719412052641 ± 0.0651184419312295).
+Average L1 Distance between original and perturbed Data Samples: (5.600987811946524 ± 6.454735581050803).
+Average L2 Distance between original and perturbed Data Samples: (2.075726324711198 ± 0.9712645867154459).
+Average L-infinity Distance between original and perturbed Data Samples: (1.0 ± 0.0).
+Overall Jensen-Shannon Distance between original and perturbed Datasets: 0.22469325091072984.
+
+
+
+Model Fooling Metrics:
+Accuracy of Original Model on unmodified training data: 0.9951333333333333.
+Accuracy of Original Model on perturbed training data: 0.42168333333333335.
+
+Jensen Shannon Distances
+ - between original dataset labels and target labels:            0.06127805289358547
+ - between perturbed dataset labels and target labels:           0.5415291183833513
+ - between original dataset labels and perturbed dataset labels: 0.5367824044717923
+
+Fooling Matrix:
+                              | Perturbed Label is incorrect |  Perturbed Label is correct  
+------------------------------|------------------------------|------------------------------
+ Original Label is incorrect  |            270.0             |             22.0             
+------------------------------|------------------------------|------------------------------
+ Original Label is correct    |           34429.0            |           25279.0            
+
+Fooling Ratio: 0.5766228981041066.
+Miracle Ratio: 0.07534246575342465.
+
+
+

@@ -1,0 +1,89 @@
+Evaluation of RDSA_spreadLimit attack
+
+
+
+Adversarial Dataset Evaluation:
+Average Cosine Similarity between original and perturbed Data Samples: (0.8050662895626565 ± 0.12169114494630628).
+Average L1 Distance between original and perturbed Data Samples: (2.9398386288234537 ± 0.9743142199405055).
+Average L2 Distance between original and perturbed Data Samples: (1.1731869572576097 ± 0.3310844581732686).
+Average L-infinity Distance between original and perturbed Data Samples: (0.7391337839100509 ± 0.22453432120416014).
+Overall Jensen-Shannon Distance between original and perturbed Datasets: 0.06427822585042268.
+
+
+
+Model Fooling Metrics:
+Accuracy of Original Model on unmodified training data: 0.9220008257638316.
+Accuracy of Original Model on perturbed training data: 0.6048926507018992.
+
+Jensen Shannon Distances
+ - between original dataset labels and target labels:            0.22754202533160725
+ - between perturbed dataset labels and target labels:           0.4053175555379092
+ - between original dataset labels and perturbed dataset labels: 0.3098063005677872
+
+Fooling Matrix:
+                              | Perturbed Label is incorrect |  Perturbed Label is correct  
+------------------------------|------------------------------|------------------------------
+ Original Label is incorrect  |           92902.0            |            1555.0            
+------------------------------|------------------------------|------------------------------
+ Original Label is correct    |           385573.0           |           730970.0           
+
+Fooling Ratio: 0.3453274974631519.
+Miracle Ratio: 0.016462517335930633.
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+Retraining Metrics:
+
+Base Test Accuracy: 0.9136311881188118
+Base Test Loss: 0.21348488330841064
+Base AUROC: 0.9725257841357464
+
+
+
+Learning Matrix of Retrained Model with 33.333333333333336% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           25485.0            |            9408.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           11141.0            |           357966.0           
+
+Improvement Ratio: 0.26962427994153554
+Overcorrect Ratio: 0.030183659480855145
+
+Accuracy: 0.9093415841584158
+Loss: 0.21943002939224243
+AUROC Score: 0.9705135930576659
+
+
+
+Learning Matrix of Retrained Model with 66.66666666666667% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           24485.0            |           10408.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           12554.0            |           356553.0           
+
+Improvement Ratio: 0.29828332330266816
+Overcorrect Ratio: 0.03401181771139534
+
+Accuracy: 0.9083193069306931
+Loss: 0.2205728441476822
+AUROC Score: 0.9705135930576659
+
+
+
+Learning Matrix of Retrained Model with 100.0% adversarial Data
+                              | Retrained Model is incorrect |  Retrained Model is correct  
+------------------------------|------------------------------|------------------------------
+ Original Model is incorrect  |           23911.0            |           10982.0            
+------------------------------|------------------------------|------------------------------
+ Original Model is correct    |           13677.0            |           355430.0           
+
+Improvement Ratio: 0.3147336141919583
+Overcorrect Ratio: 0.03705429590877442
+
+Accuracy: 0.906960396039604
+Loss: 0.22004765272140503
+AUROC Score: 0.9705135930576659
