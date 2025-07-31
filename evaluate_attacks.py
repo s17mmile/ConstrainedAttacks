@@ -253,7 +253,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/ImageNet/test_target.npy",
                 baseModelPath="Models/ImageNet/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/ImageNet/{attackName}",
                 computeCorrelation=True
@@ -277,7 +277,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/ImageNet/test_target.npy",
                 baseModelPath="Models/ImageNet/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/ImageNet/{attackName}",
                 computeCorrelation=True
@@ -301,7 +301,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/ImageNet/test_target.npy",
                 baseModelPath="Models/ImageNet/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/ImageNet/{attackName}",
                 computeCorrelation=True
@@ -330,7 +330,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/ImageNet/test_target.npy",
                 baseModelPath="Models/ImageNet/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/ImageNet/{attackName}",
                 computeCorrelation=True
@@ -354,7 +354,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/ImageNet/test_target.npy",
                 baseModelPath="Models/ImageNet/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/ImageNet/{attackName}",
                 computeCorrelation=True
@@ -378,7 +378,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/ImageNet/test_target.npy",
                 baseModelPath="Models/ImageNet/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/ImageNet/{attackName}",
                 computeCorrelation=True
@@ -408,7 +408,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/MNIST/test_target.npy",
                 baseModelPath="Models/MNIST/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/MNIST/{attackName}",
                 computeCorrelation=True
@@ -432,7 +432,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/MNIST/test_target.npy",
                 baseModelPath="Models/MNIST/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/MNIST/{attackName}",
                 computeCorrelation=True
@@ -456,7 +456,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/MNIST/test_target.npy",
                 baseModelPath="Models/MNIST/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/MNIST/{attackName}",
                 computeCorrelation=True
@@ -485,7 +485,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/MNIST/test_target.npy",
                 baseModelPath="Models/MNIST/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/MNIST/{attackName}",
                 computeCorrelation=True
@@ -509,7 +509,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/MNIST/test_target.npy",
                 baseModelPath="Models/MNIST/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/MNIST/{attackName}",
                 computeCorrelation=True
@@ -533,7 +533,7 @@ if __name__ == "__main__":
                 testTargetPath="Datasets/MNIST/test_target.npy",
                 baseModelPath="Models/MNIST/base_model.keras",
                 retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [(15,15,0),(15,15,1),(15,15,2)],
+                histogramFeatures = [],
                 attackName = attackName,
                 resultDirectory=f"Results/MNIST/{attackName}",
                 computeCorrelation=True
@@ -545,3 +545,312 @@ if __name__ == "__main__":
 
 
 
+    # region TopoDNN_clip
+
+    if (TopoDNN_FGSM_clip):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "FGSM_spreadLimit"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/spreadLimit/FGSM_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_PGD_clip):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "PGD_spreadLimit"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/spreadLimit/PGD_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_RDSA_clip):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "RDSA_spreadLimit"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/spreadLimit/RDSA_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    # endregion TopoDNN_clip
+
+    
+
+    # region TopoDNN_constits_clip
+
+    if (TopoDNN_FGSM_constits_clip):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "FGSM_conserveConstits_spreadLimit"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit/FGSM_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_PGD_constits_clip):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "PGD_conserveConstits_spreadLimit"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit/PGD_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_RDSA_constits_clip):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "RDSA_conserveConstits_spreadLimit"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit/RDSA_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    # endregion TopoDNN_constits_clip
+
+
+
+    # region TopoDNN_constits_clip_globalEnergy
+
+    if (TopoDNN_FGSM_constits_clip_globalEnergy):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "FGSM_conserveConstits_spreadLimit_conserveGlobalEnergy"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/FGSM_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_PGD_constits_clip_globalEnergy):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "PGD_conserveConstits_spreadLimit_conserveGlobalEnergy"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/PGD_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_RDSA_constits_clip_globalEnergy):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "RDSA_conserveConstits_spreadLimit_conserveGlobalEnergy"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveGlobalEnergy/RDSA_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    # endregion TopoDNN_constits_clip_globalEnergy
+
+
+    
+    # region TopoDNN_constits_clip_particleEnergy
+
+    if (TopoDNN_FGSM_constits_clip_particleEnergy):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "FGSM_conserveConstits_spreadLimit_conserveParticleEnergy"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/FGSM_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_PGD_constits_clip_particleEnergy):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "PGD_conserveConstits_spreadLimit_conserveParticleEnergy"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/PGD_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    if (TopoDNN_RDSA_constits_clip_particleEnergy):
+        try:
+            baseModelPath="Models/TopoDNN/base_model.keras"
+            attackName = "RDSA_conserveConstits_spreadLimit_conserveParticleEnergy"
+            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+
+            print(retrainedModelPaths)
+
+            EvaluationDispatcher(
+                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+                perturbedDatasetPath="Adversaries/TopoDNN/conserveConstits_spreadLimit_conserveParticleEnergy/RDSA_train_data.npy",
+                originalTargetPath="Datasets/TopoDNN/train_target.npy",
+                testDataPath="Datasets/TopoDNN/test_data.npy",
+                testTargetPath="Datasets/TopoDNN/test_target.npy",
+                baseModelPath="Models/TopoDNN/base_model.keras",
+                retrainedModelPaths=retrainedModelPaths,
+                histogramFeatures = [],
+                attackName = attackName,
+                resultDirectory=f"Results/TopoDNN/{attackName}",
+                computeCorrelation=True
+            )
+        except Exception as e:
+            print(f"Failure: {e}")
+
+    # endregion TopoDNN_constits_clip_particleEnergy
