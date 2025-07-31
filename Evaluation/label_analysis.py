@@ -46,7 +46,7 @@ def confusion_matrix(classes1, classes2):
 
 # Compute average Jensen Shannon Distance between prediction probability Distributions
 def JSD(labels1, labels2):
-    return scipy.spatial.distance.jensenshannon(labels1, labels2)
+    return scipy.spatial.distance.jensenshannon(labels1.flatten(), labels2.flatten())
 
 
 
@@ -74,6 +74,7 @@ def renderROCandGetAUROC(testLabels, testTarget, outputPath, attackName):
     plt.ylabel("True Positive Rate")
     plt.title(f"{attackName}: Micro-averaged One-vs-Rest\nReceiver Operating Characteristic. AUROC: {auroc}.")
     plt.legend()
+    plt.grid()
     plt.savefig(outputPath)
     plt.close()
 

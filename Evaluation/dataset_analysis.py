@@ -44,7 +44,7 @@ def dataset_JSD(dataset1, dataset2):
     # We could also just get the frequencies (without the normalization applied in featureDistributions()), but this is easier.
     # The shape of these arrays will then be {INPUT SHAPE}x100
     _, probabilities1 = featureDistributions(dataset1)
-    _, probabilities2 = featureDistributions(dataset1)
+    _, probabilities2 = featureDistributions(dataset2)
 
     # When computing JSD, flatten the frequency arrays, putting all the histograms in one long line.
     probabilities1 = probabilities1.flatten()
@@ -71,6 +71,7 @@ def render_feature_histograms(datasets, datasetNames, features, binCount, output
         plt.hist(feature_data, bins = binCount, histtype = "step", label = datasetNames)
 
         plt.legend()
+        plt.grid()
         plt.savefig(f"{output_directory}/{out_name}_{featureIndex}.png")
 
         plt.close()

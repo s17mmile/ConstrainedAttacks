@@ -33,6 +33,6 @@ def compare_CIFAR10(originalImage, originalLabel, perturbedImage, perturbedLabel
     ax[1,1].set_xticks(np.arange(0,10))
     ax[1,1].stairs(perturbedLabel, edges)
 
-    # plt.savefig("Results/CIFAR/CIFAR_Example.png")
+    plt.savefig("CIFAR_Example.png")
 
     plt.show()

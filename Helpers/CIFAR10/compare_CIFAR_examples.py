@@ -21,7 +21,7 @@ method = input("Attack method (RDSA/FGSM/PGD): ")
 model = keras.models.load_model("Models/CIFAR10/base_model.keras")
 
 originalDatasetPath = "Datasets/CIFAR10/train_data.npy"
-perturbedDatasetPath = "Adversaries/CIFAR10/test/" + method + "_train_data.npy"
+perturbedDatasetPath = "Adversaries/CIFAR10/scaled/" + method + "_train_data.npy"
 
 targetPath = "Datasets/CIFAR10/train_target.npy"
 

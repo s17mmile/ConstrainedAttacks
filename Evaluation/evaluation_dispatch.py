@@ -47,28 +47,35 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
 
     # region setup
 
+    print(f"Analysis of attack {attackName} on dataset {originalDatasetPath}.")
+
     print("SETUP")
 
     # Set Up 
     try:
+        os.makedirs(resultDirectory)
+    except:
+        pass
+
+    try:
         os.makedirs(f"{resultDirectory}/Dataset Metrics")
-    except Exception as e:
+    except:
         pass
 
     try:
         os.makedirs(f"{resultDirectory}/Feature Distributions")
-    except Exception as e:
+    except:
         pass
 
     try:
         os.makedirs(f"{resultDirectory}/Model Performance")
-    except Exception as e:
+    except:
         pass
 
     if computeCorrelation:
         try:
             os.makedirs(f"{resultDirectory}/Correlation Plots")
-        except Exception as e:
+        except:
             pass
 
     # Load data as memmaps
@@ -103,6 +110,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     plt.figure(figsize = (16,9))
     plt.hist(similarity, bins = 100, histtype = "step")
     plt.title(f"Cosine Similarity between original and {attackName}-attacked data. Total: ({np.mean(similarity)} ± {np.std(similarity)})")
+    plt.grid()
     plt.savefig(f"{resultDirectory}/Dataset Metrics/{attackName}_cosine_similarity.png")
     plt.close()
 
@@ -110,6 +118,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     plt.figure(figsize = (16,9))
     plt.hist(l_1, bins = 100, histtype = "step")
     plt.title(f"L-1 (manhattan) distance between original data and {attackName}-attacked data. Total: ({np.mean(l_1)} ± {np.std(l_1)})")
+    plt.grid()
     plt.savefig(f"{resultDirectory}/Dataset Metrics/{attackName}_l_1_distance.png")
     plt.close()
 
@@ -117,6 +126,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     plt.figure(figsize = (16,9))
     plt.hist(l_2, bins = 100, histtype = "step")
     plt.title(f"L-2 (euclidean) distance between original data and {attackName}-attacked data. Total: ({np.mean(l_2)} ± {np.std(l_2)})")
+    plt.grid()
     plt.savefig(f"{resultDirectory}/Dataset Metrics/{attackName}_l_2_distance.png")
     plt.close()
 
@@ -124,6 +134,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     plt.figure(figsize = (16,9))
     plt.hist(l_inf, bins = 100, histtype = "step")
     plt.title(f"L-infinity (max) distance between original data and {attackName}-attacked data. Total: ({np.mean(l_inf)} ± {np.std(l_inf)})")
+    plt.grid()
     plt.savefig(f"{resultDirectory}/Dataset Metrics/{attackName}_l_inf_distance.png")
     plt.close()
 
@@ -174,7 +185,9 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
     plt.xlim(-0.5, num_classes-0.5)
     plt.ylim(0,1)
     plt.legend()
+    plt.grid()
     plt.savefig(f"{resultDirectory}/Dataset Metrics/{attackName}_accuracy_per_class.png")
+    plt.close()
 
     # JSD between original labels, adversarial labels and target labels
     print("LABEL JSD")
@@ -285,6 +298,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
         plt.title("Dependence of Accuracy on amount of adversarial retraining Data")
         plt.scatter(x_vals, accuracy_vals, label = "Accuracy vs. Amount of retraining Data used")
         plt.legend()
+        plt.grid()
         plt.savefig(f"{resultDirectory}/Model Performance/{attackName}_Retraining_Accuracy.png")
         plt.close()
 
@@ -302,6 +316,7 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
         plt.title("Dependence of Training Loss on amount of adversarial retraining Data")
         plt.scatter(x_vals, loss_vals, label = "Loss vs. Amount of retraining Data used")
         plt.legend()
+        plt.grid()
         plt.savefig(f"{resultDirectory}/Model Performance/{attackName}_Retraining_Loss.png")    
         plt.close()
 
@@ -382,3 +397,5 @@ def EvaluationDispatcher(originalDatasetPath, perturbedDatasetPath, originalTarg
                 f.write(f"AUROC Score: {retrained_auroc_scores[i]}\n")
 
     
+
+    print("\n\n")
