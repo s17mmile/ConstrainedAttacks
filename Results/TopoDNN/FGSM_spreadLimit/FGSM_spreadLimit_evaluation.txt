@@ -54,7 +54,7 @@ Overcorrect Ratio: 0.023963241011414036
 
 Accuracy: 0.9145841584158416
 Loss: 0.21048980951309204
-AUROC Score: 0.9729323957240711
+AUROC Score: 0.9729698495061759
 
 
 
@@ -70,7 +70,7 @@ Overcorrect Ratio: 0.02333469698488514
 
 Accuracy: 0.9144084158415842
 Loss: 0.20950108766555786
-AUROC Score: 0.9729323957240711
+AUROC Score: 0.9732098184032203
 
 
 
@@ -87,3 +87,28 @@ Overcorrect Ratio: 0.023998461150831603
 Accuracy: 0.913940594059406
 Loss: 0.21125735342502594
 AUROC Score: 0.9729323957240711
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+Testing Splits: 
+
+Base Test Accuracy average over 10 testing splits: 0.9136311881188119 plus/minus 0.0011781788203878562. 
+Base AUROC average over 10 testing splits: 0.972524989400549 plus/minus 0.0005987570267426902. 
+
+
+
+Testing split average and uncertainty for retrained Model with 33.333333333333336% adversarial Data:
+Retrained Test Accuracy average over 10 testing splits: 0.9145841584158416 plus/minus 0.00157305047449667. 
+Retrained AUROC average over 10 testing splits: 0.972967848770954 plus/minus 0.0007007059959919817. 
+
+
+Testing split average and uncertainty for retrained Model with 66.66666666666667% adversarial Data:
+Retrained Test Accuracy average over 10 testing splits: 0.9144084158415842 plus/minus 0.001213348562388254. 
+Retrained AUROC average over 10 testing splits: 0.9732070031124399 plus/minus 0.000704453895147588. 
+
+
+Testing split average and uncertainty for retrained Model with 100.0% adversarial Data:
+Retrained Test Accuracy average over 10 testing splits: 0.913940594059406 plus/minus 0.0016267405072637497. 
+Retrained AUROC average over 10 testing splits: 0.9729294255771495 plus/minus 0.0007194319145639173. 

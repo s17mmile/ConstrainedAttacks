@@ -21,7 +21,7 @@ method = input("Attack method (RDSA/FGSM/PGD): ")
 model = keras.models.load_model("Models/MNIST/base_model.keras")
 
 originalDatasetPath = "Datasets/MNIST/train_data.npy"
-perturbedDatasetPath = "Adversaries/MNIST/scaled/" + method + "_train_data.npy"
+perturbedDatasetPath = "Adversaries/MNIST/scaled_boxed/" + method + "_train_data.npy"
 targetPath = "Datasets/MNIST/train_target.npy"
 
 if __name__ == "__main__":

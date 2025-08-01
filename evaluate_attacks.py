@@ -27,33 +27,33 @@ retraining_subdivisions = 3
 
 # Selector panel
 # CIFAR, ImageNet and MNIST will run (unless otherwise specified) using the scaled data - no further constraints.
-CIFAR_FGSM_scaled = True
-CIFAR_PGD_scaled = True
-CIFAR_RDSA_scaled = True
+CIFAR_FGSM_scaled = False
+CIFAR_PGD_scaled = False
+CIFAR_RDSA_scaled = False
 
-CIFAR_FGSM_scaled_boxed = True
-CIFAR_PGD_scaled_boxed = True
+CIFAR_FGSM_scaled_boxed = False
+CIFAR_PGD_scaled_boxed = False
 CIFAR_RDSA_scaled_boxed = False
 
 
 
-ImageNet_FGSM_scaled = True
-ImageNet_PGD_scaled = True
-ImageNet_RDSA_scaled = True
+ImageNet_FGSM_scaled = False
+ImageNet_PGD_scaled = False
+ImageNet_RDSA_scaled = False
 
-ImageNet_FGSM_scaled_boxed = True
-ImageNet_PGD_scaled_boxed = True
-ImageNet_RDSA_scaled_boxed = True
+ImageNet_FGSM_scaled_boxed = False
+ImageNet_PGD_scaled_boxed = False
+ImageNet_RDSA_scaled_boxed = False
 
 
 
-MNIST_FGSM_scaled = True
-MNIST_PGD_scaled = True
-MNIST_RDSA_scaled = True
+MNIST_FGSM_scaled = False
+MNIST_PGD_scaled = False
+MNIST_RDSA_scaled = False
 
-MNIST_FGSM_scaled_boxed = True
-MNIST_PGD_scaled_boxed = True
-MNIST_RDSA_scaled_boxed = True
+MNIST_FGSM_scaled_boxed = False
+MNIST_PGD_scaled_boxed = False
+MNIST_RDSA_scaled_boxed = False
 
 
 
@@ -548,28 +548,25 @@ if __name__ == "__main__":
     # region TopoDNN_clip
 
     if (TopoDNN_FGSM_clip):
-        try:
-            baseModelPath="Models/TopoDNN/base_model.keras"
-            attackName = "FGSM_spreadLimit"
-            retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
+        baseModelPath="Models/TopoDNN/base_model.keras"
+        attackName = "FGSM_spreadLimit"
+        retrainedModelPaths = [os.path.join(os.path.dirname(baseModelPath), attackName, os.path.basename(baseModelPath).replace(".keras", f"_retrained_{i}.keras")) for i in range(retraining_subdivisions)]
 
-            print(retrainedModelPaths)
+        print(retrainedModelPaths)
 
-            EvaluationDispatcher(
-                originalDatasetPath="Datasets/TopoDNN/train_data.npy",
-                perturbedDatasetPath="Adversaries/TopoDNN/spreadLimit/FGSM_train_data.npy",
-                originalTargetPath="Datasets/TopoDNN/train_target.npy",
-                testDataPath="Datasets/TopoDNN/test_data.npy",
-                testTargetPath="Datasets/TopoDNN/test_target.npy",
-                baseModelPath="Models/TopoDNN/base_model.keras",
-                retrainedModelPaths=retrainedModelPaths,
-                histogramFeatures = [],
-                attackName = attackName,
-                resultDirectory=f"Results/TopoDNN/{attackName}",
-                computeCorrelation=True
-            )
-        except Exception as e:
-            print(f"Failure: {e}")
+        EvaluationDispatcher(
+            originalDatasetPath="Datasets/TopoDNN/train_data.npy",
+            perturbedDatasetPath="Adversaries/TopoDNN/spreadLimit/FGSM_train_data.npy",
+            originalTargetPath="Datasets/TopoDNN/train_target.npy",
+            testDataPath="Datasets/TopoDNN/test_data.npy",
+            testTargetPath="Datasets/TopoDNN/test_target.npy",
+            baseModelPath="Models/TopoDNN/base_model.keras",
+            retrainedModelPaths=retrainedModelPaths,
+            histogramFeatures = [],
+            attackName = attackName,
+            resultDirectory=f"Results/TopoDNN/{attackName}",
+            computeCorrelation=True
+        )
 
     if (TopoDNN_PGD_clip):
         try:
