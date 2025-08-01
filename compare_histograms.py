@@ -28,8 +28,15 @@ constraints = ["spreadLimit", "conserveConstits_spreadLimit", "conserveConstits_
 
 # Spreadlimit only
 for constraint in constraints:
+    try:
+        os.makedirs(f"Results/TopoDNN/Feature Distributions/{constraint}")
+    except:
+        pass
+
+    print(constraint)
+
     FGSM_data = np.load(f"Adversaries/TopoDNN/{constraint}/FGSM_train_data.npy")
     PGD_data = np.load(f"Adversaries/TopoDNN/{constraint}/PGD_train_data.npy")
     RDSA_data = np.load(f"Adversaries/TopoDNN/{constraint}/RDSA_train_data.npy")
     
-    render_feature_histograms([original_data, FGSM_data, PGD_data, RDSA_data], ["Original", "FGSM", "PGD", "RDSA"], np.arange(0,90), 100, f"Results/TopoDNN/Feature Distributions/{constraint}", "Comparison")
+    render_feature_histograms([original_data, FGSM_data, PGD_data, RDSA_data], ["Original", "FGSM", "PGD", "RDSA"], np.arange(0,90), 100, f"Results/TopoDNN/Feature Distributions/{constraint}", "Attack_Comparison")

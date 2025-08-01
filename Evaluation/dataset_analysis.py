@@ -70,6 +70,8 @@ def render_feature_histograms(datasets, datasetNames, features, binCount, output
 
         plt.hist(feature_data, bins = binCount, histtype = "step", label = datasetNames)
 
+        plt.title(f"Comparison of each attack's effect on distribution of feature {featureIndex}")
+
         plt.legend()
         plt.grid()
         plt.savefig(f"{output_directory}/{out_name}_{featureIndex}.png")
